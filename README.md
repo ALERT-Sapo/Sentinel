@@ -10,7 +10,7 @@ ACLS Rhythms Quiz
 An interactive rhythm recognition quiz built with a simulated ZOLL monitor aesthetic. Presents cardiac rhythms with animated EKG traces and tests identification with immediate feedback and scoring.
 
 Usage
-Live at: https://alert-sapo.github.io/Shock-NoShock-Quiz/
+Live at: https://alert-sapo.github.io/Sentinel/
 To deploy your own copy: download the HTML files and host them on any static web server or GitHub Pages instance. No build process required.
 
 Disclaimer
