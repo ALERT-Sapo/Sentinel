@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACLS Clinical Decision Walkthrough</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --bg2: #ffffff;
+      --bg3: #f5f7fa;
+      --border: rgba(0,0,0,0.08);
+      --border2: rgba(0,0,0,0.15);
+      --text: #111827;
+      --text2: #4b5563;
+      --text3: #9ca3af;
+      --green: #059669;
+      --green-bg: rgba(5,150,105,0.08);
+      --green-border: rgba(5,150,105,0.25);
+      --red: #dc2626;
+      --red-bg: rgba(220,38,38,0.08);
+      --red-border: rgba(220,38,38,0.25);
+      --blue: #2563eb;
+      --blue-bg: rgba(37,99,235,0.08);
+      --blue-border: rgba(37,99,235,0.25);
+      --amber: #d97706;
+      --amber-bg: rgba(217,119,6,0.08);
+      --amber-border: rgba(217,119,6,0.25);
+      --coral: #ea580c;
+      --coral-bg: rgba(234,88,12,0.08);
+      --coral-border: rgba(234,88,12,0.25);
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 0 0 4rem;
+    }
+
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-icon svg { width: 18px; height: 18px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    header h1 { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+    header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+    .tag {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 12px;
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .scenario-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+      display: block;
+      width: 100%;
+    }
+
+    .scenario-btn:hover { border-color: var(--border2); background: var(--bg3); }
+
+    .scenario-btn.active.shockable { border-color: var(--coral); background: var(--coral-bg); }
+    .scenario-btn.active.nonshockable { border-color: var(--blue); background: var(--blue-bg); }
+
+    .sc-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-bottom: 7px;
+    }
+
+    .sc-badge.shockable { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+    .sc-badge.nonshockable { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+    .sc-label { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
+
+    .walkthrough-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .wt-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pulse-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pulse-dot.pulseless { background: var(--red); box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+    .pulse-dot.pulse { background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+
+    .wt-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .wt-meta { font-size: 11px; color: var(--text2); margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+    .decision-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    .decision-pill.shockable { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+    .decision-pill.nonshockable { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+    .step-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .step-item.visible { opacity: 1; transform: translateY(0); }
+    .step-item:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-num.paired { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+    .step-num.action { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .step-num.caution { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .step-num.info { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+    .step-content { flex: 1; min-width: 0; }
+
+    .step-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .step-tag.paired { color: var(--coral); }
+    .step-tag.action { color: var(--green); }
+    .step-tag.caution { color: var(--amber); }
+    .step-tag.info { color: var(--blue); }
+
+    .step-text { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .step-sub { font-size: 14px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+
+    .branch-box {
+      margin-top: 10px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .branch-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .branch-row:last-child { margin-bottom: 0; }
+
+    .branch-arrow { flex-shrink: 0; margin-top: 3px; font-size: 11px; }
+    .branch-arrow.alert { color: var(--red); }
+    .branch-arrow.ok { color: var(--green); }
+
+    .definition-box {
+      margin-top: 10px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+
+    .def-section { margin-bottom: 10px; }
+    .def-section:last-child { margin-bottom: 0; }
+
+    .def-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+
+    .def-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .def-row:last-child { margin-bottom: 0; }
+    .def-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .def-dot.green { background: var(--green); }
+    .def-dot.amber { background: var(--amber); }
+
+    .empty-state {
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .empty-state svg { width: 36px; height: 36px; stroke: var(--text3); fill: none; stroke-width: 1.5; margin: 0 auto 12px; display: block; }
+    .empty-state p { font-size: 13px; color: var(--text3); }
+
+    .progress-bar {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .footer-note {
+      margin-top: 1.5rem;
+      padding: 12px 16px;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--amber);
+      line-height: 1.6;
+    }
+
+    .footer-note strong { font-weight: 600; }
+
+    a.back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text2);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+
+    a.back-link:hover { color: var(--text); }
+    a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    @media (max-width: 480px) {
+      .scenario-grid { grid-template-columns: 1fr 1fr; }
+      header h1 { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  </div>
+  <div>
+    <h1>ACLS Clinical Decision Walkthrough</h1>
+    <p>UCI Health · ALERT Team</p>
+  </div>
+  <span class="tag">Nursing Reference</span>
+</header>
+
+<main>
+
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to rhythm quiz
+  </a>
+
+  <div class="section-label">Select a scenario</div>
+
+  <div class="scenario-grid" id="scenarioGrid"></div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="walkthrough-card" id="walkthrough">
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <p>Choose a scenario above to begin</p>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>Scope of practice reminder:</strong> Pulseless rhythms require immediate CPR + code blue activation simultaneously. For unstable V-tach with a pulse, floor nurses are credentialed to perform synchronized cardioversion without a provider present. If the patient is awake, defer to the acute response team for sedation decision.
+  </div>
+
+</main>
+
+<script>
+const scenarios = [
+  {
+    id: 'pvf',
+    label: 'Pulseless V-fib / pulseless V-tach',
+    pulse: false,
+    badge: 'Shockable',
+    badgeClass: 'shockable',
+    steps: [
+      {
+        type: 'paired',
+        tag: 'Simultaneous — do both now',
+        text: 'Start CPR + activate code blue',
+        sub: 'Do not let one delay the other. One nurse compresses, another calls the code.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'Place ZOLL pads while CPR continues — do not pause compressions to apply.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Charge and defibrillate',
+        sub: 'Pressing charge defaults to 200J on the ZOLL. Confirm shockable rhythm, clear the patient, deliver shock. Resume CPR immediately after.'
+      }
+    ]
+  },
+  {
+    id: 'uvt',
+    label: 'Unstable V-tach with a pulse',
+    pulse: true,
+    badge: 'Shockable',
+    badgeClass: 'shockable',
+    steps: [
+      {
+        type: 'info',
+        tag: 'Unstable means',
+        text: 'Patient is decompensating — act now',
+        definition: true,
+        vitalsLabel: 'Vital signs — unstable looks like',
+        assessLabel: 'Signs of decreased cardiac output',
+        vitals: [
+          'Hypotension — SBP < 90 mmHg or significant drop from baseline',
+          'MAP < 65 mmHg',
+          'Altered mental status or decreased responsiveness',
+          'Signs of decreased cardiac output'
+        ],
+        assessments: [
+          'Diaphoresis, pallor, or cool/clammy skin',
+          'Weak or absent peripheral pulses',
+          'Capillary refill > 2 seconds',
+          'Chest pain or ischemic discomfort',
+          'Signs of pulmonary edema — crackles, increased work of breathing, SpO₂ dropping',
+          'Syncope or near-syncope'
+        ]
+      },
+      {
+        type: 'action',
+        tag: 'First',
+        text: 'Activate rapid response',
+        sub: 'Call now — do not wait to see if the patient improves. Acquire a full set of vitals.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'Pads on immediately regardless of what comes next.'
+      },
+      {
+        type: 'caution',
+        tag: 'Assess',
+        text: 'Is the patient conscious?',
+        branch: true,
+        branches: [
+          { icon: 'alert', text: 'Unresponsive or rapidly deteriorating → prepare to cardiovert (synchronized) at 100J per AHA. You are credentialed to perform this without a provider present.' },
+          { icon: 'ok', text: 'Awake and communicating → prepare pads, monitor closely, wait for acute response team. Cardioversion in a conscious patient causes significant discomfort — provider makes sedation decision.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'svt',
+    label: 'Stable V-tach with a pulse',
+    pulse: true,
+    badge: 'Shockable',
+    badgeClass: 'shockable',
+    steps: [
+      {
+        type: 'info',
+        tag: 'Stable means',
+        text: 'Patient is currently compensating — do not shock',
+        definition: true,
+        vitalsLabel: 'Vital signs — what stable looks like',
+        assessLabel: null,
+        vitals: [
+          'BP within acceptable limits — not hypotensive',
+          'MAP ≥ 65 mmHg',
+          'Heart rate elevated but patient alert and oriented',
+          'No respiratory distress or O₂ requirement',
+          'No chest pain or ischemic discomfort',
+          'No altered mental status or syncope',
+          'No diaphoresis or cool/clammy skin',
+          'No signs of pulmonary edema — crackles, increased work of breathing',
+          'Capillary refill < 2 seconds, skin warm and dry',
+          'Peripheral pulses present and equal'
+        ],
+        assessments: []
+      },
+      {
+        type: 'action',
+        tag: 'First',
+        text: 'Activate rapid response',
+        sub: 'Call now — stable does not mean safe. Condition can deteriorate rapidly. Acquire a full set of vitals.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'Be prepared in case the patient deteriorates before the acute response team arrives.'
+      },
+      {
+        type: 'action',
+        tag: 'Then',
+        text: 'Monitor and wait for acute response team',
+        sub: 'Continuous rhythm monitoring. Reassess every 1–2 minutes. If any instability signs develop, reassess pathway.'
+      }
+    ]
+  },
+  {
+    id: 'pea',
+    label: 'Pulseless PEA',
+    pulse: false,
+    badge: 'Non-shockable',
+    badgeClass: 'nonshockable',
+    steps: [
+      {
+        type: 'paired',
+        tag: 'Simultaneous — do both now',
+        text: 'Start CPR + activate code blue',
+        sub: 'Do not let one delay the other. One nurse compresses, another calls the code.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'Confirm non-shockable rhythm on ZOLL. Do not defibrillate PEA.'
+      },
+      {
+        type: 'action',
+        tag: 'Then',
+        text: 'Push epinephrine as soon as IV/IO access is available — target within 5 minutes of arrest',
+        sub: 'Continue CPR without interruption. Do not delay compressions to establish access.'
+      }
+    ]
+  },
+  {
+    id: 'asys',
+    label: 'Asystole',
+    pulse: false,
+    badge: 'Non-shockable',
+    badgeClass: 'nonshockable',
+    steps: [
+      {
+        type: 'paired',
+        tag: 'Simultaneous — do both now',
+        text: 'Start CPR + activate code blue',
+        sub: 'Do not let one delay the other. One nurse compresses, another calls the code.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'Do not defibrillate asystole.'
+      },
+      {
+        type: 'action',
+        tag: 'Then',
+        text: 'Push epinephrine as soon as IV/IO access is available — target within 5 minutes of arrest',
+        sub: 'Continue CPR without interruption. Do not delay compressions to establish access.'
+      }
+    ]
+  }
+];
+
+let activeId = null;
+
+function renderScenarios() {
+  const grid = document.getElementById('scenarioGrid');
+  grid.innerHTML = scenarios.map(s => `
+    <button class="scenario-btn ${s.badgeClass} ${activeId === s.id ? 'active' : ''}"
+            onclick="selectScenario('${s.id}')"
+            aria-pressed="${activeId === s.id}">
+      <div class="sc-badge ${s.badgeClass}">${s.badge}</div>
+      <div class="sc-label">${s.label}</div>
+    </button>
+  `).join('');
+}
+
+function renderDefinitionBox(step) {
+  const vitalsLabel = step.vitalsLabel || 'Vital signs — stable looks like';
+  const assessLabel = step.assessLabel;
+  const hasAssessments = step.assessments && step.assessments.length > 0;
+  return `
+    <div class="definition-box">
+      <div class="def-section">
+        <div class="def-label">${vitalsLabel}</div>
+        ${step.vitals.map(v => `<div class="def-row"><div class="def-dot green"></div><span>${v}</span></div>`).join('')}
+      </div>
+      ${hasAssessments ? `
+      <div class="def-section">
+        <div class="def-label">${assessLabel}</div>
+        ${step.assessments.map(a => `<div class="def-row"><div class="def-dot amber"></div><span>${a}</span></div>`).join('')}
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function renderWalkthrough(scenario) {
+  const wt = document.getElementById('walkthrough');
+  const progress = document.getElementById('progressFill');
+
+  wt.innerHTML = `
+    <div class="wt-header">
+      <div class="pulse-dot ${scenario.pulse ? 'pulse' : 'pulseless'}"></div>
+      <div>
+        <div class="wt-title">${scenario.label}</div>
+        <div class="wt-meta">
+          ${scenario.pulse ? 'Pulse present' : 'Pulseless'}
+          <span style="color:var(--text3)">·</span>
+          <span class="decision-pill ${scenario.badgeClass}">${scenario.badge}</span>
+        </div>
+      </div>
+    </div>
+    ${scenario.steps.map((step, i) => `
+      <div class="step-item" id="step-${i}">
+        <div class="step-num ${step.type}">${i + 1}</div>
+        <div class="step-content">
+          <div class="step-tag ${step.type}">${step.tag}</div>
+          <div class="step-text">${step.text}</div>
+          ${step.sub ? `<div class="step-sub">${step.sub}</div>` : ''}
+          ${step.definition ? renderDefinitionBox(step) : ''}
+          ${step.branch ? `
+            <div class="branch-box">
+              ${step.branches.map(b => `
+                <div class="branch-row">
+                  <span class="branch-arrow ${b.icon}">${b.icon === 'alert' ? '▶' : '▶'}</span>
+                  <span>${b.text}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  progress.style.width = '0%';
+  setTimeout(() => { progress.style.width = '100%'; }, 50);
+
+  scenario.steps.forEach((_, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`step-${i}`);
+      if (el) el.classList.add('visible');
+    }, 80 + i * 120);
+  });
+}
+
+function selectScenario(id) {
+  activeId = id;
+  renderScenarios();
+  renderWalkthrough(scenarios.find(s => s.id === id));
+}
+
+renderScenarios();
+</script>
+</body>
+</html>

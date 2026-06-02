@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALERT Team — Clinical Training</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --bg2: #ffffff;
+      --bg3: #f5f7fa;
+      --border: rgba(0,0,0,0.08);
+      --border2: rgba(0,0,0,0.18);
+      --text: #111827;
+      --text2: #4b5563;
+      --text3: #9ca3af;
+      --green: #059669;
+      --green-bg: rgba(5,150,105,0.08);
+      --green-border: rgba(5,150,105,0.25);
+      --red: #dc2626;
+      --red-bg: rgba(220,38,38,0.08);
+      --red-border: rgba(220,38,38,0.25);
+      --coral: #ea580c;
+      --coral-bg: rgba(234,88,12,0.08);
+      --coral-border: rgba(234,88,12,0.25);
+      --blue: #2563eb;
+      --blue-bg: rgba(37,99,235,0.08);
+      --blue-border: rgba(37,99,235,0.25);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-icon svg {
+      width: 20px; height: 20px;
+      stroke: var(--red); fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .header-text h1 { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .header-text p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    .header-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    main {
+      flex: 1;
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1rem;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .intro h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .intro p {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .tool-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .tool-card:hover {
+      border-color: var(--border2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+      transform: translateY(-2px);
+    }
+
+    .tool-card.quiz:hover { border-color: var(--coral); }
+    .tool-card.decision:hover { border-color: var(--blue); }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon.quiz { background: var(--coral-bg); border: 1px solid var(--coral-border); }
+    .card-icon.decision { background: var(--blue-bg); border: 1px solid var(--blue-border); }
+
+    .card-icon svg {
+      width: 22px; height: 22px; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .card-icon.quiz svg { stroke: var(--coral); }
+    .card-icon.decision svg { stroke: var(--blue); }
+
+    .card-body { flex: 1; }
+
+    .card-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .card-tag.quiz { color: var(--coral); }
+    .card-tag.decision { color: var(--blue); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-meta {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .card-arrow {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-arrow.quiz { background: var(--coral-bg); }
+    .card-arrow.decision { background: var(--blue-bg); }
+
+    .card-arrow svg {
+      width: 14px; height: 14px; fill: none;
+      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .card-arrow.quiz svg { stroke: var(--coral); }
+    .card-arrow.decision svg { stroke: var(--blue); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 2rem 0 1.5rem;
+    }
+
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); }
+
+    .info-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-icon {
+      width: 32px; height: 32px;
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-icon svg {
+      width: 16px; height: 16px; fill: none;
+      stroke: var(--green); stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .info-text p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .info-text strong { color: var(--text); font-weight: 600; }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 11px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 480px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .intro h2 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  </div>
+  <div class="header-text">
+    <h1>ALERT Team</h1>
+    <p>UCI Health · Clinical Training Tools</p>
+  </div>
+  <span class="header-badge">Nursing Reference</span>
+</header>
+
+<main>
+
+  <div class="intro">
+    <h2>What would you like to practice?</h2>
+    <p>Select a tool below to get started. Both tools are designed to build confidence before you need it at the bedside.</p>
+  </div>
+
+  <div class="card-grid">
+
+    <a class="tool-card decision" href="decision-walkthrough.html">
+      <div class="card-icon decision">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag decision">Clinical Decision</div>
+        <div class="card-title">ACLS Clinical Decision Walkthrough</div>
+        <div class="card-desc">Step through the nursing response pathway for shockable and non-shockable rhythms.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta">Reference · 5 scenarios</span>
+        <div class="card-arrow decision">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-card quiz" href="quiz.html">
+      <div class="card-icon quiz">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag quiz">Rhythm Recognition</div>
+        <div class="card-title">ACLS Rhythms Quiz</div>
+        <div class="card-desc">Identify cardiac rhythms on a simulated ZOLL monitor and test your recognition skills.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta">Quiz · Scored</span>
+        <div class="card-arrow quiz">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+
+
+</main>
+
+<footer>
+  UCI Health · ALERT Team · For staff training use only
+</footer>
+
+</body>
+</html>
