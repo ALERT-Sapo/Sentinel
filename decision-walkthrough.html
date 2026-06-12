@@ -119,6 +119,8 @@
 
     .scenario-btn.active.shockable { border-color: var(--coral); background: var(--coral-bg); }
     .scenario-btn.active.nonshockable { border-color: var(--blue); background: var(--blue-bg); }
+    .scenario-btn.active.caution { border-color: var(--amber); background: var(--amber-bg); }
+    .scenario-btn.active.neutral { border-color: #9ca3af; background: rgba(156,163,175,0.1); }
 
     .sc-badge {
       display: inline-block;
@@ -133,6 +135,8 @@
 
     .sc-badge.shockable { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
     .sc-badge.nonshockable { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+    .sc-badge.caution { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .sc-badge.neutral { background: rgba(156,163,175,0.12); color: #6b7280; border: 1px solid rgba(156,163,175,0.35); }
 
     .sc-label { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
 
@@ -330,6 +334,106 @@
     a.back-link:hover { color: var(--text); }
     a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+    .references-section {
+      margin-top: 2rem;
+      padding: 16px 18px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .references-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 12px;
+    }
+
+    .reference-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .reference-item:last-child { margin-bottom: 0; }
+
+    .ref-number {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 16px;
+    }
+
+    .ref-content { flex: 1; }
+
+    .ref-text {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    .ref-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    .ref-link:hover { text-decoration: underline; }
+    .ref-link svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    .algorithm-links {
+      margin-top: 1rem;
+      padding: 12px 14px;
+      background: var(--blue-bg);
+      border: 1px solid var(--blue-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .algorithm-links-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .algo-link-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .algo-link-row:last-child { margin-bottom: 0; }
+
+    .algo-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .algo-link {
+      font-size: 12px;
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .algo-link:hover { text-decoration: underline; }
+
     @media (max-width: 480px) {
       .scenario-grid { grid-template-columns: 1fr 1fr; }
       header h1 { font-size: 14px; }
@@ -371,6 +475,48 @@
 
   <div class="footer-note">
     <strong>Scope of practice reminder:</strong> Pulseless rhythms require immediate CPR + code blue activation simultaneously. For unstable V-tach with a pulse, floor nurses are credentialed to perform synchronized cardioversion without a provider present. If the patient is awake, defer to the acute response team for sedation decision.
+  </div>
+
+  <div class="references-section">
+    <div class="references-title">References</div>
+
+    <div class="reference-item">
+      <div class="ref-number">1.</div>
+      <div class="ref-content">
+        <div class="ref-text">Wigginton JG, Agarwal S, Bartos JA, Coute RA, Drennan IR, Haamid A, Kudenchuk PJ, Link MS, Panchal AR, Pelter MM, et al. Part 9: Adult Advanced Life Support — 2025 American Heart Association Guidelines for Cardiopulmonary Resuscitation and Emergency Cardiovascular Care. <em>Circulation.</em> 2025;152(16_suppl_2):S538–S577.</div>
+        <a class="ref-link" href="https://doi.org/10.1161/CIR.0000000000001376" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          doi.org/10.1161/CIR.0000000000001376
+        </a>
+      </div>
+    </div>
+
+    <div class="reference-item">
+      <div class="ref-number">2.</div>
+      <div class="ref-content">
+        <div class="ref-text">Kleinman ME, Buick JE, Huber N, Idris AH, Levy M, Morgan SG, Nassal MMJ, Neth MR, Norii T, Nunnally ME, Rodriguez AJ, Walsh BK, Drennan IR, et al. Part 7: Adult Basic Life Support — 2025 American Heart Association Guidelines for Cardiopulmonary Resuscitation and Emergency Cardiovascular Care. <em>Circulation.</em> 2025;152(16_suppl_2):S448–S478.</div>
+        <a class="ref-link" href="https://doi.org/10.1161/CIR.0000000000001369" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          doi.org/10.1161/CIR.0000000000001369
+        </a>
+      </div>
+    </div>
+
+    <div class="algorithm-links">
+      <div class="algorithm-links-title">AHA Algorithm References — 2025 Guidelines</div>
+      <div class="algo-link-row">
+        <div class="algo-dot"></div>
+        <a class="algo-link" href="https://cpr.heart.org/-/media/CPR-Images/CPR-Guidelines-2025/Algorithms/Figure-2-Adult-Cardiac-Arrest-Algorithm.jpg?h=1548&w=1200&sc_lang=en&hash=E6BB937E504D9D488523C53845789D35" target="_blank" rel="noopener">Adult Cardiac Arrest Algorithm — VF/pVT, PEA, Asystole (AHA Fig. 2)</a>
+      </div>
+      <div class="algo-link-row">
+        <div class="algo-dot"></div>
+        <a class="algo-link" href="https://cpr.heart.org/-/media/CPR-Images/CPR-Guidelines-2025/Algorithms/Figure-7-Electrical-Cardioversion-Algorithm.jpg?h=2063&w=1200&sc_lang=en&hash=5F941B63C7719B622254603D9EBD8707" target="_blank" rel="noopener">Electrical Cardioversion Algorithm — Tachycardia (AHA Fig. 7)</a>
+      </div>
+    </div>
+
+    <div style="margin-top: 12px; font-size: 11px; color: var(--text3); line-height: 1.6;">
+      Content developed in alignment with 2025 AHA Guidelines for CPR and Emergency Cardiovascular Care. Note: ACLS course-specific guidelines are currently in transition following the October 2025 update. This tool is intended for educational use only and does not replace institutional policy, provider orders, or clinical judgment.
+    </div>
   </div>
 
 </main>
@@ -461,8 +607,8 @@ const scenarios = [
     id: 'svt',
     label: 'Stable V-tach with a pulse',
     pulse: true,
-    badge: 'Shockable',
-    badgeClass: 'shockable',
+    badge: 'Monitor / RRT',
+    badgeClass: 'neutral',
     steps: [
       {
         type: 'info',
@@ -569,7 +715,7 @@ function renderScenarios() {
     <button class="scenario-btn ${s.badgeClass} ${activeId === s.id ? 'active' : ''}"
             onclick="selectScenario('${s.id}')"
             aria-pressed="${activeId === s.id}">
-      <div class="sc-badge ${s.badgeClass}">${s.badge}</div>
+      ${s.badge ? `<div class="sc-badge ${s.badgeClass}">${s.badge}</div>` : ''}
       <div class="sc-label">${s.label}</div>
     </button>
   `).join('');
