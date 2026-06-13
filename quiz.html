@@ -5,84 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shock or No Shock? — Compress to Success</title>
 <style>
-/* System monospace and sans stacks — no external font dependency */
 :root {
   --mono: 'Courier New', Courier, monospace;
   --sans: 'Arial Black', 'Arial Bold', Arial, sans-serif;
   --green: #00e676;
-  --green-dim: #0d2a0d;
-  --green-mid: #1a5a1a;
-  --green-dark: #080e08;
   --red: #ff3b3b;
   --red-dark: #cc2200;
   --blue: #1199ee;
   --blue-dark: #004488;
+  --orange: #e86000;
+  --orange-dark: #aa4400;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
-  background: #111;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 24px 12px;
-  font-family: Arial, sans-serif;
+  background: #111; min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 24px 12px; font-family: Arial, sans-serif;
 }
-.wrap {
-  width: 100%;
-  max-width: 680px;
-}
-.r {
-  background: var(--green-dark);
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #0d2a0d;
-}
+.wrap { width: 100%; max-width: 680px; }
+.footer { text-align: center; margin-top: 14px; font-family: var(--mono); font-size: 9px; color: #1a3a1a; letter-spacing: 1.5px; }
+
+/* ── SHARED MONITOR SHELL ── */
+.r { background: #080e08; border-radius: 10px; overflow: hidden; border: 1px solid #0d2a0d; }
 .hdr {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 18px;
-  border-bottom: 1px solid #0d2a0d;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 18px; border-bottom: 1px solid #0d2a0d; gap: 8px; flex-wrap: wrap;
 }
 .logo { font-family: var(--mono); font-size: 10px; color: #1a4a1a; letter-spacing: 2px; }
 .vits { display: flex; gap: 14px; }
-.vit { font-family: var(--mono); font-size: 10px; color: #0d3a0d; letter-spacing: 1px; }
+.vit { font-family: var(--mono); font-size: 10px; color: #0d3a0d; }
 .vit span { color: var(--green); font-size: 13px; font-weight: 700; }
 .dots { display: flex; gap: 4px; flex-wrap: wrap; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: #0d2a0d; border: 1px solid #1a3a1a; transition: all .3s; }
 .dot.ok { background: var(--green); border-color: var(--green); }
 .dot.no { background: var(--red); border-color: var(--red); }
 .body { padding: 14px 18px; }
-.lbl {
-  font-family: var(--mono); font-size: 9px; color: #1a4a1a; letter-spacing: 2px;
-  margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;
-}
-.phase-badge {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-  padding: 2px 8px; border-radius: 3px;
-}
-.phase-cpr    { background: #001a00; border: 1px solid #005500; color: #00aa44; }
-.phase-analyze{ background: #001a0a; border: 1px solid #00aa66; color: #00dd88; }
-.phase-rhythm { background: #001400; border: 1px solid var(--green); color: var(--green); }
-.screen {
-  background: #020802; border: 1px solid #0d2a0d; border-radius: 4px;
-  margin-bottom: 12px; overflow: hidden;
-}
+.pg { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 10px; color: #1a5a1a; letter-spacing: 1px; margin-bottom: 12px; }
+.pbw { flex: 1; height: 2px; background: #0d2a0d; margin: 0 10px; border-radius: 1px; overflow: hidden; }
+.pbi { height: 100%; background: var(--green); border-radius: 1px; transition: width .4s; }
+
+/* ── INTRO ── */
+.intro { text-align: center; padding: 36px 18px; }
+.it { font-family: var(--mono); color: var(--green); font-size: 11px; letter-spacing: 3px; margin-bottom: 7px; }
+.is { font-size: 28px; font-weight: 900; color: #5ab85a; margin-bottom: 5px; font-family: var(--sans); }
+.id { font-family: var(--mono); font-size: 10px; color: #1a5a1a; letter-spacing: 1px; margin-bottom: 24px; line-height: 1.9; }
+.mode-toggle { display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; }
+.mode-btn { padding: 12px 20px; border-radius: 5px; cursor: pointer; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; border: 1px solid; transition: all .15s; text-align: center; line-height: 1.6; }
+.mode-btn.classic { background: #001a00; border-color: #005500; color: #00aa44; }
+.mode-btn.classic.active { background: #003300; border-color: var(--green); color: var(--green); }
+.mode-btn.zoll { background: #1a0800; border-color: var(--orange-dark); color: var(--orange); }
+.mode-btn.zoll.active { background: #2a1000; border-color: var(--orange); }
+.zoll-note { background: #180a00; border: 1px solid #553300; border-radius: 5px; padding: 12px 16px; margin-bottom: 18px; font-family: var(--mono); font-size: 10px; color: #cc7700; letter-spacing: 1px; line-height: 1.8; }
+.zoll-note strong { color: #ffaa00; }
+.st { padding: 13px 36px; background: #001800; border: 1px solid var(--green); border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 18px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; }
+.st:hover { background: #003300; }
+
+/* ── CLASSIC QUIZ ── */
+.lbl { font-family: var(--mono); font-size: 9px; color: #1a4a1a; letter-spacing: 2px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+.phase-badge { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; padding: 2px 8px; border-radius: 3px; }
+.phase-cpr     { background: #001a00; border: 1px solid #005500; color: #00aa44; }
+.phase-analyze { background: #001a0a; border: 1px solid #00aa66; color: #00dd88; }
+.phase-rhythm  { background: #001400; border: 1px solid var(--green); color: var(--green); }
+.screen { background: #020802; border: 1px solid #0d2a0d; border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
 .screen canvas { display: block; width: 100%; height: 128px; }
 .cpr-bar { height: 3px; background: #0d2a0d; margin-bottom: 12px; border-radius: 2px; overflow: hidden; }
 .cpr-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .08s linear; }
 .cpr-label { font-family: var(--mono); font-size: 9px; color: #1a6a1a; letter-spacing: 1.5px; margin-bottom: 3px; }
-.qs { font-family: var(--mono); font-size: 10px; color: var(--green-mid); letter-spacing: 1.5px; margin-bottom: 4px; }
-.pt { font-size: 16px; font-weight: 700; color: #5ab85a; margin-bottom: 13px; min-height: 26px; font-family: Arial, sans-serif; }
+.qs { font-family: var(--mono); font-size: 10px; color: #1a5a1a; letter-spacing: 1.5px; margin-bottom: 4px; }
+.pt { font-size: 16px; font-weight: 700; color: #5ab85a; margin-bottom: 13px; min-height: 26px; }
 .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.btn {
-  padding: 14px; border: 1px solid; border-radius: 5px;
-  font-family: var(--sans); font-size: 18px; font-weight: 900;
-  letter-spacing: 2px; cursor: pointer; transition: all .15s; text-transform: uppercase;
-}
+.btn { padding: 14px; border: 1px solid; border-radius: 5px; font-family: var(--sans); font-size: 18px; font-weight: 900; letter-spacing: 2px; cursor: pointer; transition: all .15s; text-transform: uppercase; }
 .bs { background: #0a0200; border-color: var(--red-dark); color: var(--red); }
 .bs:hover:not(:disabled) { background: #1a0400; border-color: var(--red); }
 .bn { background: #000510; border-color: var(--blue-dark); color: var(--blue); }
@@ -92,221 +84,325 @@ html, body {
 .btn.sc { background: #001800; border-color: var(--green); color: var(--green); }
 .btn.sw { background: #180000; border-color: var(--red); color: var(--red); }
 .btn.rv { background: #001800; border-color: var(--green); color: var(--green); }
-.fb { border-radius: 5px; padding: 11px 13px; margin-bottom: 11px; border: 1px solid; }
+.fb { border-radius: 5px; padding: 12px 14px; margin-bottom: 11px; border: 1px solid; }
 .fb.ok { background: #001400; border-color: var(--green); }
 .fb.no { background: #140000; border-color: var(--red); }
-.ft { font-size: 17px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase; font-family: Arial, sans-serif; }
+.ft { font-size: 17px; font-weight: 700; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
 .fb.ok .ft { color: var(--green); }
 .fb.no .ft { color: var(--red); }
-.fr { display: inline-block; background: #003300; border: 1px solid #005500; border-radius: 4px; padding: 5px 10px; margin-bottom: 10px; font-size: 15px; font-weight: 700; color: #88ffaa; font-family: Arial, sans-serif; }
-.fa { font-family: Arial, sans-serif; font-size: 14px; color: #aaffcc; line-height: 1.65; }
-.nxt {
-  width: 100%; padding: 11px; background: #001800; border: 1px solid var(--green);
-  border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 16px;
-  font-weight: 900; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all .15s;
-}
+.fr { display: inline-block; background: #003300; border: 1px solid #005500; border-radius: 4px; padding: 5px 10px; margin-bottom: 8px; font-size: 15px; font-weight: 700; color: #88ffaa; }
+.fa { font-size: 14px; color: #aaffcc; line-height: 1.65; }
+.nxt { width: 100%; padding: 12px; background: #001800; border: 1px solid var(--green); border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 16px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all .15s; }
 .nxt:hover { background: #003300; }
-.pg {
-  display: flex; justify-content: space-between; align-items: center;
-  font-family: var(--mono); font-size: 9px; color: var(--green-mid); letter-spacing: 1px; margin-bottom: 12px;
-}
-.pbw { flex: 1; height: 2px; background: #0d2a0d; margin: 0 10px; border-radius: 1px; overflow: hidden; }
-.pbi { height: 100%; background: var(--green); border-radius: 1px; transition: width .4s; }
+
+/* ── END SCREEN ── */
 .end { text-align: center; padding: 36px 18px; }
 .et { font-family: var(--mono); font-size: 11px; color: #1a5a1a; letter-spacing: 3px; margin-bottom: 10px; }
-.es { font-size: 64px; font-weight: 700; color: var(--green); line-height: 1; margin-bottom: 5px; font-family: Arial, sans-serif; }
+.es { font-size: 64px; font-weight: 700; color: var(--green); line-height: 1; margin-bottom: 5px; font-family: Arial; }
 .ep { font-family: var(--mono); font-size: 10px; color: #1a7a1a; letter-spacing: 2px; margin-bottom: 16px; }
-.eg { font-size: 18px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; padding: 9px 16px; border-radius: 5px; display: inline-block; font-family: Arial, sans-serif; }
+.eg { font-size: 18px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; padding: 9px 16px; border-radius: 5px; display: inline-block; }
 .eg.p  { background: #001400; border: 1px solid var(--green); color: var(--green); }
 .eg.rv { background: #140a00; border: 1px solid #cc7700; color: #ff9900; }
 .eg.f  { background: #140000; border: 1px solid var(--red); color: var(--red); }
-.rs {
-  padding: 12px 28px; background: #001800; border: 1px solid var(--green); border-radius: 5px;
-  color: var(--green); font-family: var(--sans); font-size: 16px; font-weight: 900;
-  letter-spacing: 3px; text-transform: uppercase; cursor: pointer; display: inline-block; margin-bottom: 8px;
-}
+.rs { padding: 12px 28px; background: #001800; border: 1px solid var(--green); border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 16px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; display: inline-block; margin-bottom: 8px; }
 .rs:hover { background: #003300; }
 .em { text-align: left; margin-top: 16px; border-top: 1px solid #0d2a0d; padding-top: 12px; }
 .ml { font-family: var(--mono); font-size: 9px; color: #884400; letter-spacing: 2px; margin-bottom: 7px; }
 .mi { font-size: 12px; color: #bb4400; margin-bottom: 4px; font-family: var(--mono); }
-.intro { text-align: center; padding: 36px 18px; }
-.it { font-family: var(--mono); color: var(--green); font-size: 11px; letter-spacing: 3px; margin-bottom: 7px; }
-.is { font-size: 28px; font-weight: 900; color: #5ab85a; margin-bottom: 5px; font-family: var(--sans); }
-.id { font-family: var(--mono); font-size: 10px; color: #1a5a1a; letter-spacing: 1px; margin-bottom: 20px; line-height: 1.9; }
-.st {
-  padding: 13px 36px; background: #001800; border: 1px solid var(--green); border-radius: 5px;
-  color: var(--green); font-family: var(--sans); font-size: 18px; font-weight: 900;
-  letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
+.switch-btn { margin-top: 12px; display: inline-block; padding: 10px 22px; background: #1a0800; border: 1px solid var(--orange-dark); border-radius: 5px; color: var(--orange); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; cursor: pointer; transition: all .15s; }
+.switch-btn:hover { background: #2a1000; border-color: var(--orange); }
+.precharge-tip { margin-top: 18px; background: #0a1a00; border: 1px solid #225500; border-radius: 5px; padding: 16px 18px; text-align: left; }
+.precharge-tip .tip-label { font-family: var(--mono); font-size: 9px; color: #00aa44; letter-spacing: 2px; margin-bottom: 10px; }
+.precharge-tip p { font-size: 13px; color: #88cc88; line-height: 1.7; }
+
+/* ══════════════════════════════════════════
+   ZOLL DEVICE — matches R Series layout
+══════════════════════════════════════════ */
+.zoll-wrap { padding: 0; }
+.z-device {
+  background: #b8bec7; border-radius: 0 0 8px 8px;
+  padding: 12px; display: flex; flex-direction: column; gap: 10px;
 }
-.st:hover { background: #003300; }
-.footer {
-  text-align: center; margin-top: 14px;
-  font-family: var(--mono); font-size: 9px; color: #1a3a1a; letter-spacing: 1.5px;
+/* Screen + right-col side by side */
+.z-mid { display: flex; gap: 10px; align-items: stretch; }
+.z-screen-wrap {
+  flex: 1; min-width: 0; background: #020802; border: 2px solid #333;
+  border-radius: 6px; overflow: hidden; display: flex; flex-direction: column;
 }
+.z-screen-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px; background: #080e08; border-bottom: 1px solid #0d2a0d; flex-shrink: 0;
+}
+.z-screen-hdr span { font-family: var(--mono); font-size: 10px; color: #1a5a1a; letter-spacing: 1px; }
+.z-elbl { display: flex; align-items: baseline; gap: 3px; }
+.z-eval { font-family: var(--mono); font-size: 22px; font-weight: 700; color: #ffaa00; }
+.z-eunit { font-family: var(--mono); font-size: 10px; color: #885500; }
+.z-canvas { display: block; width: 100%; height: 140px; }
+.z-cpr-row { padding: 4px 12px 6px; background: #080e08; border-top: 1px solid #0d2a0d; }
+.z-cpr-bar { height: 3px; background: #0d2a0d; border-radius: 2px; overflow: hidden; }
+.z-cpr-fill { height: 100%; width: 0%; background: var(--green); border-radius: 2px; transition: width .08s linear; }
+.z-screen-status {
+  background: #111; padding: 7px 12px; font-family: var(--mono); font-size: 11px; color: #444;
+  letter-spacing: 1.2px; text-align: center; min-height: 30px;
+  display: flex; align-items: center; justify-content: center; border-top: 1px solid #0d2a0d;
+}
+.z-screen-status.warn { color: #ffaa00; }
+.z-screen-status.ready { color: #ff4444; }
+.z-screen-status.analyzing { color: #44aaff; }
+.z-screen-status.good { color: var(--green); }
+
+/* Right control column */
+.z-right-col {
+  width: 110px; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+/* Big shock circle */
+.z-shock-circle {
+  width: 94px; height: 94px; border-radius: 50%;
+  background: var(--orange); border: 4px solid var(--orange-dark);
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: Arial; color: #fff; font-weight: 900; font-size: 12px; letter-spacing: 2px;
+  opacity: 0.35; transition: background .12s, border-color .12s; flex-shrink: 0;
+}
+.z-shock-circle .si { font-size: 20px; display: block; margin-bottom: 2px; }
+.z-shock-circle.live { opacity: 1; background: #cc0000; border-color: #ff4444; animation: zpulse .7s infinite; }
+.z-shock-circle.live:hover { background: #dd0000; }
+@keyframes zpulse {
+  0%,100% { border-color: #ff4444; box-shadow: 0 0 0 4px rgba(255,0,0,0.2); }
+  50%      { border-color: #ff8888; box-shadow: 0 0 0 8px rgba(255,0,0,0.08); }
+}
+/* Charge button under shock circle */
+.z-charge {
+  width: 100%; border-radius: 5px; cursor: pointer; font-family: Arial; font-weight: 900;
+  font-size: 11px; letter-spacing: 1px; text-align: center; border: none;
+  transition: all .12s; padding: 10px 4px; line-height: 1.3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  background: #dd8800; color: #fff;
+}
+.z-charge:hover:not(:disabled) { background: #ee9900; }
+.z-charge.charging { background: #cc6600; }
+.z-charge.charged  { background: #226600; color: #aaffaa; }
+.z-charge:disabled { opacity: 0.35; cursor: not-allowed; }
+.z-cbar-wrap { height: 3px; background: rgba(0,0,0,0.3); border-radius: 2px; overflow: hidden; width: 80%; }
+.z-cbar { height: 100%; width: 0%; background: #fff; border-radius: 2px; transition: width .08s linear; }
+.z-cbar.full { background: #88ffaa; }
+
+/* Scenario text — dark on grey for legibility */
+.z-scenario { padding: 4px 0 2px; font-family: var(--mono); font-size: 10px; color: #222; letter-spacing: 1.5px; }
+.z-pt { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; min-height: 24px; }
+
+/* No shock — full width below the mid row */
+.z-noshock {
+  width: 100%; padding: 12px; border-radius: 8px;
+  background: #001028; border: 2px solid var(--blue-dark);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: Arial; color: var(--blue); font-weight: 900; font-size: 15px; letter-spacing: 1.5px;
+  transition: all .12s;
+}
+.z-noshock:hover { background: #001a3a; border-color: var(--blue); }
+.z-noshock:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Disarm */
+.z-disarm {
+  display: none; width: 100%; padding: 10px; background: #ccaa00; border: none;
+  border-radius: 5px; font-family: Arial; font-weight: 900; font-size: 14px;
+  color: #fff; letter-spacing: 2px; cursor: pointer; transition: background .12s;
+}
+.z-disarm:hover { background: #ddbb00; }
+.z-disarm.vis { display: block; }
+
+/* Footer */
+.z-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; }
+.z-logo { font-family: Arial; font-size: 14px; font-weight: 900; color: #2255aa; letter-spacing: 3px; }
+.z-mute { display: flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--mono); font-size: 9px; color: #445; letter-spacing: 1px; user-select: none; }
+.z-track { width: 28px; height: 14px; background: #778; border-radius: 7px; position: relative; transition: background .2s; flex-shrink: 0; }
+.z-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: #fff; border-radius: 50%; transition: transform .2s; }
+.z-mute.on .z-track { background: #2255aa; }
+.z-mute.on .z-track::after { transform: translateX(14px); }
+
+/* feedback */
+.z-fb { border-radius: 5px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid; }
+.z-fb.ok { background: #001400; border-color: var(--green); }
+.z-fb.no { background: #140000; border-color: var(--red); }
+.z-fb .ft { font-size: 16px; font-weight: 700; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
+.z-fb.ok .ft { color: var(--green); }
+.z-fb.no .ft { color: var(--red); }
+.z-fb .fr { display: inline-block; background: #003300; border: 1px solid #005500; border-radius: 4px; padding: 5px 10px; margin-bottom: 8px; font-size: 15px; font-weight: 700; color: #88ffaa; }
+.z-fb .fa { font-size: 14px; color: #aaffcc; line-height: 1.65; }
+
+/* Disarm */
+.z-disarm {
+  display: none; width: 100%; padding: 10px; background: #ccaa00; border: none;
+  border-radius: 5px; font-family: Arial; font-weight: 900; font-size: 14px;
+  color: #fff; letter-spacing: 2px; cursor: pointer; transition: background .12s;
+}
+.z-disarm:hover { background: #ddbb00; }
+.z-disarm.vis { display: block; }
+
+/* Footer */
+.z-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; }
+.z-logo { font-family: Arial; font-size: 14px; font-weight: 900; color: #2255aa; letter-spacing: 3px; }
+.z-mute { display: flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--mono); font-size: 9px; color: #445; letter-spacing: 1px; user-select: none; }
+.z-track { width: 28px; height: 14px; background: #778; border-radius: 7px; position: relative; transition: background .2s; flex-shrink: 0; }
+.z-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: #fff; border-radius: 50%; transition: transform .2s; }
+.z-mute.on .z-track { background: #2255aa; }
+.z-mute.on .z-track::after { transform: translateX(14px); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="r" id="root"></div>
-  <div class="footer">COMPRESS TO SUCCESS &nbsp;◆&nbsp; UCI HEALTH ALERT RN &nbsp;◆&nbsp; 2026</div>
+<div class="r" id="root"></div>
+<div class="footer">COMPRESS TO SUCCESS &nbsp;◆&nbsp; UCI HEALTH ALERT RN &nbsp;◆&nbsp; 2026</div>
 </div>
 
 <script>
-const CPR_DUR = 4.2;
-const ANALYZE_DUR = 2.0;
-
 const RHYTHMS = [
-  {
-    id:'vtach', shockable:true, name:'Pulseless Ventricular Tachycardia', abbr:'Pulseless V-Tach', pulse:false,
+  { id:'vtach', shockable:true, name:'Pulseless Ventricular Tachycardia', abbr:'Pulseless V-Tach', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK as soon as the defibrillator is ready.',
-    gen(t){ const cw=0.42, r=1/3.5, p=t%r; return p<cw ? Math.sin(Math.PI*p/cw)*1.1 : -Math.sin(Math.PI*(p-cw)/(r-cw))*0.55; }
+    pearl:'Pulseless V-Tach is electrically identical to V-Fib in terms of management — no pulse means treat it as cardiac arrest. The organized waveform can fool you into thinking there\'s output. Always check for a pulse before deciding.',
+    gen(t){ const r=1/3.5,cw=0.42,p=t%r; return p<cw?Math.sin(Math.PI*p/cw)*1.1:-Math.sin(Math.PI*(p-cw)/(r-cw))*0.55; }
   },
-  {
-    id:'asystole', shockable:false, name:'Asystole', abbr:'Asystole', pulse:false,
-    action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes (H's & T's).",
-    gen(t){ return Math.sin(t*7.3)*0.03 + Math.sin(t*13.1)*0.02; }
+  { id:'asystole', shockable:false, name:'Asystole', abbr:'Asystole', pulse:false,
+    action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes (H's & T's). Do NOT shock asystole.",
+    pearl:'Shocking a flatline does not restart the heart — it has no electrical activity to reset. Confirm in two leads before calling it; fine V-Fib can mimic asystole and IS shockable. CPR and epinephrine are your tools here.',
+    gen(t){ return Math.sin(t*7.3)*0.03+Math.sin(t*13.1)*0.02; }
   },
-  {
-    id:'cvfib', shockable:true, name:'Coarse Ventricular Fibrillation', abbr:'Coarse V-Fib', pulse:false,
+  { id:'cvfib', shockable:true, name:'Coarse Ventricular Fibrillation', abbr:'Coarse V-Fib', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK as soon as the defibrillator is ready.',
+    pearl:'Coarse V-Fib has higher amplitude chaos and generally responds better to defibrillation than fine V-Fib. Speed matters — every minute without defibrillation drops survival by roughly 10%. Pre-charge during CPR to minimize the hands-off interval.',
     _s:null,
-    gen(t){
-      if(!this._s){ this._s=[]; for(let i=0;i<8;i++) this._s.push({f:1+i*1.4+Math.sin(i)*0.4, a:0.5-i*0.04, p:i*0.97}); }
-      let v=0; this._s.forEach(s => v += s.a*Math.sin(2*Math.PI*s.f*t+s.p)); return v*0.88;
-    }
+    gen(t){ if(!this._s){this._s=[];for(let i=0;i<8;i++)this._s.push({f:1+i*1.4+Math.sin(i)*0.4,a:0.5-i*0.04,p:i*0.97});} let v=0;this._s.forEach(s=>v+=s.a*Math.sin(2*Math.PI*s.f*t+s.p));return v*0.88; }
   },
-  {
-    id:'nsr', shockable:false, name:'Normal Sinus Rhythm', abbr:'NSR', pulse:true,
-    action:'Pulse is present. Check vital signs and proceed per clinical judgment.',
-    gen(t){
-      const r=0.83, p=t%r;
-      if(p<0.09) return 0.18*Math.sin(Math.PI*p/0.09);
-      if(p>=0.11&&p<0.14) return -0.12*Math.sin(Math.PI*(p-0.11)/0.03);
-      if(p>=0.14&&p<0.20) return 1.15*Math.sin(Math.PI*(p-0.14)/0.06);
-      if(p>=0.20&&p<0.24) return -0.28*Math.sin(Math.PI*(p-0.20)/0.04);
-      if(p>=0.26&&p<0.46) return 0.22*Math.sin(Math.PI*(p-0.26)/0.20);
-      return 0;
-    }
+  { id:'nsr', shockable:false, name:'Normal Sinus Rhythm', abbr:'NSR', pulse:true,
+    action:'Pulse is present. Check vital signs and proceed per clinical judgment. Do NOT shock.',
+    pearl:'NSR in a pulseless patient is PEA until proven otherwise. Always confirm with a pulse check — the monitor tells you electricity, not perfusion. A patient can have a perfect rhythm and no cardiac output.',
+    gen(t){ const r=0.83,p=t%r; if(p<0.09)return 0.18*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.12*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 1.15*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.28*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.22*Math.sin(Math.PI*(p-0.26)/0.20); return 0; }
   },
-  {
-    id:'torsades', shockable:true, name:'Torsades de Pointes', abbr:'Polymorphic V-Tach', pulse:false,
+  { id:'torsades', shockable:true, name:'Torsades de Pointes', abbr:'Polymorphic V-Tach', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK. Primary team will administer Magnesium 2g IVP.',
-    gen(t){ const r=1/3.3, cw=0.28, p=t%r; return Math.sin(2*Math.PI*0.28*t)*(p<cw ? Math.sin(Math.PI*p/cw)*1.45 : 0); }
+    pearl:'Torsades is a polymorphic V-Tach that twists around the baseline — the classic "twisting of the points." It\'s associated with prolonged QT. Magnesium 2g IVP is the specific antidote, but if the patient is pulseless, defibrillate first and sort out the cause after ROSC.',
+    gen(t){ const r=1/3.3,cw=0.28,p=t%r; return Math.sin(2*Math.PI*0.28*t)*(p<cw?Math.sin(Math.PI*p/cw)*1.45:0); }
   },
-  {
-    id:'junctional', shockable:false, name:'Junctional Escape Rhythm', abbr:'Junctional Escape', pulse:true,
-    action:'Pulse is present. Check vital signs and hemodynamic stability. Proceed per clinical judgment.',
-    gen(t){
-      const r=1.43, p=t%r;
-      if(p<0.07) return 1.05*Math.sin(Math.PI*p/0.07);
-      if(p>=0.07&&p<0.11) return -0.22*Math.sin(Math.PI*(p-0.07)/0.04);
-      if(p>=0.13&&p<0.33) return 0.18*Math.sin(Math.PI*(p-0.13)/0.20);
-      return 0;
-    }
+  { id:'junctional', shockable:false, name:'Junctional Escape Rhythm', abbr:'Junctional Escape', pulse:true,
+    action:'Pulse is present. Check vital signs and hemodynamic stability. Do NOT shock.',
+    pearl:'Junctional escape fires when the SA node fails or slows — the AV node takes over at 40–60 bpm. P waves are absent, inverted, or buried in the QRS. It\'s a rescue rhythm. If the patient is hemodynamically stable, notify the team and monitor closely.',
+    gen(t){ const r=1.43,p=t%r; if(p<0.07)return 1.05*Math.sin(Math.PI*p/0.07); if(p>=0.07&&p<0.11)return -0.22*Math.sin(Math.PI*(p-0.07)/0.04); if(p>=0.13&&p<0.33)return 0.18*Math.sin(Math.PI*(p-0.13)/0.20); return 0; }
   },
-  {
-    id:'fvfib', shockable:true, name:'Fine Ventricular Fibrillation', abbr:'Fine V-Fib', pulse:false,
+  { id:'fvfib', shockable:true, name:'Fine Ventricular Fibrillation', abbr:'Fine V-Fib', pulse:false,
     action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK. Fine V-Fib can look like asystole — look closely.",
+    pearl:'Fine V-Fib has low amplitude and is easy to miss or misread as asystole. Check two leads. If there\'s any doubt and the amplitude is greater than 1mm, treat it as V-Fib and shock. CPR can actually convert fine V-Fib to coarse, improving the chance of successful defibrillation.',
     _s:null,
-    gen(t){
-      if(!this._s){ this._s=[]; for(let i=0;i<7;i++) this._s.push({f:2+i*2.2+Math.sin(i*1.3)*0.5, a:0.13-i*0.01, p:i*1.1}); }
-      let v=0; this._s.forEach(s => v += s.a*Math.sin(2*Math.PI*s.f*t+s.p)); return v;
-    }
+    gen(t){ if(!this._s){this._s=[];for(let i=0;i<7;i++)this._s.push({f:2+i*2.2+Math.sin(i*1.3)*0.5,a:0.13-i*0.01,p:i*1.1});} let v=0;this._s.forEach(s=>v+=s.a*Math.sin(2*Math.PI*s.f*t+s.p));return v; }
   },
-  {
-    id:'sbrad', shockable:false, name:'Sinus Bradycardia', abbr:'Sinus Brady', pulse:true,
-    action:'Pulse is present. Check vital signs and hemodynamic stability. Proceed per clinical judgment.',
-    gen(t){
-      const r=1.67, p=t%r;
-      if(p<0.09) return 0.18*Math.sin(Math.PI*p/0.09);
-      if(p>=0.11&&p<0.14) return -0.12*Math.sin(Math.PI*(p-0.11)/0.03);
-      if(p>=0.14&&p<0.20) return 1.15*Math.sin(Math.PI*(p-0.14)/0.06);
-      if(p>=0.20&&p<0.24) return -0.28*Math.sin(Math.PI*(p-0.20)/0.04);
-      if(p>=0.26&&p<0.46) return 0.22*Math.sin(Math.PI*(p-0.26)/0.20);
-      return 0;
-    }
+  { id:'sbrad', shockable:false, name:'Sinus Bradycardia', abbr:'Sinus Brady', pulse:true,
+    action:'Pulse is present. Check vital signs and hemodynamic stability. Do NOT shock.',
+    pearl:'Sinus bradycardia is only an emergency if the patient is unstable — hypotension, altered mentation, chest pain, or syncope. In a well-perfused patient it may be normal (athletes, vagal tone, beta-blockers). Treat the patient, not the number on the monitor.',
+    gen(t){ const r=1.67,p=t%r; if(p<0.09)return 0.18*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.12*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 1.15*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.28*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.22*Math.sin(Math.PI*(p-0.26)/0.20); return 0; }
   },
-  {
-    id:'pea', shockable:false, name:'Pulseless Electrical Activity', abbr:'PEA', pulse:false,
-    action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Aggressively treat reversible causes (H's & T's).",
-    gen(t){
-      const r=1.09, p=t%r;
-      if(p<0.09) return 0.15*Math.sin(Math.PI*p/0.09);
-      if(p>=0.11&&p<0.14) return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);
-      if(p>=0.14&&p<0.20) return 0.90*Math.sin(Math.PI*(p-0.14)/0.06);
-      if(p>=0.20&&p<0.24) return -0.22*Math.sin(Math.PI*(p-0.20)/0.04);
-      if(p>=0.26&&p<0.46) return 0.18*Math.sin(Math.PI*(p-0.26)/0.20);
-      return 0;
-    }
+  { id:'pea', shockable:false, name:'Pulseless Electrical Activity', abbr:'PEA', pulse:false,
+    action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes (H's & T's). Do NOT shock PEA.",
+    pearl:'PEA has organized electrical activity but no mechanical output. The key is hunting for reversible causes — the H\'s and T\'s. Tension pneumothorax, tamponade, hypovolemia, and hypoxia are the most common culprits at the bedside. CPR and epi buy time while the team finds the cause.',
+    gen(t){ const r=1.09,p=t%r; if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 0.90*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.22*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.18*Math.sin(Math.PI*(p-0.26)/0.20); return 0; }
   },
-  {
-    id:'agonal', shockable:false, name:'Agonal Rhythm', abbr:'Agonal', pulse:false,
-    action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes.',
-    gen(t){ const r=4.8, p=t%r, cw=0.72; return p<cw ? (0.55*Math.sin(Math.PI*p/cw) + 0.30*Math.sin(2*Math.PI*p/cw)) : 0; }
+  { id:'agonal', shockable:false, name:'Agonal Rhythm', abbr:'Agonal', pulse:false,
+    action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes. Do NOT shock.',
+    pearl:'Agonal rhythm is a dying heart — slow, wide, irregular beats as the myocardium loses all organized activity. It\'s a terminal rhythm and carries a very poor prognosis. Do not shock. High-quality CPR and aggressive treatment of reversible causes are the only interventions with any chance of ROSC.',
+    gen(t){ const r=4.8,p=t%r,cw=0.72; return p<cw?(0.55*Math.sin(Math.PI*p/cw)+0.30*Math.sin(2*Math.PI*p/cw)):0; }
   }
 ];
 
 function cprArtifact(t){
-  const rate=1.8, p=(t%(1/rate))*rate;
-  const comp = p<0.45 ? Math.sin(Math.PI*p/0.45)*1.3 : 0;
-  return comp + Math.sin(t*23.1)*0.12 + Math.sin(t*47.3)*0.07 + Math.sin(t*11.7)*0.09;
+  const rate=1.8,p=(t%(1/rate))*rate;
+  return (p<0.45?Math.sin(Math.PI*p/0.45)*1.3:0)+Math.sin(t*23.1)*0.12+Math.sin(t*47.3)*0.07;
+}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+/* ── STATE ── */
+let mode='classic';
+let qs=[],cur=0,answered=false,score=0,missed=[],phase='intro';
+let animId=null,simT=0,lastTS=null,cprPhase='cpr',phaseT=0;
+let prechargeShown=false;
+
+/* ZOLL device state */
+let zCharged=false,zCharging=false,zAnalyzing=false;
+let zEIdx=3,zMuted=false;
+let audioCtx=null,chargeOsc=null,chargeGain=null,disarmTimer=null;
+
+const ENERGIES=[50,100,150,200];
+const CPR_DUR_CLASSIC=4.2;
+const CPR_DUR_ZOLL=9.0;   // 7–10 second window
+const ANALYZE_DUR=2.0;
+const PRECHARGE_PROMPT_AT=6.5; // seconds into CPR
+
+/* ── AUDIO ── */
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function startChargeSound(){
+  if(zMuted)return; const ctx=getCtx(); stopChargeSound();
+  chargeOsc=ctx.createOscillator(); chargeGain=ctx.createGain();
+  const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2800; f.Q.value=8;
+  chargeOsc.connect(f); f.connect(chargeGain); chargeGain.connect(ctx.destination);
+  chargeOsc.type='sawtooth';
+  chargeOsc.frequency.setValueAtTime(300,ctx.currentTime);
+  chargeOsc.frequency.exponentialRampToValueAtTime(2800,ctx.currentTime+4.0);
+  chargeGain.gain.setValueAtTime(0,ctx.currentTime);
+  chargeGain.gain.linearRampToValueAtTime(0.04,ctx.currentTime+1.0);
+  chargeGain.gain.linearRampToValueAtTime(0.09,ctx.currentTime+4.0);
+  chargeGain.gain.setValueAtTime(0.09,ctx.currentTime+4.0);
+  chargeOsc.start(ctx.currentTime);
+}
+function stopChargeSound(){if(chargeOsc){try{chargeOsc.stop();}catch(e){}chargeOsc=null;chargeGain=null;}}
+function playReadyBeep(){
+  if(zMuted)return; const ctx=getCtx();
+  [0,0.2,0.4].forEach(o=>{
+    const osc=ctx.createOscillator(),g=ctx.createGain();
+    osc.connect(g);g.connect(ctx.destination);osc.type='sine';osc.frequency.value=1100;
+    g.gain.setValueAtTime(0,ctx.currentTime+o);g.gain.linearRampToValueAtTime(0.12,ctx.currentTime+o+0.01);g.gain.linearRampToValueAtTime(0,ctx.currentTime+o+0.14);
+    osc.start(ctx.currentTime+o);osc.stop(ctx.currentTime+o+0.16);
+  });
+}
+function playShockSound(){
+  if(zMuted)return; const ctx=getCtx();
+  const buf=ctx.createBuffer(1,ctx.sampleRate*0.2,ctx.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(ctx.sampleRate*0.04));
+  const src=ctx.createBufferSource(),g=ctx.createGain(); src.buffer=buf;src.connect(g);g.connect(ctx.destination);g.gain.value=0.5;src.start();
+}
+function playDisarmBeep(){
+  if(zMuted)return; const ctx=getCtx();
+  const osc=ctx.createOscillator(),g=ctx.createGain(); osc.connect(g);g.connect(ctx.destination);osc.type='sine';osc.frequency.value=800;
+  g.gain.setValueAtTime(0.1,ctx.currentTime);g.gain.linearRampToValueAtTime(0,ctx.currentTime+0.3);
+  osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.35);
 }
 
-function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
-
-let qs=[], cur=0, answered=false, score=0, missed=[], phase='intro';
-let animId=null, simT=0, lastTS=null, cprPhase='cpr', phaseT=0;
-
-function startQuiz(){
-  qs = shuffle(RHYTHMS.map(r => ({...r, _s:null})));
-  cur=0; answered=false; score=0; missed=[]; phase='quiz'; render();
-}
-
-function stopAnim(){ if(animId){ cancelAnimationFrame(animId); animId=null; } lastTS=null; }
+/* ── ANIMATION ── */
+function stopAnim(){if(animId){cancelAnimationFrame(animId);animId=null;}lastTS=null;}
 
 function startAnim(rhythm){
   stopAnim();
-  simT=0; phaseT=0; cprPhase='cpr';
-  const canvas = document.getElementById('ekgc');
-  if(!canvas) return;
+  simT=0;phaseT=0;cprPhase='cpr';prechargeShown=false;
 
-  const dpr = window.devicePixelRatio || 1;
-  const cssW = canvas.clientWidth || 640;
-  const cssH = 128;
-  canvas.width  = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  canvas.style.width  = cssW + 'px';
-  canvas.style.height = cssH + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const W=cssW, H=cssH, MID=H/2, SCALE=H*0.34, PPS=200, ERASER=18;
-  const buf = new Float32Array(W);
-  let xPos = 0;
+  const canvasId = mode==='zoll' ? 'zCanvas' : 'ekgc';
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const cssW=canvas.clientWidth||640, cssH=canvas.clientHeight||(mode==='zoll'?160:128);
+  canvas.width=Math.round(cssW*dpr); canvas.height=Math.round(cssH*dpr);
+  canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=cssW,H=cssH,MID=H/2,SCALE=H*0.34,PPS=200,ERASER=18;
+  const buf=new Float32Array(W); let xPos=0;
 
   ctx.fillStyle='#020802'; ctx.fillRect(0,0,W,H);
-  drawFullGrid(ctx,W,H);
 
-  function drawFullGrid(c,W,H){
-    c.strokeStyle='#0d2a0d'; c.lineWidth=0.5;
-    for(let x=0;x<=W;x+=W/20){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,H); c.stroke(); }
-    for(let y=0;y<=H;y+=H/5){ c.beginPath(); c.moveTo(0,y); c.lineTo(W,y); c.stroke(); }
-    c.strokeStyle='#071407'; c.lineWidth=0.2;
-    for(let x=0;x<=W;x+=W/100){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,H); c.stroke(); }
-    for(let y=0;y<=H;y+=H/25){ c.beginPath(); c.moveTo(0,y); c.lineTo(W,y); c.stroke(); }
-  }
-
-  function drawGridStrip(x,w){
+  function drawStrip(x,w){
     ctx.save(); ctx.beginPath(); ctx.rect(x,0,w,H); ctx.clip();
     ctx.fillStyle='#020802'; ctx.fillRect(x,0,w,H);
     ctx.strokeStyle='#0d2a0d'; ctx.lineWidth=0.5;
-    for(let gx=0;gx<=W;gx+=W/20) if(gx>=x-1&&gx<=x+w+1){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
-    for(let gy=0;gy<=H;gy+=H/5){ ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x+w,gy); ctx.stroke(); }
-    ctx.strokeStyle='#071407'; ctx.lineWidth=0.2;
-    for(let gx=0;gx<=W;gx+=W/100) if(gx>=x-1&&gx<=x+w+1){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for(let gx=0;gx<=W;gx+=W/20) if(gx>=x-1&&gx<=x+w+1){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(let gy=0;gy<=H;gy+=H/5){ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x+w,gy);ctx.stroke();}
     ctx.restore();
   }
+
+  const CPR_DUR = mode==='zoll' ? CPR_DUR_ZOLL : CPR_DUR_CLASSIC;
 
   function getSample(t){
     if(cprPhase==='cpr') return cprArtifact(t);
@@ -315,158 +411,369 @@ function startAnim(rhythm){
   }
 
   function frame(ts){
-    if(!lastTS) lastTS=ts;
-    const dt = Math.min((ts-lastTS)/1000, 0.05);
+    if(!lastTS)lastTS=ts;
+    const dt=Math.min((ts-lastTS)/1000,0.05);
     lastTS=ts; simT+=dt; phaseT+=dt;
 
-    if(cprPhase==='cpr' && phaseT>=CPR_DUR){ cprPhase='analyze'; phaseT=0; updateBadge('analyze'); }
-    else if(cprPhase==='analyze' && phaseT>=ANALYZE_DUR){ cprPhase='rhythm'; phaseT=0; updateBadge('rhythm'); if(!answered) unlockButtons(); }
-
     if(cprPhase==='cpr'){
-      const el=document.getElementById('cprfill');
-      if(el) el.style.width=(Math.min(phaseT/CPR_DUR,1)*100)+'%';
+      // update CPR bar
+      const fill=document.getElementById('cprfill')||document.getElementById('zCprFill');
+      if(fill) fill.style.width=(Math.min(phaseT/CPR_DUR,1)*100)+'%';
+
+      // ZOLL: pre-charge prompt
+      if(mode==='zoll'&&!prechargeShown&&phaseT>=PRECHARGE_PROMPT_AT){
+        prechargeShown=true;
+        zSetStatus('▶ PRE-CHARGE NOW — minimize time off chest','warn');
+      }
+
+      if(phaseT>=CPR_DUR){ cprPhase='analyze'; phaseT=0; updateBadge('analyze'); }
+    }
+    else if(cprPhase==='analyze'&&phaseT>=ANALYZE_DUR){
+      cprPhase='rhythm'; phaseT=0; updateBadge('rhythm');
+      if(mode==='classic') unlockClassic();
+      if(mode==='zoll') onZollRhythmRevealed();
     }
 
-    const steps = Math.max(1, Math.ceil(PPS*dt));
+    const steps=Math.max(1,Math.ceil(PPS*dt));
     for(let s=0;s<steps;s++){
-      const st = simT-dt+(s/steps)*dt;
-      const val = getSample(st);
-      const x = Math.floor(xPos) % W;
-      buf[x] = val;
-      drawGridStrip((x+ERASER)%W, ERASER+2);
-      const px = (x-1+W)%W;
-      ctx.strokeStyle='#00e676'; ctx.lineWidth=1.8; ctx.lineCap='round'; ctx.lineJoin='round';
-      ctx.beginPath(); ctx.moveTo(px, MID-buf[px]*SCALE); ctx.lineTo(x, MID-val*SCALE); ctx.stroke();
-      xPos = (xPos + 1/steps) % W;
+      const st=simT-dt+(s/steps)*dt;
+      const val=getSample(st);
+      const x=Math.floor(xPos)%W; buf[x]=val;
+      drawStrip((x+ERASER)%W,ERASER+2);
+      const px=(x-1+W)%W;
+      ctx.strokeStyle='#00e676'; ctx.lineWidth=1.8; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(px,MID-buf[px]*SCALE); ctx.lineTo(x,MID-val*SCALE); ctx.stroke();
+      xPos=(xPos+1/steps)%W;
     }
-    animId = requestAnimationFrame(frame);
+    animId=requestAnimationFrame(frame);
   }
-  animId = requestAnimationFrame(frame);
+  animId=requestAnimationFrame(frame);
 }
 
 function updateBadge(ph){
-  const el=document.getElementById('pbadge'); if(!el) return;
-  if(ph==='analyze'){ el.className='phase-badge phase-analyze'; el.textContent='ANALYZING — DO NOT TOUCH PATIENT'; }
-  else if(ph==='rhythm'){ el.className='phase-badge phase-rhythm'; el.textContent='RHYTHM IDENTIFIED'; }
+  const el=document.getElementById('pbadge'); if(!el)return;
+  if(ph==='analyze'){el.className='phase-badge phase-analyze';el.textContent='ANALYZING — DO NOT TOUCH PATIENT';}
+  else if(ph==='rhythm'){el.className='phase-badge phase-rhythm';el.textContent='RHYTHM IDENTIFIED';}
 }
 
-function unlockButtons(){
-  const s=document.getElementById('shockbtn'), n=document.getElementById('noshockbtn');
-  const pt=document.getElementById('ptxt');
-  if(s){ s.disabled=false; s.classList.remove('locked'); }
-  if(n){ n.disabled=false; n.classList.remove('locked'); }
-  if(pt){
-    const q=qs[cur];
-    pt.textContent='Patient is unresponsive. '+(q.pulse?'Pulse IS present.':'NO pulse detected.');
-    pt.style.color = q.pulse?'#00e676':'#cccccc';
-  }
-  const cl=document.getElementById('cprlbl'); if(cl) cl.textContent='▶ RHYTHM CLEAR — MAKE YOUR CALL';
+/* ── CLASSIC LOGIC ── */
+function unlockClassic(){
+  const q=qs[cur];
+  const s=document.getElementById('shockbtn'),n=document.getElementById('noshockbtn'),pt=document.getElementById('ptxt');
+  if(s){s.disabled=false;s.classList.remove('locked');}
+  if(n){n.disabled=false;n.classList.remove('locked');}
+  if(pt){pt.textContent='Patient is unresponsive. '+(q.pulse?'Pulse IS present.':'NO pulse detected.');pt.style.color=q.pulse?'#00e676':'#cccccc';}
+  const cl=document.getElementById('cprlbl'); if(cl)cl.textContent='▶ RHYTHM CLEAR — MAKE YOUR CALL';
 }
-
-function answerQ(shock){
-  if(answered) return; answered=true;
+function answerClassic(shock){
+  if(answered)return; answered=true;
   const q=qs[cur]; const correct=shock===q.shockable;
-  if(correct) score++; else missed.push(q.name);
-  let sbC='btn bs', nbC='btn bn';
-  if(shock===true){ sbC='btn '+(correct?'sc':'sw'); if(!correct) nbC='btn rv'; }
-  else            { nbC='btn '+(correct?'sc':'sw'); if(!correct) sbC='btn rv'; }
-  const fb=document.getElementById('fbarea');
-  if(fb) fb.innerHTML=`<div class="fb ${correct?'ok':'no'}">
-    <div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div>
-    <div class="fr">${q.name} (${q.abbr})</div>
-    <div class="fa">${q.action}</div>
-  </div>`;
-  const nxt=document.getElementById('nxtbtn'); if(nxt) nxt.style.display='block';
-  const sb=document.getElementById('shockbtn'), nb=document.getElementById('noshockbtn');
-  if(sb){ sb.disabled=true; sb.className=sbC; }
-  if(nb){ nb.disabled=true; nb.className=nbC; }
+  if(correct)score++;else missed.push(q.name);
+  let sbC='btn bs',nbC='btn bn';
+  if(shock){sbC='btn '+(correct?'sc':'sw');if(!correct)nbC='btn rv';}
+  else{nbC='btn '+(correct?'sc':'sw');if(!correct)sbC='btn rv';}
+  document.getElementById('fbarea').innerHTML=`<div class="fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div><div style="margin-top:8px;padding:10px 13px;background:#0a0e0a;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
+  document.getElementById('nxtbtn').style.display='block';
+  const sb=document.getElementById('shockbtn'),nb=document.getElementById('noshockbtn');
+  if(sb){sb.disabled=true;sb.className=sbC;} if(nb){nb.disabled=true;nb.className=nbC;}
 }
 
+/* ── ZOLL LOGIC ── */
+function zSetStatus(msg,cls){
+  const s=document.getElementById('zStatus'); if(!s)return;
+  s.textContent=msg; s.className='z-screen-status'+(cls?' '+cls:'');
+}
+function zShowDisarm(v){const b=document.getElementById('zDisarm');if(b)v?b.classList.add('vis'):b.classList.remove('vis');}
+
+function onZollRhythmRevealed(){
+  const q=qs[cur];
+  zSetStatus('RHYTHM IDENTIFIED — USE THE DEFIBRILLATOR','');
+  const pt=document.getElementById('ptxt');
+  if(pt){pt.textContent='Patient is unresponsive. '+(q.pulse?'Pulse IS present.':'NO pulse detected.');pt.style.color=q.pulse?'#1a6e1a':'#333';}
+  const cl=document.getElementById('cprlbl'); if(cl)cl.textContent='▶ RHYTHM CLEAR — WORK THE PANEL';
+  // unlock no-shock button
+  const ns=document.getElementById('zNoShockBtn'); if(ns)ns.disabled=false;
+}
+
+function zResetTimer(){
+  if(disarmTimer)clearTimeout(disarmTimer);
+  disarmTimer=setTimeout(()=>{if(zCharged&&!answered)zAutoDisarm();},30000);
+}
+function zAutoDisarm(){
+  if(!zCharged)return;
+  zCharged=false; stopChargeSound(); playDisarmBeep(); if(disarmTimer)clearTimeout(disarmTimer);
+  document.getElementById('zShockCircle').classList.remove('live');
+  zResetChargeBtn(); zShowDisarm(false);
+  zSetStatus('AUTO-DISARMED — 30 SEC TIMEOUT — RECHARGE IF NEEDED','warn');
+}
+function zResetChargeBtn(){
+  const cb=document.getElementById('zChargeBtn'); if(!cb)return;
+  cb.className='z-charge'; cb.disabled=false;
+  cb.innerHTML='CHARGE<div class="z-cbar-wrap"><div class="z-cbar" id="zCbar"></div></div>';
+}
+
+function zDoCharge(){
+  if(zCharging||zCharged||answered)return;
+  zCharging=true;
+  const j=ENERGIES[zEIdx];
+  const btn=document.getElementById('zChargeBtn');
+  if(btn){btn.className='z-charge charging';btn.disabled=true;btn.innerHTML='CHARG-<br>ING...<div class="z-cbar-wrap"><div class="z-cbar" id="zCbar"></div></div>';}
+  const ab=document.getElementById('zAnalyzeBtn'); if(ab){ab.disabled=true;ab.style.opacity='0.35';}
+  zSetStatus('▶ CHARGING TO '+j+'J — STAND CLEAR','warn');
+  startChargeSound();
+  let pct=0;
+  const iv=setInterval(()=>{
+    pct+=2.4; const b=document.getElementById('zCbar'); if(b)b.style.width=Math.min(pct,100)+'%';
+    if(pct>=100){
+      clearInterval(iv); zCharging=false; zCharged=true;
+      const cb=document.getElementById('zChargeBtn');
+      if(cb){cb.className='z-charge charged';cb.disabled=true;cb.innerHTML='✓ READY<div class="z-cbar-wrap"><div class="z-cbar full" style="width:100%"></div></div>';}
+      // Analyze unlocks only now that device is charged
+      const ab2=document.getElementById('zAnalyzeBtn'); if(ab2){ab2.disabled=false;ab2.style.opacity='1';}
+      document.getElementById('zShockCircle').classList.add('live');
+      document.getElementById('zChargeLbl').textContent='CHARGED — READY';
+      zSetStatus('⚡ READY — ANALYZE RHYTHM OR PRESS SHOCK','ready');
+      zShowDisarm(true); playReadyBeep(); zResetTimer();
+    }
+  },38);
+}
+function zDoAnalyze(){
+  if(!zCharged||zAnalyzing||answered)return;
+  zAnalyzing=true;
+  const ab=document.getElementById('zAnalyzeBtn'); if(ab){ab.disabled=true;ab.style.opacity='0.35';}
+  zSetStatus('▶ ANALYZING — DO NOT TOUCH PATIENT','analyzing');
+  let d=0;
+  const iv=setInterval(()=>{
+    d=(d+1)%4;
+    zSetStatus('▶ ANALYZING'+'.'.repeat(d)+' — DO NOT TOUCH PATIENT','analyzing');
+  },400);
+  setTimeout(()=>{
+    clearInterval(iv); zAnalyzing=false;
+    const q=qs[cur];
+    const rec = q.shockable ? 'SHOCK ADVISED — PRESS SHOCK TO DELIVER' : 'NO SHOCK ADVISED';
+    const recCls = q.shockable ? 'ready' : 'good';
+    zSetStatus('⚡ ANALYSIS COMPLETE — ' + rec, recCls);
+    // show pre-charge caveat in fbarea if not already answered
+    if(!answered){
+      const fb=document.getElementById('fbarea');
+      if(fb&&fb.innerHTML==='') fb.innerHTML=`<div style="padding:9px 12px;background:#0a0800;border:1px solid #554400;border-radius:5px;font-size:13px;color:#ccaa44;line-height:1.6;margin-bottom:8px;">⚠ <strong>On a real code:</strong> charge first, then analyze — not the other way around. Analyze → charge → shock costs extra seconds off the chest. Pre-charge during CPR so you're ready to fire the moment compressions pause.</div>`;
+    }
+    // locked — no re-use
+  },2600);
+}
+function zDoShock(){
+  if(!zCharged||answered)return;
+  const q=qs[cur];
+  zCharged=false; stopChargeSound(); playShockSound(); if(disarmTimer)clearTimeout(disarmTimer);
+  document.getElementById('zShockCircle').classList.remove('live');
+  zResetChargeBtn(); zShowDisarm(false);
+  document.getElementById('zChargeLbl').textContent='DEFIB MODE';
+  const correct=q.shockable;
+  answered=true; if(correct)score++;else missed.push(q.name);
+  zSetStatus(correct?'⚡ SHOCK DELIVERED — RESUME CPR':'⚠ SHOCK DELIVERED — NOT A SHOCKABLE RHYTHM',correct?'good':'warn');
+  showZollFb(correct,q);
+}
+function zDoNoShock(){
+  if(answered)return;
+  const q=qs[cur];
+  const correct=!q.shockable;
+  answered=true; if(correct)score++;else missed.push(q.name);
+  // lock panel
+  ['zChargeBtn','zNoShockBtn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true;});
+  const wasCharged=zCharged;
+  if(zCharged){
+    zCharged=false;stopChargeSound();if(disarmTimer)clearTimeout(disarmTimer);
+    const sc=document.getElementById('zShockCircle');if(sc)sc.classList.remove('live');
+    zShowDisarm(false);
+  }
+  zSetStatus(correct?'✓ CORRECT — CPR & MEDS, NO SHOCK INDICATED':'✗ INCORRECT — THIS RHYTHM REQUIRES DEFIBRILLATION',correct?'good':'warn');
+  // Build feedback with disarm reminder if charged
+  const disarmReminder = wasCharged
+    ? `<div style="margin-top:10px;padding:8px 10px;background:#1a1200;border:1px solid #665500;border-radius:4px;font-size:13px;color:#ffcc44;line-height:1.6;">⚠ <strong>Don't forget:</strong> the device was charged — always disarm before resuming care.</div>`
+    : `<div style="margin-top:10px;padding:8px 10px;background:#0a1a00;border:1px solid #224400;border-radius:4px;font-size:13px;color:#88cc88;line-height:1.6;">✓ Good habit reminder: if the device had been charged, you would need to <strong>disarm it</strong> before resuming CPR.</div>`;
+  const fb=document.getElementById('fbarea');
+  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div>${disarmReminder}<div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
+  const nxt=document.getElementById('nxtbtn'); if(nxt)nxt.style.display='block';
+}
+function zDoDisarm(){
+  if(!zCharged)return;
+  zCharged=false; stopChargeSound(); playDisarmBeep(); if(disarmTimer)clearTimeout(disarmTimer);
+  document.getElementById('zShockCircle').classList.remove('live');
+  zResetChargeBtn(); zShowDisarm(false);
+  document.getElementById('zChargeLbl').textContent='DEFIB MODE';
+  zSetStatus('DISARMED — RECHARGE IF SHOCK NEEDED','');
+}
+function zCycleEnergy(){
+  if(zCharging)return;
+  zEIdx=(zEIdx+1)%ENERGIES.length;
+  const e=document.getElementById('zEDisp'); if(e)e.textContent=ENERGIES[zEIdx];
+}
+function zToggleMute(){
+  zMuted=!zMuted;
+  const t=document.getElementById('zMuteToggle'),l=document.getElementById('zMuteLabel');
+  if(zMuted){t.classList.remove('on');l.textContent='SOUND OFF';if(chargeOsc)stopChargeSound();}
+  else{t.classList.add('on');l.textContent='SOUND ON';if(zCharged)startChargeSound();}
+}
+function showZollFb(correct,q){
+  const fb=document.getElementById('fbarea');
+  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div><div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
+  const nxt=document.getElementById('nxtbtn'); if(nxt)nxt.style.display='block';
+}
+
+/* ── NEXT / FLOW ── */
 function nextQ(){
   cur++; answered=false;
-  if(cur>=qs.length) phase='end';
+  zCharged=false; zCharging=false; zAnalyzing=false;
+  stopChargeSound(); if(disarmTimer)clearTimeout(disarmTimer);
+  if(cur>=qs.length)phase='end';
   render();
 }
+function startQuiz(){
+  qs=shuffle(RHYTHMS.map(r=>({...r,_s:null}))); cur=0; answered=false; score=0; missed=[];
+  zCharged=false;zCharging=false;zAnalyzing=false;zEIdx=3;
+  stopChargeSound();if(disarmTimer)clearTimeout(disarmTimer);
+  phase='quiz'; render();
+}
 
+/* ── RENDER ── */
 function render(){
-  const root=document.getElementById('root');
-  stopAnim();
+  const root=document.getElementById('root'); stopAnim();
 
+  /* INTRO */
   if(phase==='intro'){
-    root.innerHTML=`<div class="intro">
+    root.innerHTML=`
+    <div class="intro">
       <div class="it">▶ ALERT TEAM TRAINING MODULE</div>
       <div class="is">SHOCK OR NO SHOCK?</div>
-      <div class="id">
-        Each scenario starts mid-resuscitation.<br>
-        CPR artifact runs &rarr; compressions pause &rarr; rhythm clears.<br>
-        Identify the rhythm. Make your call.<br>
-        10 rhythms &nbsp;&bull;&nbsp; Randomized every attempt.
+      <div class="id">CPR artifact → rhythm reveals → make your call.<br>10 rhythms &nbsp;•&nbsp; Randomized every attempt.</div>
+      <div class="mode-toggle">
+        <div class="mode-btn classic ${mode==='classic'?'active':''}" onclick="mode='classic';render()">RHYTHM<br>RECOGNITION</div>
+        <div class="mode-btn zoll ${mode==='zoll'?'active':''}" onclick="mode='zoll';render()">ZOLL<br>DEFIBRILLATOR</div>
       </div>
+      ${mode==='zoll'?`<div class="zoll-note"><strong>▶ ZOLL MODE</strong> — Simulates the actual R Series workflow.<br>Charge, analyze, shock, or disarm — your call.<br><span style="color:#886633">New to this? Complete Rhythm Recognition first.</span></div>`:''}
       <button class="st" onclick="startQuiz()">INITIATE QUIZ</button>
     </div>`;
     return;
   }
 
+  /* END */
   if(phase==='end'){
     const pct=Math.round(score/qs.length*100);
     let g,gc;
-    if(pct>=90){ g='CLEARED FOR RESPONSE'; gc='p'; }
-    else if(pct>=70){ g='REVIEW RECOMMENDED'; gc='rv'; }
-    else{ g='REMEDIATION REQUIRED'; gc='f'; }
+    if(pct>=90){g='CLEARED FOR RESPONSE';gc='p';}
+    else if(pct>=70){g='REVIEW RECOMMENDED';gc='rv';}
+    else{g='REMEDIATION REQUIRED';gc='f';}
     const mh=missed.length?`<div class="em"><div class="ml">▸ REVIEW THESE RHYTHMS</div>${missed.map(m=>`<div class="mi">▹ ${m}</div>`).join('')}</div>`:'';
-    root.innerHTML=`<div class="end">
-      <div class="et">SESSION COMPLETE</div>
-      <div class="es">${score}/${qs.length}</div>
-      <div class="ep">${pct}% ACCURACY</div>
-      <div class="eg ${gc}">${g}</div><br><br>
-      <button class="rs" onclick="startQuiz()">RUN AGAIN</button>
-      ${mh}
-    </div>`;
+    const switchBtn=mode==='classic'
+      ?`<br><button class="switch-btn" onclick="mode='zoll';phase='intro';render()">▶ TRY THE ZOLL DEFIBRILLATOR VERSION</button>`
+      :`<br><button class="switch-btn" style="border-color:#005500;color:#00aa44" onclick="mode='classic';phase='intro';render()">▶ BACK TO RHYTHM RECOGNITION</button>`;
+    const zExtra=mode==='zoll'?`<div class="precharge-tip"><div class="tip-label">▶ PRE-CHARGING — WHY IT MATTERS</div><p>Pre-charging during the last few seconds of a CPR cycle means the defibrillator is ready to fire the moment compressions pause. This shrinks the hands-off interval between the last compression and shock delivery — a gap that directly impacts outcomes. The goal is under 5 seconds. Pre-charging while CPR is still running costs nothing and buys critical time.</p></div>`:'';
+    root.innerHTML=`<div class="end"><div class="et">SESSION COMPLETE — ${mode==='zoll'?'ZOLL MODE':'RHYTHM MODE'}</div><div class="es">${score}/${qs.length}</div><div class="ep">${pct}% ACCURACY</div><div class="eg ${gc}">${g}</div><br><button class="rs" onclick="startQuiz()">RUN AGAIN</button>${switchBtn}${zExtra}${mh}</div>`;
     return;
   }
 
+  /* QUIZ */
   const q=qs[cur];
   const prog=(cur/qs.length)*100;
-  const dots=qs.map((_,i)=>{
-    let c='dot';
-    if(i<cur) c+=missed.some(m=>m===qs[i].name)?' no':' ok';
-    return `<div class="${c}"></div>`;
-  }).join('');
+  const dots=qs.map((_,i)=>{let c='dot';if(i<cur)c+=missed.some(m=>m===qs[i].name)?' no':' ok';return `<div class="${c}"></div>`;}).join('');
 
+  if(mode==='classic'){
+    root.innerHTML=`
+    <div class="hdr">
+      <div class="logo">ZOLL R SERIES ◆ COMPRESS TO SUCCESS</div>
+      <div class="vits"><div class="vit">HR <span>---</span></div><div class="vit">SpO2 <span>---</span></div><div class="vit">NIBP <span>---/---</span></div></div>
+      <div class="dots">${dots}</div>
+    </div>
+    <div class="body">
+      <div class="pg"><span>RHYTHM ${cur+1} OF ${qs.length}</span><div class="pbw"><div class="pbi" style="width:${prog}%"></div></div><span>SCORE ${score}</span></div>
+      <div class="lbl"><span>▶ LEAD II &nbsp;|&nbsp; 25mm/s &nbsp;|&nbsp; 10mm/mV</span><span class="phase-badge phase-cpr" id="pbadge">CPR IN PROGRESS</span></div>
+      <div class="screen"><canvas id="ekgc"></canvas></div>
+      <div class="cpr-label" id="cprlbl">▶ COMPRESSIONS ONGOING — STAND BY FOR ANALYSIS</div>
+      <div class="cpr-bar"><div class="cpr-fill" id="cprfill" style="width:0%"></div></div>
+      <div class="qs">CLINICAL SCENARIO</div>
+      <div class="pt" id="ptxt" style="color:#2a6a2a">Patient is unresponsive. CPR in progress...</div>
+      <div id="fbarea"></div>
+      <div class="btns">
+        <button class="btn bs locked" id="shockbtn" disabled onclick="answerClassic(true)">&#9889; SHOCK</button>
+        <button class="btn bn locked" id="noshockbtn" disabled onclick="answerClassic(false)">&#10007; NO SHOCK</button>
+      </div>
+      <button class="nxt" id="nxtbtn" style="display:none" onclick="nextQ()">${cur+1<qs.length?'NEXT RHYTHM &#9654;':'VIEW RESULTS &#9654;'}</button>
+    </div>`;
+    requestAnimationFrame(()=>startAnim(q));
+    return;
+  }
+
+  /* ZOLL MODE */
   root.innerHTML=`
   <div class="hdr">
     <div class="logo">ZOLL R SERIES ◆ COMPRESS TO SUCCESS</div>
-    <div class="vits">
-      <div class="vit">HR <span>---</span></div>
-      <div class="vit">SpO2 <span>---</span></div>
-      <div class="vit">NIBP <span>---/---</span></div>
-    </div>
+    <div class="vits"><div class="vit">HR <span>---</span></div><div class="vit">SpO2 <span>---</span></div></div>
     <div class="dots">${dots}</div>
   </div>
-  <div class="body">
-    <div class="pg">
-      <span>RHYTHM ${cur+1} OF ${qs.length}</span>
-      <div class="pbw"><div class="pbi" style="width:${prog}%"></div></div>
-      <span>SCORE ${score}</span>
+  <div class="zoll-wrap">
+    <div class="z-device">
+
+      <!-- SCREEN + RIGHT COL side by side like real R Series -->
+      <div class="z-mid">
+        <div class="z-screen-wrap">
+          <div class="z-screen-hdr">
+            <div>
+              <span style="display:block">LEAD II &nbsp;·&nbsp; 25mm/s &nbsp;·&nbsp; 10mm/mV</span>
+              <span id="zChargeLbl" style="color:#665500">DEFIB MODE</span>
+            </div>
+            <div class="z-elbl"><span class="z-eval" id="zEDisp">200</span><span class="z-eunit">J</span></div>
+          </div>
+          <canvas class="z-canvas" id="zCanvas"></canvas>
+          <div class="z-cpr-row"><div class="z-cpr-bar"><div class="z-cpr-fill" id="zCprFill"></div></div></div>
+          <div class="z-screen-status" id="zStatus">CPR IN PROGRESS — STAND BY</div>
+        </div>
+
+        <div class="z-right-col">
+          <button class="z-shock-circle" id="zShockCircle" onclick="zDoShock()">
+            <span class="si">⚡</span>SHOCK
+          </button>
+          <button class="z-charge" id="zChargeBtn" onclick="zDoCharge()">
+            CHARGE
+            <div class="z-cbar-wrap"><div class="z-cbar" id="zCbar"></div></div>
+          </button>
+          <button id="zAnalyzeBtn" onclick="zDoAnalyze()" disabled style="width:100%;padding:8px 4px;background:#2255aa;border:none;border-radius:5px;color:#fff;font-family:Arial;font-weight:900;font-size:11px;letter-spacing:1px;cursor:pointer;opacity:0.35;transition:all .12s">ANALYZE</button>
+          <button style="width:100%;padding:8px 4px;background:#444d5a;border:2px solid #333;border-radius:5px;color:#aaa;font-family:Arial;font-weight:900;font-size:9px;letter-spacing:1px;cursor:default;opacity:0.6">ENERGY<br>SELECT</button>
+        </div>
+      </div>
+
+      <!-- SCENARIO TEXT -->
+      <div class="z-scenario">▶ CLINICAL SCENARIO</div>
+      <div class="z-pt" id="ptxt" style="color:#333">Patient is unresponsive. CPR in progress...</div>
+
+      <!-- FEEDBACK -->
+      <div id="fbarea"></div>
+
+      <!-- NO SHOCK — full width -->
+      <button class="z-noshock" id="zNoShockBtn" onclick="zDoNoShock()" disabled>✗ &nbsp;NO SHOCK</button>
+
+      <!-- DISARM -->
+      <button class="z-disarm" id="zDisarm" onclick="zDoDisarm()">DISARM</button>
+
+      <!-- FOOTER -->
+      <div class="z-footer">
+        <div class="z-logo">ZOLL</div>
+        <label class="z-mute on" id="zMuteToggle" onclick="zToggleMute()">
+          <div class="z-track"></div>
+          <span id="zMuteLabel">SOUND ON</span>
+        </label>
+        <div style="font-family:var(--mono);font-size:9px;color:#445;letter-spacing:1px">R SERIES</div>
+      </div>
+
     </div>
-    <div class="lbl">
-      <span>▶ LEAD II &nbsp;|&nbsp; 25mm/s &nbsp;|&nbsp; 10mm/mV</span>
-      <span class="phase-badge phase-cpr" id="pbadge">CPR IN PROGRESS</span>
-    </div>
-    <div class="screen"><canvas id="ekgc"></canvas></div>
-    <div class="cpr-label" id="cprlbl">▶ COMPRESSIONS ONGOING — STAND BY FOR ANALYSIS</div>
-    <div class="cpr-bar"><div class="cpr-fill" id="cprfill" style="width:0%"></div></div>
-    <div class="qs">CLINICAL SCENARIO</div>
-    <div class="pt" id="ptxt" style="color:#2a6a2a">Patient is unresponsive. CPR in progress...</div>
-    <div id="fbarea"></div>
-    <div class="btns">
-      <button class="btn bs locked" id="shockbtn" disabled onclick="answerQ(true)">&#9889; SHOCK</button>
-      <button class="btn bn locked" id="noshockbtn" disabled onclick="answerQ(false)">&#10007; NO SHOCK</button>
-    </div>
+  </div>
+
+  <!-- PROGRESS / NEXT outside device -->
+  <div style="padding:12px 18px 0">
+    <div class="pg"><span>RHYTHM ${cur+1} OF ${qs.length}</span><div class="pbw"><div class="pbi" style="width:${prog}%"></div></div><span>SCORE ${score}</span></div>
     <button class="nxt" id="nxtbtn" style="display:none" onclick="nextQ()">${cur+1<qs.length?'NEXT RHYTHM &#9654;':'VIEW RESULTS &#9654;'}</button>
   </div>`;
 
-  requestAnimationFrame(() => startAnim(q));
+  requestAnimationFrame(()=>startAnim(q));
 }
 
 render();
