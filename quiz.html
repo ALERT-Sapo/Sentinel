@@ -95,7 +95,47 @@ html, body {
 .nxt { width: 100%; padding: 12px; background: #001800; border: 1px solid var(--green); border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 16px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all .15s; }
 .nxt:hover { background: #003300; }
 
-/* ── END SCREEN ── */
+/* ── DOT COLORS — ZOLL MODE ── */
+.dot.ok-fast  { background: var(--green); border-color: var(--green); }
+.dot.ok-slow  { background: #ddaa00; border-color: #ddaa00; }
+.dot.ok-assist{ background: #1199ee; border-color: #1199ee; }
+.dot.no       { background: var(--red); border-color: var(--red); }
+
+/* ── INSTRUCTIONS OVERLAY ── */
+.z-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; padding: 24px;
+}
+.z-overlay-box {
+  background: #b8bec7; border-radius: 10px; border: 2px solid #8a9099;
+  max-width: 420px; width: 100%; padding: 20px; display: flex; flex-direction: column; gap: 14px;
+}
+.z-overlay-title {
+  font-family: Arial; font-size: 15px; font-weight: 900; color: #111; letter-spacing: 1px;
+}
+.z-overlay-logo { font-family: Arial; font-size: 13px; font-weight: 900; color: #2255aa; letter-spacing: 3px; }
+.z-overlay-steps { display: flex; flex-direction: column; gap: 8px; }
+.z-overlay-step {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #080e08; border-radius: 6px; padding: 10px 12px;
+}
+.z-overlay-step .step-n {
+  font-family: 'Courier New', monospace; font-size: 10px; font-weight: 700;
+  color: #2a6a2a; letter-spacing: 1px; flex-shrink: 0; margin-top: 1px; width: 18px;
+}
+.z-overlay-step .step-t { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.z-overlay-step .step-d { font-size: 12px; color: #88aa88; line-height: 1.5; }
+.z-overlay-note {
+  background: #0a0800; border: 1px solid #554400; border-radius: 5px;
+  padding: 9px 12px; font-size: 12px; color: #ccaa44; line-height: 1.6;
+}
+.z-overlay-dismiss {
+  width: 100%; padding: 12px; background: #001800; border: 1px solid var(--green);
+  border-radius: 5px; color: var(--green); font-family: var(--sans); font-size: 15px;
+  font-weight: 900; letter-spacing: 2px; cursor: pointer;
+}
+.z-overlay-dismiss:hover { background: #003300; }
 .end { text-align: center; padding: 36px 18px; }
 .et { font-family: var(--mono); font-size: 11px; color: #1a5a1a; letter-spacing: 3px; margin-bottom: 10px; }
 .es { font-size: 64px; font-weight: 700; color: var(--green); line-height: 1; margin-bottom: 5px; font-family: Arial; }
@@ -327,6 +367,10 @@ let prechargeShown=false;
 let zCharged=false,zCharging=false,zAnalyzing=false;
 let zEIdx=3,zMuted=false;
 let audioCtx=null,chargeOsc=null,chargeGain=null,disarmTimer=null;
+// timing
+let zDecisionStart=null, zPrechargedBeforeReveal=false, zUsedAnalyze=false;
+let zQuestionLog=[];   // {correct, dt, preCharged, usedAnalyze, analyzeDt}
+let zInstructionsSeen=false;
 
 const ENERGIES=[50,100,150,200];
 const CPR_DUR_CLASSIC=4.2;
@@ -342,12 +386,15 @@ function startChargeSound(){
   const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2800; f.Q.value=8;
   chargeOsc.connect(f); f.connect(chargeGain); chargeGain.connect(ctx.destination);
   chargeOsc.type='sawtooth';
+  // Frequency sweep 300Hz → 2800Hz over exactly 4.5s to match real device
   chargeOsc.frequency.setValueAtTime(300,ctx.currentTime);
-  chargeOsc.frequency.exponentialRampToValueAtTime(2800,ctx.currentTime+4.0);
-  chargeGain.gain.setValueAtTime(0,ctx.currentTime);
-  chargeGain.gain.linearRampToValueAtTime(0.04,ctx.currentTime+1.0);
-  chargeGain.gain.linearRampToValueAtTime(0.09,ctx.currentTime+4.0);
-  chargeGain.gain.setValueAtTime(0.09,ctx.currentTime+4.0);
+  chargeOsc.frequency.exponentialRampToValueAtTime(2800,ctx.currentTime+4.5);
+  chargeOsc.frequency.setValueAtTime(2800,ctx.currentTime+4.5);
+  // Gain crescendo — starts near-silent, peaks at full charge (4.5s), holds steady after
+  chargeGain.gain.setValueAtTime(0.01,ctx.currentTime);
+  chargeGain.gain.linearRampToValueAtTime(0.03,ctx.currentTime+1.5);
+  chargeGain.gain.linearRampToValueAtTime(0.09,ctx.currentTime+4.5);
+  chargeGain.gain.setValueAtTime(0.09,ctx.currentTime+4.5);
   chargeOsc.start(ctx.currentTime);
 }
 function stopChargeSound(){if(chargeOsc){try{chargeOsc.stop();}catch(e){}chargeOsc=null;chargeGain=null;}}
@@ -416,16 +463,8 @@ function startAnim(rhythm){
     lastTS=ts; simT+=dt; phaseT+=dt;
 
     if(cprPhase==='cpr'){
-      // update CPR bar
       const fill=document.getElementById('cprfill')||document.getElementById('zCprFill');
       if(fill) fill.style.width=(Math.min(phaseT/CPR_DUR,1)*100)+'%';
-
-      // ZOLL: pre-charge prompt
-      if(mode==='zoll'&&!prechargeShown&&phaseT>=PRECHARGE_PROMPT_AT){
-        prechargeShown=true;
-        zSetStatus('▶ PRE-CHARGE NOW — minimize time off chest','warn');
-      }
-
       if(phaseT>=CPR_DUR){ cprPhase='analyze'; phaseT=0; updateBadge('analyze'); }
     }
     else if(cprPhase==='analyze'&&phaseT>=ANALYZE_DUR){
@@ -487,11 +526,13 @@ function zShowDisarm(v){const b=document.getElementById('zDisarm');if(b)v?b.clas
 
 function onZollRhythmRevealed(){
   const q=qs[cur];
+  zDecisionStart=performance.now();
+  zPrechargedBeforeReveal=(zCharged||zCharging);
+  zUsedAnalyze=false;
   zSetStatus('RHYTHM IDENTIFIED — USE THE DEFIBRILLATOR','');
   const pt=document.getElementById('ptxt');
   if(pt){pt.textContent='Patient is unresponsive. '+(q.pulse?'Pulse IS present.':'NO pulse detected.');pt.style.color=q.pulse?'#1a6e1a':'#333';}
   const cl=document.getElementById('cprlbl'); if(cl)cl.textContent='▶ RHYTHM CLEAR — WORK THE PANEL';
-  // unlock no-shock button
   const ns=document.getElementById('zNoShockBtn'); if(ns)ns.disabled=false;
 }
 
@@ -523,7 +564,7 @@ function zDoCharge(){
   startChargeSound();
   let pct=0;
   const iv=setInterval(()=>{
-    pct+=2.4; const b=document.getElementById('zCbar'); if(b)b.style.width=Math.min(pct,100)+'%';
+    pct+=100/(4500/38); const b=document.getElementById('zCbar'); if(b)b.style.width=Math.min(pct,100)+'%';
     if(pct>=100){
       clearInterval(iv); zCharging=false; zCharged=true;
       const cb=document.getElementById('zChargeBtn');
@@ -539,7 +580,7 @@ function zDoCharge(){
 }
 function zDoAnalyze(){
   if(!zCharged||zAnalyzing||answered)return;
-  zAnalyzing=true;
+  zAnalyzing=true; zUsedAnalyze=true;
   const ab=document.getElementById('zAnalyzeBtn'); if(ab){ab.disabled=true;ab.style.opacity='0.35';}
   zSetStatus('▶ ANALYZING — DO NOT TOUCH PATIENT','analyzing');
   let d=0;
@@ -561,6 +602,27 @@ function zDoAnalyze(){
     // locked — no re-use
   },2600);
 }
+function zLogDecision(correct){
+  const dt = zDecisionStart ? (performance.now()-zDecisionStart)/1000 : null;
+  zQuestionLog.push({
+    idx: cur,
+    name: qs[cur].name,
+    abbr: qs[cur].abbr,
+    correct,
+    dt,
+    preCharged: zPrechargedBeforeReveal,
+    usedAnalyze: zUsedAnalyze
+  });
+}
+function zDotClass(i){
+  if(i>=cur) return 'dot';
+  const log=zQuestionLog[i];
+  if(!log) return 'dot ok';
+  if(!log.correct) return 'dot no';
+  if(log.usedAnalyze) return 'dot ok-assist';
+  if(log.dt!==null&&log.dt>10) return 'dot ok-slow';
+  return 'dot ok-fast';
+}
 function zDoShock(){
   if(!zCharged||answered)return;
   const q=qs[cur];
@@ -570,6 +632,7 @@ function zDoShock(){
   document.getElementById('zChargeLbl').textContent='DEFIB MODE';
   const correct=q.shockable;
   answered=true; if(correct)score++;else missed.push(q.name);
+  zLogDecision(correct);
   zSetStatus(correct?'⚡ SHOCK DELIVERED — RESUME CPR':'⚠ SHOCK DELIVERED — NOT A SHOCKABLE RHYTHM',correct?'good':'warn');
   showZollFb(correct,q);
 }
@@ -578,7 +641,7 @@ function zDoNoShock(){
   const q=qs[cur];
   const correct=!q.shockable;
   answered=true; if(correct)score++;else missed.push(q.name);
-  // lock panel
+  zLogDecision(correct);
   ['zChargeBtn','zNoShockBtn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true;});
   const wasCharged=zCharged;
   if(zCharged){
@@ -587,12 +650,11 @@ function zDoNoShock(){
     zShowDisarm(false);
   }
   zSetStatus(correct?'✓ CORRECT — CPR & MEDS, NO SHOCK INDICATED':'✗ INCORRECT — THIS RHYTHM REQUIRES DEFIBRILLATION',correct?'good':'warn');
-  // Build feedback with disarm reminder if charged
   const disarmReminder = wasCharged
     ? `<div style="margin-top:10px;padding:8px 10px;background:#1a1200;border:1px solid #665500;border-radius:4px;font-size:13px;color:#ffcc44;line-height:1.6;">⚠ <strong>Don't forget:</strong> the device was charged — always disarm before resuming care.</div>`
     : `<div style="margin-top:10px;padding:8px 10px;background:#0a1a00;border:1px solid #224400;border-radius:4px;font-size:13px;color:#88cc88;line-height:1.6;">✓ Good habit reminder: if the device had been charged, you would need to <strong>disarm it</strong> before resuming CPR.</div>`;
   const fb=document.getElementById('fbarea');
-  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div>${disarmReminder}<div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
+  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div>${disarmReminder}${zTimingBox()}<div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
   const nxt=document.getElementById('nxtbtn'); if(nxt)nxt.style.display='block';
 }
 function zDoDisarm(){
@@ -614,9 +676,63 @@ function zToggleMute(){
   if(zMuted){t.classList.remove('on');l.textContent='SOUND OFF';if(chargeOsc)stopChargeSound();}
   else{t.classList.add('on');l.textContent='SOUND ON';if(zCharged)startChargeSound();}
 }
+function zTimingBox(){
+  const dt = zDecisionStart ? (performance.now()-zDecisionStart)/1000 : null;
+  const preCharged = zPrechargedBeforeReveal;
+  const usedAnalyze = zUsedAnalyze;
+  const ANALYZE_COST = 2.6;
+  const CHARGE_COST = 4.5;
+
+  let rows = '';
+
+  // Pre-charge row
+  if(preCharged){
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a2a1a">
+      <span style="color:#88cc88">Pre-charged during CPR</span>
+      <span style="color:#00e676;font-family:monospace;font-size:11px;font-weight:700">✓ NO TIME LOST</span>
+    </div>`;
+  } else {
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #2a1a1a">
+      <span style="color:#cc8888">Did not pre-charge — device charged after CPR paused</span>
+      <span style="color:#ff8888;font-family:monospace;font-size:11px;font-weight:700">+${CHARGE_COST.toFixed(1)}s LOST</span>
+    </div>`;
+  }
+
+  // Analyze row
+  if(usedAnalyze){
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1a2a">
+      <span style="color:#88aacc">Analyze used — compressions held during analysis</span>
+      <span style="color:#66aaff;font-family:monospace;font-size:11px;font-weight:700">+${ANALYZE_COST.toFixed(1)}s LOST</span>
+    </div>`;
+  }
+
+  // Decision time row
+  if(dt !== null){
+    const slow = dt > 10;
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+      <span style="color:${slow?'#cc8888':'#88cc88'}">Decision time after rhythm revealed${slow?' — exceeded 10s limit':''}</span>
+      <span style="color:${slow?'#ff8888':'#00e676'};font-family:monospace;font-size:11px;font-weight:700">${dt.toFixed(1)}s</span>
+    </div>`;
+  }
+
+  // Total estimated hands-off
+  if(dt !== null){
+    const total = dt + (preCharged?0:CHARGE_COST) + (usedAnalyze?ANALYZE_COST:0);
+    const bad = total > 10;
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 2px;border-top:1px solid #223322;margin-top:4px">
+      <span style="color:#aaa;font-weight:700">Estimated hands-off interval</span>
+      <span style="color:${bad?'#ff6644':'#00e676'};font-family:monospace;font-size:12px;font-weight:700">${total.toFixed(1)}s ${bad?'⚠':'✓'}</span>
+    </div>`;
+  }
+
+  return `<div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;line-height:1.7;">
+    <span style="font-family:monospace;font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:8px">▶ TIMING BREAKDOWN</span>
+    ${rows}
+  </div>`;
+}
 function showZollFb(correct,q){
   const fb=document.getElementById('fbarea');
-  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div><div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
+  if(fb)fb.innerHTML=`<div class="z-fb ${correct?'ok':'no'}"><div class="ft">${correct?'▸ CORRECT':'▸ INCORRECT'}</div><div class="fr">${q.name} (${q.abbr})</div><div class="fa">${q.action}</div></div>${zTimingBox()}<div style="margin-top:8px;padding:10px 13px;background:#080e08;border:1px solid #1a3a1a;border-radius:5px;font-size:13px;color:#7ab87a;line-height:1.65;"><span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:#2a6a2a;display:block;margin-bottom:5px">▶ CLINICAL PEARL</span>${q.pearl}</div>`;
   const nxt=document.getElementById('nxtbtn'); if(nxt)nxt.style.display='block';
 }
 
@@ -624,6 +740,7 @@ function showZollFb(correct,q){
 function nextQ(){
   cur++; answered=false;
   zCharged=false; zCharging=false; zAnalyzing=false;
+  zDecisionStart=null; zPrechargedBeforeReveal=false; zUsedAnalyze=false;
   stopChargeSound(); if(disarmTimer)clearTimeout(disarmTimer);
   if(cur>=qs.length)phase='end';
   render();
@@ -631,6 +748,7 @@ function nextQ(){
 function startQuiz(){
   qs=shuffle(RHYTHMS.map(r=>({...r,_s:null}))); cur=0; answered=false; score=0; missed=[];
   zCharged=false;zCharging=false;zAnalyzing=false;zEIdx=3;
+  zDecisionStart=null;zPrechargedBeforeReveal=false;zUsedAnalyze=false;zQuestionLog=[];
   stopChargeSound();if(disarmTimer)clearTimeout(disarmTimer);
   phase='quiz'; render();
 }
@@ -651,7 +769,7 @@ function render(){
         <div class="mode-btn zoll ${mode==='zoll'?'active':''}" onclick="mode='zoll';render()">ZOLL<br>DEFIBRILLATOR</div>
       </div>
       ${mode==='zoll'?`<div class="zoll-note"><strong>▶ ZOLL MODE</strong> — Simulates the actual R Series workflow.<br>Charge, analyze, shock, or disarm — your call.<br><span style="color:#886633">New to this? Complete Rhythm Recognition first.</span></div>`:''}
-      <button class="st" onclick="startQuiz()">INITIATE QUIZ</button>
+      <button class="st" onclick="${mode==='zoll'&&!zInstructionsSeen?'showZollInstructions()':'startQuiz()'}">INITIATE QUIZ</button>
     </div>`;
     return;
   }
@@ -667,7 +785,29 @@ function render(){
     const switchBtn=mode==='classic'
       ?`<br><button class="switch-btn" onclick="mode='zoll';phase='intro';render()">▶ TRY THE ZOLL DEFIBRILLATOR VERSION</button>`
       :`<br><button class="switch-btn" style="border-color:#005500;color:#00aa44" onclick="mode='classic';phase='intro';render()">▶ BACK TO RHYTHM RECOGNITION</button>`;
-    const zExtra=mode==='zoll'?`<div class="precharge-tip"><div class="tip-label">▶ PRE-CHARGING — WHY IT MATTERS</div><p>Pre-charging during the last few seconds of a CPR cycle means the defibrillator is ready to fire the moment compressions pause. This shrinks the hands-off interval between the last compression and shock delivery — a gap that directly impacts outcomes. The goal is under 5 seconds. Pre-charging while CPR is still running costs nothing and buys critical time.</p></div>`:'';
+    const zExtra=mode==='zoll'?(()=>{
+      const rows=zQuestionLog.map((l,i)=>{
+        const dtStr=l.dt!==null?l.dt.toFixed(1)+'s':'—';
+        const color=!l.correct?'#ff4444':l.usedAnalyze?'#1199ee':l.dt>10?'#ddaa00':'#00e676';
+        const tag=!l.correct?'INCORRECT':l.usedAnalyze?'ANALYZE-ASSISTED · '+dtStr:l.dt>10?'SLOW · '+dtStr:'CLEAN · '+dtStr;
+        const pre=l.preCharged?'<span style="color:#558855;margin-left:6px;font-family:monospace;font-size:9px">✓ pre-charged</span>':'';
+        return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#080e08;border-radius:4px;margin-bottom:5px;font-size:12px;">'
+          +'<span style="width:8px;height:8px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'
+          +'<span style="color:#aaa;font-family:monospace;font-size:9px;flex-shrink:0">'+String(i+1).padStart(2,'0')+'</span>'
+          +'<span style="color:#ccc;flex:1">'+l.abbr+'</span>'
+          +'<span style="color:'+color+';font-family:monospace;font-size:9px">'+tag+'</span>'
+          +pre+'</div>';
+      }).join('');
+      return '<div style="margin-top:18px;text-align:left">'
+        +'<div style="font-family:monospace;font-size:9px;color:#1a5a1a;letter-spacing:2px;margin-bottom:10px">▶ DECISION BREAKDOWN</div>'
+        +'<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-family:monospace;font-size:9px;">'
+        +'<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#00e676;display:inline-block"></span><span style="color:#558855">CLEAN (&lt;10s)</span></span>'
+        +'<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#ddaa00;display:inline-block"></span><span style="color:#887733">SLOW (&gt;10s)</span></span>'
+        +'<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#1199ee;display:inline-block"></span><span style="color:#336688">ANALYZE-ASSISTED</span></span>'
+        +'<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#ff3b3b;display:inline-block"></span><span style="color:#883333">INCORRECT</span></span>'
+        +'</div>'+rows+'</div>'
+        +'<div class="precharge-tip"><div class="tip-label">▶ PRE-CHARGING — WHY IT MATTERS</div><p>Pre-charging during the last few seconds of a CPR cycle means the defibrillator is ready to fire the moment compressions pause. This shrinks the hands-off interval between the last compression and shock delivery — a gap that directly impacts outcomes. The goal is under 5 seconds. Pre-charging while CPR is still running costs nothing and buys critical time.</p></div>';
+    })():''
     root.innerHTML=`<div class="end"><div class="et">SESSION COMPLETE — ${mode==='zoll'?'ZOLL MODE':'RHYTHM MODE'}</div><div class="es">${score}/${qs.length}</div><div class="ep">${pct}% ACCURACY</div><div class="eg ${gc}">${g}</div><br><button class="rs" onclick="startQuiz()">RUN AGAIN</button>${switchBtn}${zExtra}${mh}</div>`;
     return;
   }
@@ -675,7 +815,9 @@ function render(){
   /* QUIZ */
   const q=qs[cur];
   const prog=(cur/qs.length)*100;
-  const dots=qs.map((_,i)=>{let c='dot';if(i<cur)c+=missed.some(m=>m===qs[i].name)?' no':' ok';return `<div class="${c}"></div>`;}).join('');
+  const dots = mode==='zoll'
+    ? qs.map((_,i)=>`<div class="${zDotClass(i)}"></div>`).join('')
+    : qs.map((_,i)=>{let c='dot';if(i<cur)c+=missed.some(m=>m===qs[i].name)?' no':' ok';return `<div class="${c}"></div>`;}).join('');
 
   if(mode==='classic'){
     root.innerHTML=`
@@ -774,6 +916,44 @@ function render(){
   </div>`;
 
   requestAnimationFrame(()=>startAnim(q));
+}
+
+function showZollInstructions(){
+  const ov=document.createElement('div');
+  ov.className='z-overlay'; ov.id='zOverlay';
+  ov.innerHTML=`
+  <div class="z-overlay-box">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="z-overlay-title">HOW TO USE THE DEFIBRILLATOR</div>
+      <div class="z-overlay-logo">ZOLL</div>
+    </div>
+    <div class="z-overlay-steps">
+      <div class="z-overlay-step">
+        <div class="step-n">01</div>
+        <div><div class="step-t">PRE-CHARGE DURING CPR</div><div class="step-d">Hit Charge while compressions are ongoing. The device will be ready the moment CPR pauses — minimizing time off the chest.</div></div>
+      </div>
+      <div class="z-overlay-step">
+        <div class="step-n">02</div>
+        <div><div class="step-t">ANALYZE (OPTIONAL)</div><div class="step-d">Only available once the device is charged. One use per rhythm. The device recommends — you decide. Using it costs time, so use it wisely.</div></div>
+      </div>
+      <div class="z-overlay-step">
+        <div class="step-n">03</div>
+        <div><div class="step-t">SHOCK OR NO SHOCK</div><div class="step-d">Press the orange Shock circle to deliver. Press No Shock if the rhythm doesn't call for defibrillation. The device won't fire on its own.</div></div>
+      </div>
+      <div class="z-overlay-step">
+        <div class="step-n">04</div>
+        <div><div class="step-t">DISARM WHEN CHARGED BUT NOT SHOCKING</div><div class="step-d">If you charged but aren't delivering a shock, always disarm before resuming CPR. The yellow Disarm button appears when the device is live.</div></div>
+      </div>
+    </div>
+    <div class="z-overlay-note">⚠ Compressions should only be held for <strong>10 seconds</strong> maximum. Your decision time is tracked from the moment the rhythm reveals.</div>
+    <button class="z-overlay-dismiss" onclick="dismissZollInstructions()">GOT IT — START QUIZ</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+function dismissZollInstructions(){
+  zInstructionsSeen=true;
+  const ov=document.getElementById('zOverlay'); if(ov)ov.remove();
+  startQuiz();
 }
 
 render();
