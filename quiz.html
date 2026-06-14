@@ -104,12 +104,14 @@ html, body {
 /* ── INSTRUCTIONS OVERLAY ── */
 .z-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   z-index: 999; padding: 24px;
+  overflow-y: auto;
 }
 .z-overlay-box {
   background: #b8bec7; border-radius: 10px; border: 2px solid #8a9099;
   max-width: 420px; width: 100%; padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  margin: auto;
 }
 .z-overlay-title {
   font-family: Arial; font-size: 15px; font-weight: 900; color: #111; letter-spacing: 1px;
