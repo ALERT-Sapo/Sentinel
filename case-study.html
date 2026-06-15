@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACLS Case Studies — ALERT Team</title>
+  <style>
+    :root {
+      --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f5f7fa;
+      --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+      --text: #111827; --text2: #4b5563; --text3: #9ca3af;
+      --green: #059669; --green-bg: rgba(5,150,105,0.08); --green-border: rgba(5,150,105,0.25);
+      --red: #dc2626; --red-bg: rgba(220,38,38,0.08); --red-border: rgba(220,38,38,0.25);
+      --blue: #2563eb; --blue-bg: rgba(37,99,235,0.08); --blue-border: rgba(37,99,235,0.25);
+      --amber: #d97706; --amber-bg: rgba(217,119,6,0.08); --amber-border: rgba(217,119,6,0.25);
+      --coral: #ea580c; --coral-bg: rgba(234,88,12,0.08); --coral-border: rgba(234,88,12,0.25);
+      --radius: 10px; --radius-sm: 6px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 5rem; }
+    header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; }
+    .header-icon { width: 36px; height: 36px; background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header-icon svg { width: 18px; height: 18px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    header h1 { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+    header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .tag { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); background: var(--bg3); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; }
+    main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+    a.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; margin-bottom: 1.5rem; transition: color 0.15s; }
+    a.back-link:hover { color: var(--text); }
+    a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+    .category-group { margin-bottom: 1.5rem; }
+    .category-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; text-align: left; }
+    .case-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .case-card.active { border-color: var(--coral); background: var(--coral-bg); }
+    .case-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+    .case-meta { font-size: 12px; color: var(--text2); }
+    .how-it-works { margin-top: 1rem; padding: 12px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); font-size: 13px; color: var(--blue); line-height: 1.6; }
+    #caseRunner { display: none; }
+    .patient-status { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 1rem; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .vital-chip { display: flex; flex-direction: column; gap: 2px; }
+    .vital-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); }
+    .vital-value { font-size: 14px; font-weight: 600; color: var(--text); }
+    .vital-value.danger { color: var(--red); }
+    .vital-value.warn { color: var(--amber); }
+    .vital-value.ok { color: var(--green); }
+    .vitals-divider { width: 1px; background: var(--border); align-self: stretch; }
+    .progress-track { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+    .progress-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
+    .step-dots { display: flex; gap: 6px; flex: 1; }
+    .step-dot { height: 4px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+    .step-dot.done { background: var(--green); }
+    .step-dot.current { background: var(--coral); }
+    .scene-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+    .scene-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .scene-num { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); }
+    .scene-phase { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; }
+    .phase-assess { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+    .phase-decide { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .phase-act { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+    .phase-manage { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .scene-body { padding: 16px 18px; }
+    .scene-narrative { font-size: 15px; line-height: 1.65; color: var(--text); margin-bottom: 16px; }
+    .scene-narrative strong { font-weight: 600; }
+    .scene-prompt { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+    .choices { display: flex; flex-direction: column; gap: 8px; }
+    .choice-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; text-align: left; cursor: pointer; font-size: 14px; color: var(--text); line-height: 1.5; transition: border-color 0.15s, background 0.15s; display: flex; gap: 10px; align-items: flex-start; }
+    .choice-btn:hover:not(:disabled) { border-color: var(--border2); background: var(--bg2); }
+    .choice-btn:disabled { cursor: default; }
+    .choice-letter { font-size: 10px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; background: var(--border); color: var(--text3); transition: background 0.15s, color 0.15s; }
+    .choice-btn.correct { border-color: var(--green); background: var(--green-bg); }
+    .choice-btn.correct .choice-letter { background: var(--green); color: white; }
+    .choice-btn.wrong { border-color: var(--red); background: var(--red-bg); }
+    .choice-btn.wrong .choice-letter { background: var(--red); color: white; }
+    .feedback-card { border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 14px; border: 1px solid; opacity: 0; transform: translateY(4px); transition: opacity 0.25s ease, transform 0.25s ease; }
+    .feedback-card.visible { opacity: 1; transform: translateY(0); }
+    .feedback-card.correct { background: var(--green-bg); border-color: var(--green-border); }
+    .feedback-card.wrong { background: var(--amber-bg); border-color: var(--amber-border); }
+    .fb-head { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .feedback-card.correct .fb-head { color: var(--green); }
+    .feedback-card.wrong .fb-head { color: var(--amber); }
+    .fb-body { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    .consequence-scene { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 12px; opacity: 0; transform: translateY(4px); transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s; }
+    .consequence-scene.visible { opacity: 1; transform: translateY(0); }
+    .consequence-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+    .consequence-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+    .pearl-box { margin-top: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+    .pearl-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+    .pearl-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .continue-btn { margin-top: 14px; width: 100%; padding: 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; transition: background 0.15s; display: none; }
+    .continue-btn.visible { display: block; }
+    .continue-btn:hover { background: var(--bg3); }
+    .checklist-box { margin-top: 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .checklist-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item:hover { background: var(--bg2); }
+    .checklist-item.checked { background: var(--green-bg); }
+    .check-box { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background 0.15s, border-color 0.15s; }
+    .checklist-item.checked .check-box { background: var(--green); border-color: var(--green); }
+    .check-mark { font-size: 11px; color: white; display: none; }
+    .checklist-item.checked .check-mark { display: block; }
+    .check-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .checklist-item.checked .check-text { color: var(--green); }
+    .deliver-btn { width: 100%; margin-top: 12px; padding: 13px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; color: var(--text3); cursor: not-allowed; transition: all 0.2s; }
+    .deliver-btn.unlocked { background: var(--coral-bg); border-color: var(--coral); color: var(--coral); cursor: pointer; }
+    .deliver-btn.unlocked:hover { background: rgba(234,88,12,0.14); }
+    .summary-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; }
+    .summary-header { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .summary-score { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 4px; }
+    .summary-step { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+    .summary-step:last-child { border-bottom: none; }
+    .ss-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+    .ss-icon.correct { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .ss-icon.wrong { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .ss-content { flex: 1; }
+    .ss-step { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+    .ss-choice { font-size: 14px; color: var(--text); line-height: 1.4; }
+    .ss-correct { font-size: 12px; color: var(--green); margin-top: 3px; }
+    .action-btn { width: 100%; padding: 13px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-bottom: 10px; }
+    .btn-neutral { background: var(--bg2); border: 1px solid var(--border2); color: var(--text); }
+    .btn-neutral:hover { background: var(--bg3); }
+    .btn-coral { background: var(--coral-bg); border: 1px solid var(--coral-border); color: var(--coral); }
+    .btn-coral:hover { background: rgba(234,88,12,0.14); }
+    @media (max-width: 520px) { .case-grid { grid-template-columns: 1fr; } .patient-status { gap: 12px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  </div>
+  <div>
+    <h1>ACLS Case Studies</h1>
+    <p>UCI Health · ALERT Team</p>
+  </div>
+  <span class="tag">Interactive Practice</span>
+</header>
+
+<main>
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to home
+  </a>
+
+  <div id="caseSelector">
+    <div class="section-label">Choose a case</div>
+    <div id="categoryList"></div>
+    <div class="how-it-works">
+      <strong style="font-weight:600;">How this works:</strong> You'll step through a real clinical scenario, making decisions at each inflection point. If you choose wrong, the case keeps going — you'll see the consequence and have to recover. That's intentional.
+    </div>
+  </div>
+
+  <div id="caseRunner">
+    <div class="patient-status" id="patientStatus"></div>
+    <div class="progress-track">
+      <span class="progress-label" id="progressLabel">Step 1</span>
+      <div class="step-dots" id="stepDots"></div>
+    </div>
+    <div id="sceneContainer"></div>
+  </div>
+</main>
+
+<!-- ── CASE DATA FILES — add new cases by adding a script tag here ── -->
+<script src="cases/vtach-unstable.js"></script>
+<script src="cases/vfib-pulseless.js"></script>
+<!-- <script src="cases/vtach-stable.js"></script> -->
+<!-- <script src="cases/pea.js"></script>          -->
+<!-- <script src="cases/asystole.js"></script>     -->
+
+<script>
+const REGISTRY = [];
+const CASE_MAP = {};
+
+window.registerCase = function(caseObj) {
+  REGISTRY.push(caseObj);
+  CASE_MAP[caseObj.id] = caseObj;
+};
+
+let activeCase = null;
+let currentStep = 0;
+let results = [];
+let choiceMade = false;
+
+function buildSelector() {
+  const categories = {};
+  REGISTRY.forEach(c => {
+    if (!categories[c.category]) categories[c.category] = [];
+    categories[c.category].push(c);
+  });
+  const list = document.getElementById('categoryList');
+  list.innerHTML = Object.entries(categories).map(([cat, cases]) => `
+    <div class="category-group">
+      <div class="category-label">${cat}</div>
+      <div class="case-grid">
+        ${cases.map(c => `
+          <div class="case-card" id="card-${c.id}" onclick="startCase('${c.id}')">
+            <div class="case-title">${c.title}</div>
+            <div class="case-meta">${c.meta}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function shuffleChoices(choices) {
+  const indexed = choices.map((c, i) => ({ ...c, _origIdx: i }));
+  for (let i = indexed.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+  }
+  return indexed;
+}
+
+function getVitals() {
+  if (activeCase.vitalsProgression)
+    return activeCase.vitalsProgression[Math.min(currentStep, activeCase.vitalsProgression.length - 1)];
+  return activeCase.baseVitals;
+}
+
+function startCase(id) {
+  activeCase = CASE_MAP[id];
+  currentStep = 0; results = []; choiceMade = false;
+  document.querySelectorAll('.case-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + id).classList.add('active');
+  document.getElementById('caseSelector').style.display = 'none';
+  document.getElementById('caseRunner').style.display = 'block';
+  renderStep();
+}
+
+function renderStep() {
+  choiceMade = false;
+  const step = activeCase.steps[currentStep];
+  const total = activeCase.steps.length;
+  renderVitals(); renderProgress(total);
+  const container = document.getElementById('sceneContainer');
+  container.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'scene-card';
+  const phaseClasses = { assess:'phase-assess', decide:'phase-decide', act:'phase-act', manage:'phase-manage' };
+
+  if (step.isChecklist) {
+    card.innerHTML = `
+      <div class="scene-header">
+        <span class="scene-num">Step ${currentStep + 1} of ${total}</span>
+        <span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span>
+      </div>
+      <div class="scene-body">
+        <div class="scene-narrative">${step.narrative}</div>
+        <div class="scene-prompt">Check each item before delivering the shock</div>
+        <div class="checklist-box">
+          <div class="checklist-header">Pre-cardioversion safety checklist</div>
+          ${step.checklistItems.map(item => `
+            <div class="checklist-item" id="chk-${item.id}" onclick="toggleCheck('${item.id}')">
+              <div class="check-box"><span class="check-mark">✓</span></div>
+              <span class="check-text">${item.text}</span>
+            </div>
+          `).join('')}
+        </div>
+        <button class="deliver-btn" id="deliverBtn" onclick="completeChecklist()">Deliver shock →</button>
+        <div id="feedbackArea"></div>
+        <div class="pearl-box" style="margin-top:14px;">
+          <div class="pearl-label">Clinical pearl</div>
+          <div class="pearl-text">${step.pearl}</div>
+        </div>
+      </div>`;
+  } else {
+    const shuffled = shuffleChoices(step.choices);
+    card.innerHTML = `
+      <div class="scene-header">
+        <span class="scene-num">Step ${currentStep + 1} of ${total}</span>
+        <span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span>
+      </div>
+      <div class="scene-body">
+        <div class="scene-narrative">${step.narrative}</div>
+        <div class="scene-prompt">${step.prompt || 'What do you do?'}</div>
+        <div class="choices" id="choices">
+          ${shuffled.map((c, i) => `
+            <button class="choice-btn" onclick="handleChoice(${c._origIdx})" id="choice-${c._origIdx}">
+              <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
+              <span>${c.text}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div id="feedbackArea"></div>
+      </div>`;
+  }
+  container.appendChild(card);
+}
+
+function renderVitals() {
+  const v = getVitals();
+  const isPulseless = !!activeCase.baseVitals;
+  const isPost = activeCase.vitalsProgression && currentStep === activeCase.steps.length - 1;
+  const color = (f) => isPulseless ? 'danger' : isPost ? 'ok' : f === 'bp' ? 'danger' : 'warn';
+  document.getElementById('patientStatus').innerHTML = `
+    <div class="vital-chip"><span class="vital-label">HR</span><span class="vital-value ${color('hr')}">${v.hr}</span></div>
+    <div class="vitals-divider"></div>
+    <div class="vital-chip"><span class="vital-label">BP</span><span class="vital-value ${color('bp')}">${v.bp}</span></div>
+    <div class="vitals-divider"></div>
+    <div class="vital-chip"><span class="vital-label">SpO2</span><span class="vital-value ${color('spo2')}">${v.spo2}</span></div>
+    <div class="vitals-divider"></div>
+    <div class="vital-chip"><span class="vital-label">RR</span><span class="vital-value ${color('rr')}">${v.rr}</span></div>
+    <div class="vitals-divider"></div>
+    <div class="vital-chip"><span class="vital-label">Status</span><span class="vital-value" style="font-size:12px;">${v.label || activeCase.title}</span></div>`;
+}
+
+function renderProgress(total) {
+  document.getElementById('progressLabel').textContent = `Step ${currentStep + 1} of ${total}`;
+  document.getElementById('stepDots').innerHTML = Array.from({length:total},(_,i)=>{
+    let cls='step-dot'; if(i<currentStep)cls+=' done'; else if(i===currentStep)cls+=' current';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+function handleChoice(idx) {
+  if (choiceMade) return;
+  choiceMade = true;
+  const step = activeCase.steps[currentStep];
+  const choice = step.choices[idx];
+  const correct = choice.correct;
+  results.push({ stepIndex: currentStep, correct, choiceText: choice.text, correctChoice: step.choices.find(c=>c.correct).text, phaseLabel: step.phaseLabel });
+  step.choices.forEach((c,i) => {
+    const btn = document.getElementById('choice-'+i); if(!btn)return;
+    btn.disabled = true;
+    if(i===idx) btn.classList.add(correct?'correct':'wrong');
+    else if(c.correct) btn.classList.add('correct');
+  });
+  const feedbackArea = document.getElementById('feedbackArea');
+  const nextLabel = currentStep+1 < activeCase.steps.length ? 'Continue →' : 'See results →';
+  if (correct) {
+    feedbackArea.innerHTML = `
+      <div class="feedback-card correct" id="fb">
+        <div class="fb-head">✓ Correct</div>
+        <div class="fb-body">${step.correctFeedback}</div>
+        <div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div>
+      </div>
+      <button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
+    setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+  } else {
+    feedbackArea.innerHTML = `
+      <div class="feedback-card wrong" id="fb">
+        <div class="fb-head">Not quite</div>
+        <div class="fb-body">${step.wrongFeedback}</div>
+      </div>
+      <div class="consequence-scene" id="consequence">
+        <div class="consequence-label">▸ Here's what happens</div>
+        <div class="consequence-text">${choice.consequence}</div>
+        <div class="pearl-box" style="margin-top:10px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div>
+      </div>
+      <button class="continue-btn" id="continueBtn" onclick="nextStep()">${nextLabel}</button>`;
+    setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+    setTimeout(()=>document.getElementById('consequence')?.classList.add('visible'),300);
+    setTimeout(()=>document.getElementById('continueBtn')?.classList.add('visible'),600);
+  }
+  setTimeout(()=>feedbackArea.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+function toggleCheck(id) {
+  document.getElementById('chk-'+id).classList.toggle('checked');
+  const step = activeCase.steps[currentStep];
+  const allChecked = step.checklistItems.every(i=>document.getElementById('chk-'+i.id)?.classList.contains('checked'));
+  document.getElementById('deliverBtn').classList.toggle('unlocked', allChecked);
+}
+
+function completeChecklist() {
+  const step = activeCase.steps[currentStep];
+  if (!step.checklistItems.every(i=>document.getElementById('chk-'+i.id)?.classList.contains('checked'))) return;
+  step.checklistItems.forEach(i=>{const el=document.getElementById('chk-'+i.id);el.style.cursor='default';el.onclick=null;});
+  document.getElementById('deliverBtn').style.display='none';
+  results.push({stepIndex:currentStep,correct:true,choiceText:'Completed pre-cardioversion safety checklist',correctChoice:'Completed pre-cardioversion safety checklist',phaseLabel:step.phaseLabel});
+  const feedbackArea = document.getElementById('feedbackArea');
+  feedbackArea.innerHTML = `
+    <div class="feedback-card correct" id="fb">
+      <div class="fb-head">✓ All items confirmed</div>
+      <div class="fb-body">Safety check complete. Every item on this list exists because something went wrong when it was skipped. The verbal clear, the O2 position, the sync markers — these are not bureaucratic steps. They are the difference between a controlled procedure and an incident report.</div>
+    </div>
+    <button class="continue-btn visible" onclick="nextStep()">Continue →</button>`;
+  setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+  setTimeout(()=>feedbackArea.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+function nextStep() {
+  currentStep++;
+  if (currentStep >= activeCase.steps.length) renderSummary();
+  else { window.scrollTo({top:0,behavior:'smooth'}); renderStep(); }
+}
+
+function renderSummary() {
+  window.scrollTo({top:0,behavior:'smooth'});
+  const correct = results.filter(r=>r.correct).length;
+  const total = results.length;
+  const pct = Math.round(correct/total*100);
+  let grade, gradeColor;
+  if(pct===100){grade='Clean run';gradeColor='var(--green)';}
+  else if(pct>=75){grade='Good — review your misses';gradeColor='var(--amber)';}
+  else{grade='Review recommended';gradeColor='var(--red)';}
+  document.getElementById('patientStatus').innerHTML=`<div style="font-size:12px;color:var(--text2);line-height:1.6;">Case complete — <strong style="color:var(--text)">${activeCase.title}</strong></div>`;
+  document.getElementById('progressLabel').textContent='Complete';
+  document.getElementById('stepDots').innerHTML=Array.from({length:total},()=>`<div class="step-dot done"></div>`).join('');
+  const others = REGISTRY.filter(c=>c.id!==activeCase.id);
+  document.getElementById('sceneContainer').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="summary-score">${correct}/${total}</div>
+        <div style="font-size:12px;font-weight:600;color:${gradeColor};margin-top:2px;">${grade}</div>
+      </div>
+      <div>
+        ${results.map((r,i)=>`
+          <div class="summary-step">
+            <div class="ss-icon ${r.correct?'correct':'wrong'}">${r.correct?'✓':'✗'}</div>
+            <div class="ss-content">
+              <div class="ss-step">Step ${i+1} — ${r.phaseLabel}</div>
+              <div class="ss-choice">${r.choiceText}</div>
+              ${!r.correct?`<div class="ss-correct">Correct: ${r.correctChoice}</div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
+    ${others.map(c=>`<button class="action-btn btn-coral" onclick="startCase('${c.id}')">${c.title} →</button>`).join('')}
+    <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
+}
+
+function restartCase() {
+  currentStep=0; results=[];
+  document.getElementById('caseRunner').style.display='block';
+  renderStep();
+}
+
+function backToSelector() {
+  activeCase=null; currentStep=0; results=[];
+  document.querySelectorAll('.case-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('caseRunner').style.display='none';
+  document.getElementById('caseSelector').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+buildSelector();
+</script>
+</body>
+</html>
