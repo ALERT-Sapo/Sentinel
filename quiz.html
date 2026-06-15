@@ -705,15 +705,21 @@ function zTimingBox(){
   }
 
   // Pre-charge — independent cost before decision clock
+  const q = qs[cur];
   if(preCharged){
     rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a2a1a">
       <span style="color:#88cc88">Pre-charged during CPR</span>
       <span style="color:#00e676;font-family:monospace;font-size:11px;font-weight:700">✓ NO TIME LOST</span>
     </div>`;
-  } else {
+  } else if(q.shockable){
     rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #2a1a1a">
       <span style="color:#cc8888">Not pre-charging added an extra 4.5s to time off chest</span>
       <span style="color:#ff8888;font-family:monospace;font-size:11px;font-weight:700">4.5s ⚠</span>
+    </div>`;
+  } else {
+    rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a2a1a">
+      <span style="color:#88aacc">Rhythm wasn't shockable — but remember to pre-charge on the next one</span>
+      <span style="color:#66aaff;font-family:monospace;font-size:11px;font-weight:700">ℹ</span>
     </div>`;
   }
 
@@ -867,7 +873,13 @@ function render(){
             <div class="z-elbl"><span class="z-eval" id="zEDisp">200</span><span class="z-eunit">J</span></div>
           </div>
           <canvas class="z-canvas" id="zCanvas"></canvas>
-          <div class="z-cpr-row"><div class="z-cpr-bar"><div class="z-cpr-fill" id="zCprFill"></div></div></div>
+          <div class="z-cpr-row">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span style="font-family:var(--mono);font-size:8px;color:#1a5a1a;letter-spacing:1px">TIME TO RHYTHM CHECK</span>
+              <span style="font-family:var(--mono);font-size:8px;color:#1a5a1a;letter-spacing:1px">CPR</span>
+            </div>
+            <div class="z-cpr-bar"><div class="z-cpr-fill" id="zCprFill"></div></div>
+          </div>
           <div class="z-screen-status" id="zStatus">CPR IN PROGRESS — STAND BY</div>
         </div>
 
