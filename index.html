@@ -140,6 +140,7 @@
 
     .tool-card.quiz:hover { border-color: var(--coral); }
     .tool-card.decision:hover { border-color: var(--blue); }
+    .tool-card.cases:hover { border-color: var(--green); }
 
     .card-icon {
       width: 44px;
@@ -153,6 +154,7 @@
 
     .card-icon.quiz { background: var(--coral-bg); border: 1px solid var(--coral-border); }
     .card-icon.decision { background: var(--blue-bg); border: 1px solid var(--blue-border); }
+    .card-icon.cases { background: var(--green-bg); border: 1px solid var(--green-border); }
 
     .card-icon svg {
       width: 22px; height: 22px; fill: none;
@@ -161,6 +163,7 @@
 
     .card-icon.quiz svg { stroke: var(--coral); }
     .card-icon.decision svg { stroke: var(--blue); }
+    .card-icon.cases svg { stroke: var(--green); }
 
     .card-body { flex: 1; }
 
@@ -174,6 +177,7 @@
 
     .card-tag.quiz { color: var(--coral); }
     .card-tag.decision { color: var(--blue); }
+    .card-tag.cases { color: var(--green); }
 
     .card-title {
       font-size: 16px;
@@ -212,6 +216,7 @@
 
     .card-arrow.quiz { background: var(--coral-bg); }
     .card-arrow.decision { background: var(--blue-bg); }
+    .card-arrow.cases { background: var(--green-bg); }
 
     .card-arrow svg {
       width: 14px; height: 14px; fill: none;
@@ -220,6 +225,7 @@
 
     .card-arrow.quiz svg { stroke: var(--coral); }
     .card-arrow.decision svg { stroke: var(--blue); }
+    .card-arrow.cases svg { stroke: var(--green); }
 
     .divider {
       display: flex;
@@ -269,7 +275,7 @@
       border-top: 1px solid var(--border);
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       .card-grid { grid-template-columns: 1fr; }
       .intro h2 { font-size: 20px; }
     }
@@ -292,7 +298,7 @@
 
   <div class="intro">
     <h2>What would you like to practice?</h2>
-    <p>Select a tool below to get started. Both tools are designed to build confidence before you need it at the bedside.</p>
+    <p>Select a tool below to get started. All tools are designed to build confidence before you need it at the bedside.</p>
   </div>
 
   <div class="card-grid">
@@ -326,6 +332,23 @@
       <div class="card-footer">
         <span class="card-meta">Quiz · Scored</span>
         <div class="card-arrow quiz">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-card cases" href="case-study.html">
+      <div class="card-icon cases">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag cases">Interactive Cases</div>
+        <div class="card-title">ACLS Case Studies</div>
+        <div class="card-desc">Work through real clinical scenarios, make decisions, and see the consequences unfold.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta">Practice · Decision-based</span>
+        <div class="card-arrow cases">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
