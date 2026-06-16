@@ -439,7 +439,8 @@ function backToSelector() {
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-buildSelector();
+// buildSelector runs after all case scripts have loaded
+window.addEventListener('load', buildSelector);
 </script>
 
 <script src="cases/vtach-unstable.js"></script>
