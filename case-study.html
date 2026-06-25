@@ -39,6 +39,25 @@
     .case-meta { font-size: 12px; color: var(--text2); }
     .how-it-works { margin-top: 1rem; padding: 12px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); font-size: 13px; color: var(--blue); line-height: 1.6; }
     #caseRunner { display: none; }
+    .zoll-screen { background: #0a0a0a; border-radius: 6px; padding: 10px 14px; margin: 14px 0; border: 1.5px solid #333; }
+    .zoll-lbl { font-size: 10px; color: #4ade80; font-family: monospace; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .zoll-lbl.pre-charged { color: #facc15; }
+    .code-clock { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin: 14px 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .cc-item { text-align: center; }
+    .cc-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); margin-bottom: 3px; }
+    .cc-value { font-size: 15px; font-weight: 600; color: var(--text); font-family: monospace; }
+    .cc-value.due { color: var(--amber); }
+    .multi-confirm-btn { margin-top: 10px; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--blue-border); background: var(--blue-bg); color: var(--blue); font-size: 14px; font-weight: 600; cursor: pointer; }
+    .multi-confirm-btn:hover:not(:disabled) { background: rgba(37,99,235,0.15); }
+    .multi-confirm-btn:disabled { opacity: 0.4; cursor: default; }
+    .choice-btn.multi-selected { border-color: var(--blue); background: var(--blue-bg); }
+    .choice-btn.multi-selected .choice-letter { background: var(--blue); color: white; }
+    .narrative-continue { margin-top: 16px; padding: 10px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; float: right; }
+    .narrative-continue:hover { background: var(--bg2); }
+    .landing-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 1rem; }
+    .landing-text { font-size: 15px; line-height: 1.8; color: var(--text); }
+    .landing-text p { margin-bottom: 1rem; }
+    .landing-text p:last-child { margin-bottom: 0; }
     .patient-status { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 1rem; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
     .vital-chip { display: flex; flex-direction: column; gap: 2px; }
     .vital-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); }
@@ -458,6 +477,205 @@ registerCase({
   ]
 });
 
+// ── PEA / ASYSTOLE CASE ──
+registerCase({
+  id: 'pea-asystole',
+  category: 'Pulseless Arrest',
+  title: 'PEA Arrest — Hemorrhagic Shock',
+  meta: '8 steps · High acuity · Family present',
+  vitalsProgression: [
+    { hr:'112', bp:'78/42',      spo2:'91%', rr:'18',       label:'RRT in progress' },
+    { hr:'118', bp:'unreadable', spo2:'89%', rr:'agonal',   label:'Impending arrest' },
+    { hr:'—',   bp:'—',          spo2:'88%', rr:'agonal',   label:'Pre-arrest staging' },
+    { hr:'—',   bp:'—',          spo2:'—',   rr:'CPR',      label:'Code blue — PEA' },
+    { hr:'—',   bp:'—',          spo2:'—',   rr:'CPR',      label:'Epi #1 on board' },
+    { hr:'—',   bp:'—',          spo2:'—',   rr:'CPR',      label:'2-minute check' },
+    { hr:'—',   bp:'—',          spo2:'—',   rr:'CPR',      label:'4-minute check — asystole' },
+    { hr:'—',   bp:'—',          spo2:'—',   rr:'—',        label:'Resuscitation ended' },
+  ],
+  steps: [
+    {
+      phase:'assess', phaseLabel:'Recognition',
+      narrative:`<p>You're the ALERT RN on this rapid. You arrived at the bedside to find Mr. E. — an 85-year-old male with ischemic cardiomyopathy, EF 15–20%, paroxysmal atrial fibrillation, and dementia — admitted for GI bleed and global weakness. On arrival his vitals showed HR 112, BP 78/42 on an active PRBC transfusion, SpO₂ 91%. Family is at the bedside and tells you he's been more responsive since the blood started.</p><p>You're mid-assessment when his breathing changes. Slow, irregular gasps — jaw dropping open with each breath. Guppy breathing. You move to his femoral. Weak pulse, still present. The BP cuff is no longer reading. The responding MD is in the room reviewing the chart at the bedside workstation.</p>`,
+      prompt:'You recognize this as an impending arrest. How do you verbalize it to the room?',
+      choices:[
+        { text:'"I\'m concerned the patient is about to arrest — I think we need to set the stage now while we have time."', correct:true },
+        { text:'"His breathing looks a little different — let\'s get another set of vitals and see where we are."', correct:false, consequence:'Vague language in a deteriorating patient creates hesitation in the team. By the time another set of vitals comes back, the window to stage proactively has closed.' },
+        { text:'"Can we get the attending in here now?"', correct:false, consequence:'The responding MD is already at the bedside. Calling for someone else who isn\'t there delays action and creates confusion about who is running the room.' },
+        { text:'Ask the MD at the bedside to reassess the patient', correct:false, consequence:'The MD is already aware and in the room. Asking for a reassessment without acting yourself delays the one window you have to stage before this becomes uncontrolled. You don\'t need permission to set up — you need to move.' }
+      ],
+      correctFeedback:'Right call. Naming it out loud shifts the team\'s mental model immediately — shared awareness before the chaos starts. Now move.',
+      wrongFeedback:'Name what you see, out loud, to the room. "I\'m concerned this patient is about to arrest" is the most important thing you can say right now. It creates shared awareness and gives everyone a cue to act. You don\'t need permission — you need to move.',
+      pearl:'Name what you see, out loud, to the room. Position the ZOLL at the foot of the bed and bring the crash cart in where medications remain accessible without blocking the team. Make space at the head of the bed for the anesthesia team. Confirm suction is available. Mark the femoral pulse site with a marker — you\'ll want to be able to find it fast every time your hands come off of it.'
+    },
+    {
+      phase:'decide', phaseLabel:'Pre-Arrest Setup',
+      isMulti:true,
+      narrative:`<p>The crash cart is in the room, positioned out of the way with medications accessible. The ZOLL is at the foot of the bed, powered on in monitor mode. Family has been asked to step back. The responding MD is now at the bedside.</p><p>One of the nurses has a hand resting at the marked femoral site. You glance at the ZOLL monitor — organized rhythm, rate around 65.</p>`,
+      zoll:'nsr', zollLabel:'MONITOR MODE  LEAD II  HR: 65',
+      prompt:'Select all that apply, then confirm.',
+      choices:[
+        { text:'Switch ZOLL from monitor mode to defib mode', correct:true },
+        { text:'Apply defib pads and slide the backboard under', correct:true },
+        { text:'Confirm IV access is patent', correct:true },
+        { text:'Designate two compressors by name', correct:true },
+        { text:'Assign roles: MD lead runs the code, RT on airway and BVM, nurse to prepare medications at crash cart (to be relieved by pharmacy), you as nurse leader', correct:true },
+        { text:'Sync the defibrillator since the rhythm is organized', correct:false, consequence:'Synchronized cardioversion is for unstable tachyarrhythmias in a patient who still has a pulse. He has a pulse right now, but syncing the defibrillator is not the intervention — staging for an impending arrest is.' },
+        { text:'Step back and let the responding MD direct the setup', correct:false, consequence:'The responding MD is at the bedside, but the nurse leader stages the room. Waiting for direction costs the window you have right now.' }
+      ],
+      correctFeedback:'Pads on. Backboard in. Two compressors named. Roles locked. ZOLL in defib mode and ready.',
+      wrongFeedback:'Staging the room before the arrest is the entire point of an RRT. Every item on the correct list reduces the time between pulse loss and organized response.',
+      pearl:'Nurse leader sets the stage and assigns roles. When the pulse disappears the team steps into structure — not scramble.'
+    },
+    {
+      phase:'act', phaseLabel:'Arrest',
+      isMulti:true,
+      narrative:`<p>Mid-sentence from the responding MD — the nurse at the femoral site looks up: <strong>"No pulse."</strong></p><p>You look at the ZOLL. Organized rhythm. Rate around 65. No mechanical output.</p><p>PEA.</p>`,
+      zoll:'nsr', zollLabel:'DEFIB MODE  LEAD II  HR: 65  PULSELESS',
+      prompt:'Select everything that needs to happen now.',
+      choices:[
+        { text:'Call code blue overhead', correct:true },
+        { text:'Have the designated compressor initiate CPR immediately', correct:true },
+        { text:'Confirm PEA on the ZOLL — non-shockable, do not defibrillate', correct:true },
+        { text:'Start your compressor clock for the 2-minute pulse and rhythm check', correct:true },
+        { text:'Defibrillate — the rhythm looks organized and could be shockable', correct:false, consequence:'PEA has organized electrical activity with no mechanical output. Shocking it delivers energy to a heart that has no chaotic signal to reset. It interrupts CPR and causes harm.' },
+        { text:'Sync the ZOLL for cardioversion', correct:false, consequence:'Synchronized cardioversion is for unstable tachyarrhythmias with a pulse — not pulseless arrest. Syncing the ZOLL here wastes critical time.' },
+        { text:'Step in to take over compressions yourself', correct:false, consequence:'Your compressors are designated and in position. You are the nurse leader — your role is the clock, the room, and closed-loop communication. Step into that role, not theirs.' }
+      ],
+      correctFeedback:'No pulse plus organized rhythm equals PEA. Non-shockable. CPR starts immediately, overhead goes out, clock starts.',
+      wrongFeedback:'PEA is non-shockable. The organized rhythm on the screen does not represent perfusion — it represents electrical activity with no mechanical output. CPR and epi are the interventions here, not electricity.',
+      pearl:'No pulse plus organized rhythm equals PEA. Non-shockable. CPR starts immediately, overhead goes out, clock starts. Epi follows right behind.'
+    },
+    {
+      phase:'act', phaseLabel:'Epi #1',
+      narrative:`<p>CPR is running. Code blue has been called. The MD lead is running the code. RT is managing the airway. A nurse is at the crash cart preparing medications. You're managing the room and times.</p><p>Rhythm is PEA. IV access is confirmed and patent.</p>`,
+      prompt:'What do you call for?',
+      choices:[
+        { text:'Epinephrine 1mg IVP — now. Time noted.', correct:true },
+        { text:'Hold epi and wait for the next rhythm check first', correct:false, consequence:'For PEA and asystole, epi goes in as soon as access is confirmed — not after a rhythm check. There\'s no shock to sequence around. Call it now.' },
+        { text:'Hold epi — confirm with MD lead before pushing anything', correct:false, consequence:'Epi in PEA is protocol. You know the rhythm, you have access. Call it with closed loop and document the time. The MD lead is running H\'s and T\'s — this is yours to call.' }
+      ],
+      correctFeedback:'Epi 1mg IVP — in and timed. You own the clock from here.',
+      wrongFeedback:'Epi goes in immediately for PEA and asystole — as soon as IV access is confirmed. No rhythm check needed, no additional order needed. Call it now.',
+      pearl:'Epinephrine 1mg IVP immediately for PEA and asystole. Repeat every 3–5 minutes at the discretion of the MD lead. You own the clock — that\'s how you know when it\'s due.'
+    },
+    {
+      phase:'act', phaseLabel:'1:45 Mark',
+      clock:{ elapsed:'1:45', epiGiven:'0:05', epiNext:'3:05–5:05' },
+      narrative:`<p>CPR is running well. The compressor is pacing to the ZOLL feedback device. MD lead is working through H's and T's — hemorrhagic shock and hypoxia called out as most likely contributors. More blood products are on the way. Anesthesia is still en route to perform intubation if indicated.</p>`,
+      prompt:'Approaching the 2-minute mark. What do you do?',
+      choices:[
+        { text:'Pre-charge the ZOLL ahead of the rhythm check', correct:true },
+        { text:'Rotate compressors now without doing a rhythm or pulse check — initial rhythm was PEA', correct:false, consequence:'Compressor rotation happens at the 2-minute rhythm and pulse check — not before it, and not without one. The rhythm can change. You need eyes on the monitor and a hand on the femoral at every check.' },
+        { text:'Push epi #2 now — PEA was confirmed on the last check', correct:false, consequence:'Epi #1 went in at 0:05. You\'re at 1:45. Epi repeats every 3–5 minutes — pushing again now is too early and outside protocol. Hold until the window opens.' }
+      ],
+      correctFeedback:'Pre-charged and ready. When the rhythm check comes, you\'re not scrambling.',
+      wrongFeedback:'Pre-charge the ZOLL before every rhythm check — rhythm can change, and you want to be ready to act in seconds, not scramble to charge under pressure.',
+      pearl:'Pre-charge the ZOLL before every rhythm check — even when you expect a non-shockable rhythm. Rhythms change. Being pre-charged when you need it is the difference between a 9-second delay and a 4-second one.'
+    },
+    {
+      phase:'act', phaseLabel:'2-Minute Check',
+      zoll:'nsr', zollLabel:'DEFIB MODE  LEAD II  HR: 62  PULSELESS', zollPreCharged:true,
+      clock:{ elapsed:'2:00', epiGiven:'0:05', epiNext:'3:05–5:05' },
+      narrative:`<p>2-minute mark. You call the rhythm check. Compressions pause. Femoral check simultaneous with rhythm read.</p><p>Still no pulse. ZOLL shows the same organized rhythm. PEA continues.</p><p>Compressor rotates upon direction of the MD lead. CPR resumes immediately.</p>`,
+      prompt:'The ZOLL is pre-charged. What do you do?',
+      choices:[
+        { text:'Disarm — still PEA, non-shockable. Resume CPR. Note the check time.', correct:true },
+        { text:'Deliver the shock — rhythm looks the same as before, try resetting it', correct:false, consequence:'PEA is non-shockable regardless of how organized it looks. Shocking it does not restore mechanical output. Disarm and resume CPR without interruption.' },
+        { text:'Disarm and push epi #2 now', correct:false, consequence:'Epi #1 went in at 0:05. You\'re at 2 minutes. The window for epi #2 is 3–5 minutes from the first dose — you\'re not there yet. Resume CPR and hold.' }
+      ],
+      correctFeedback:'Disarmed. CPR resumed. Check time noted. Epi window opens at 3:05.',
+      wrongFeedback:'PEA is non-shockable — organized rhythm with no mechanical output. Disarm, resume CPR, note the time. Epi #2 window opens at 3:05 from first dose, not from the rhythm check.',
+      pearl:'Rhythm unchanged, still non-shockable. Disarm, resume CPR, note the check time. Epi #2 window opens at 3:05 from first dose — not from the rhythm check.'
+    },
+    {
+      phase:'act', phaseLabel:'4-Minute Check',
+      zoll:'asystole', zollLabel:'DEFIB MODE  LEAD II  HR: ---  PULSELESS', zollPreCharged:true,
+      clock:{ elapsed:'4:00', epiGiven:'0:05', epiNext:'3:05–5:05', epiDue:true },
+      narrative:`<p>4-minute mark. Second rhythm check called. Compressions pause. Femoral check simultaneous.</p><p>No pulse. You look at the ZOLL.</p><p>The organized complexes are gone.</p>`,
+      prompt:'The ZOLL is pre-charged. What do you do?',
+      choices:[
+        { text:'Disarm — asystole is non-shockable. Resume CPR. Confirm epi #2 with MD lead — it\'s due.', correct:true },
+        { text:'Shock — flatline needs a reset', correct:false, consequence:'Shocking asystole delivers energy to a heart with no electrical activity to reset. It does not restart the heart. It interrupts CPR and can cause harm. This is one of the most dangerous errors in a code. Disarm immediately.' },
+        { text:'Disarm — asystole is non-shockable. Resume CPR. Push epi #2 now without confirming with MD lead.', correct:false, consequence:'Close — and epi is due. But closed-loop communication means confirming with the MD lead before pushing. Call it out, get confirmation, then push. That\'s the process.' },
+        { text:'Hold CPR to confirm this isn\'t fine V-fib', correct:false, consequence:'Fine V-fib can mimic asystole and is shockable — checking a second lead is reasonable if genuinely uncertain. But holding CPR to do it is not. Check the second lead without pausing compressions.' }
+      ],
+      correctFeedback:'Disarmed. CPR resumed. Epi #2 confirmed with MD lead and in. The team is still working.',
+      wrongFeedback:'Asystole is non-shockable. Disarm immediately — shocking a flatline is one of the most dangerous errors in a code. Resume CPR and confirm epi #2 with the MD lead.',
+      pearl:'Asystole is non-shockable. Disarm. Resume CPR. Epi #2 is due — confirm with MD lead and push. Shocking a flatline is a critical error. When in doubt about fine V-fib, check a second lead without stopping CPR.'
+    },
+    {
+      phase:'manage', phaseLabel:'End of Code',
+      isNarrative:true,
+      narrative:`<p>CPR continues. Epi #2 is in. Anesthesia arrives and secures the airway. More blood products arrive at the bedside.</p><p>The family has been in the corner the entire time — watching compressions, the monitor, the team moving around their person. One of them has been quietly crying.</p><p>The MD lead steps away from the foot of the bed and speaks quietly with the family. After a moment he returns.</p><p><strong>"The family believes we have done enough and no longer want to continue the resuscitation."</strong></p><p>He pauses. <strong>"Let's take a moment of silence to honor his life as he passes on."</strong></p><p>A full minute passes.</p><p><strong>"Time of death — 03:27. Thank you all. When you're ready, there's space to debrief at the nurses' station."</strong></p><p>The family moves to the bedside. The team begins to step back.</p>`
+    },
+    {
+      isLanding:true,
+      landingText:`<p>You did everything right.</p><p>The pads were on before he arrested. Roles were assigned before chaos could set in. Epi went in on time, twice. The rhythm was correctly identified — twice. CPR was high quality and uninterrupted. The reversible cause was identified and actively being treated.</p><p>The family was in the room. They watched you work. And when they asked you to stop, you stopped — because that is also part of the job.</p><p>Not every code ends with a pulse and a second chance. Some end here. That doesn't mean you failed. It means you were present for one of the hardest moments a family will ever have, and you can leave knowing you did exactly what you were supposed to do.</p><p>Take a breath. Document. Check on your team.</p>`
+    }
+  ]
+});
+
+// ── RHYTHM HELPERS ──
+function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
+function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
+function drawRhythm(canvasId,waveFn){
+  const cv=document.getElementById(canvasId);if(!cv)return;
+  const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#4ade80';ctx.lineWidth=1.5;ctx.beginPath();
+  for(let x=0;x<W;x++){const t=(x/W)*4;const y=H/2-waveFn(t)*(H*0.38);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.stroke();
+}
+function zollBlockHtml(step){
+  if(!step.zoll)return '';
+  const cls=step.zollPreCharged?'zoll-lbl pre-charged':'zoll-lbl';
+  return `<div class="zoll-screen"><div class="${cls}">${step.zollLabel||'LEAD II'}</div><canvas id="zollCanvas" width="580" height="80"></canvas></div>`;
+}
+function clockBlockHtml(c){
+  if(!c)return '';
+  return `<div class="code-clock"><div class="cc-item"><div class="cc-label">Code elapsed</div><div class="cc-value">${c.elapsed}</div></div><div class="cc-item"><div class="cc-label">Epi #1 given</div><div class="cc-value">${c.epiGiven}</div></div><div class="cc-item"><div class="cc-label">Next epi window</div><div class="cc-value ${c.epiDue?'due':''}">${c.epiNext}${c.epiDue?' ⚑':''}</div></div></div>`;
+}
+function scheduleRhythmDraw(step){
+  if(step.zoll)setTimeout(()=>drawRhythm('zollCanvas',step.zoll==='nsr'?nsrWave:asystoleWave),60);
+}
+
+// ── MULTI-SELECT STATE ──
+let multiSelected=[];
+function toggleMultiChoice(idx){
+  const step=activeCase.steps[currentStep];
+  const choice=step.choices[idx];
+  if(!choice.correct){
+    document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+    document.getElementById('multiConfirmBtn').disabled=true;
+    document.getElementById('choice-'+idx).classList.add('wrong');
+    const nextLabel=currentStep+1<activeCase.steps.length?'Continue →':'See results →';
+    results.push({stepIndex:currentStep,correct:false,choiceText:choice.text,correctChoice:step.choices.filter(c=>c.correct).map(c=>c.text).join(' + '),phaseLabel:step.phaseLabel});
+    document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card wrong" id="fb"><div class="fb-head">Not quite</div><div class="fb-body">${step.wrongFeedback}</div></div><div class="consequence-scene" id="consequence"><div class="consequence-label">▸ Here's what happens</div><div class="consequence-text">${choice.consequence}</div><div class="pearl-box" style="margin-top:10px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn" id="continueBtn" onclick="nextStep()">${nextLabel}</button>`;
+    setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+    setTimeout(()=>document.getElementById('consequence')?.classList.add('visible'),300);
+    setTimeout(()=>document.getElementById('continueBtn')?.classList.add('visible'),600);
+    setTimeout(()=>document.getElementById('feedbackArea').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+    return;
+  }
+  const pos=multiSelected.indexOf(idx);
+  const btn=document.getElementById('choice-'+idx);
+  if(pos===-1){multiSelected.push(idx);btn.classList.add('multi-selected');}
+  else{multiSelected.splice(pos,1);btn.classList.remove('multi-selected');}
+  document.getElementById('multiConfirmBtn').disabled=multiSelected.length<step.choices.filter(c=>c.correct).length;
+}
+function confirmMultiChoices(){
+  const step=activeCase.steps[currentStep];
+  step.choices.map((c,i)=>c.correct?i:-1).filter(i=>i!==-1).forEach(i=>document.getElementById('choice-'+i).classList.add('correct'));
+  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+  document.getElementById('multiConfirmBtn').disabled=true;
+  results.push({stepIndex:currentStep,correct:true,choiceText:'All correct items selected',correctChoice:'All correct items selected',phaseLabel:step.phaseLabel});
+  const nextLabel=currentStep+1<activeCase.steps.length?'Continue →':'See results →';
+  document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card correct" id="fb"><div class="fb-head">✓ Correct</div><div class="fb-body">${step.correctFeedback}</div><div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
+  setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+  setTimeout(()=>document.getElementById('feedbackArea').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
 let activeCase = null;
 let currentStep = 0;
 let results = [];
@@ -512,62 +730,83 @@ function startCase(id) {
 
 function renderStep() {
   choiceMade = false;
+  multiSelected = [];
   const step = activeCase.steps[currentStep];
   const total = activeCase.steps.length;
   renderVitals(); renderProgress(total);
   const container = document.getElementById('sceneContainer');
   container.innerHTML = '';
-  const card = document.createElement('div');
-  card.className = 'scene-card';
   const phaseClasses = { assess:'phase-assess', decide:'phase-decide', act:'phase-act', manage:'phase-manage' };
 
-  if (step.isChecklist) {
-    card.innerHTML = `
-      <div class="scene-header">
-        <span class="scene-num">Step ${currentStep + 1} of ${total}</span>
-        <span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span>
-      </div>
-      <div class="scene-body">
-        <div class="scene-narrative">${step.narrative}</div>
-        <div class="scene-prompt">${step.checklistPrompt || 'Check each item before delivering the shock'}</div>
-        <div class="checklist-box">
-          <div class="checklist-header">${step.checklistHeader || 'Pre-shock safety checklist'}</div>
-          ${step.checklistItems.map(item => `
-            <div class="checklist-item" id="chk-${item.id}" onclick="toggleCheck('${item.id}')">
-              <div class="check-box"><span class="check-mark">✓</span></div>
-              <span class="check-text">${item.text}</span>
-            </div>
-          `).join('')}
-        </div>
-        <button class="deliver-btn" id="deliverBtn" onclick="completeChecklist()">${step.checklistButtonLabel || 'Deliver shock →'}</button>
-        <div id="feedbackArea"></div>
-        <div class="pearl-box" style="margin-top:14px;">
-          <div class="pearl-label">Clinical pearl</div>
-          <div class="pearl-text">${step.pearl}</div>
-        </div>
-      </div>`;
-  } else {
-    const shuffled = shuffleChoices(step.choices);
-    card.innerHTML = `
-      <div class="scene-header">
-        <span class="scene-num">Step ${currentStep + 1} of ${total}</span>
-        <span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span>
-      </div>
-      <div class="scene-body">
-        <div class="scene-narrative">${step.narrative}</div>
-        <div class="scene-prompt">${step.prompt || 'What do you do?'}</div>
-        <div class="choices" id="choices">
-          ${shuffled.map((c, i) => `
-            <button class="choice-btn" onclick="handleChoice(${c._origIdx})" id="choice-${c._origIdx}">
-              <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
-              <span>${c.text}</span>
-            </button>
-          `).join('')}
-        </div>
-        <div id="feedbackArea"></div>
-      </div>`;
+  // ── LANDING CARD ──
+  if(step.isLanding){
+    container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
+      <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
+      ${REGISTRY.filter(c=>c.id!==activeCase.id).map(c=>`<button class="action-btn btn-coral" onclick="startCase('${c.id}')">${c.title} →</button>`).join('')}
+      <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
+    return;
   }
+
+  // ── NARRATIVE STEP ──
+  if(step.isNarrative){
+    const card=document.createElement('div'); card.className='scene-card';
+    card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]||'phase-manage'}">${step.phaseLabel||''}</span></div>
+      <div class="scene-body"><div class="scene-narrative">${step.narrative}</div>
+      <div style="text-align:right;"><button class="narrative-continue" onclick="nextStep()">Continue →</button></div></div>`;
+    container.appendChild(card); return;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'scene-card';
+
+  // ── MULTI-SELECT STEP ──
+  if(step.isMulti){
+    multiSelected=[];
+    card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span></div>
+      <div class="scene-body">
+        <div class="scene-narrative">${step.narrative}</div>
+        ${zollBlockHtml(step)}${clockBlockHtml(step.clock)}
+        <div class="scene-prompt">${step.prompt||'Select all that apply.'}</div>
+        <div class="choices" id="choices">
+          ${step.choices.map((c,i)=>`<button class="choice-btn" onclick="toggleMultiChoice(${i})" id="choice-${i}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
+        </div>
+        <button class="multi-confirm-btn" id="multiConfirmBtn" onclick="confirmMultiChoices()" disabled>Confirm selections</button>
+        <div id="feedbackArea"></div>
+      </div>`;
+    container.appendChild(card);
+    scheduleRhythmDraw(step);
+    return;
+  }
+
+  // ── CHECKLIST STEP ──
+  if(step.isChecklist){
+    card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span></div>
+      <div class="scene-body"><div class="scene-narrative">${step.narrative}</div>
+        <div class="scene-prompt">${step.checklistPrompt||'Check each item before delivering the shock'}</div>
+        <div class="checklist-box"><div class="checklist-header">${step.checklistHeader||'Pre-shock safety checklist'}</div>
+          ${step.checklistItems.map(item=>`<div class="checklist-item" id="chk-${item.id}" onclick="toggleCheck('${item.id}')"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">${item.text}</span></div>`).join('')}
+        </div>
+        <button class="deliver-btn" id="deliverBtn" onclick="completeChecklist()">${step.checklistButtonLabel||'Deliver shock →'}</button>
+        <div id="feedbackArea"></div>
+        <div class="pearl-box" style="margin-top:14px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div>
+      </div>`;
+    container.appendChild(card); return;
+  }
+
+  // ── STANDARD SINGLE-CHOICE STEP ──
+  const shuffled = shuffleChoices(step.choices);
+  card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span></div>
+    <div class="scene-body">
+      <div class="scene-narrative">${step.narrative}</div>
+      ${zollBlockHtml(step)}${clockBlockHtml(step.clock)}
+      <div class="scene-prompt">${step.prompt||'What do you do?'}</div>
+      <div class="choices" id="choices">
+        ${shuffled.map((c,i)=>`<button class="choice-btn" onclick="handleChoice(${c._origIdx})" id="choice-${c._origIdx}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
+      </div>
+      <div id="feedbackArea"></div>
+    </div>`;
   container.appendChild(card);
+  scheduleRhythmDraw(step);
 }
 
 function renderVitals() {
@@ -669,8 +908,11 @@ function completeChecklist() {
 
 function nextStep() {
   currentStep++;
-  if (currentStep >= activeCase.steps.length) renderSummary();
-  else { window.scrollTo({top:0,behavior:'smooth'}); renderStep(); }
+  const step = activeCase.steps[currentStep];
+  if (!step) { renderSummary(); return; }
+  if (step.isLanding) { renderStep(); return; }
+  if (currentStep >= activeCase.steps.length) { renderSummary(); return; }
+  window.scrollTo({top:0,behavior:'smooth'}); renderStep();
 }
 
 function renderSummary() {
