@@ -28,16 +28,24 @@
     a.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; margin-bottom: 1.5rem; transition: color 0.15s; }
     a.back-link:hover { color: var(--text); }
     a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
-    .category-group { margin-bottom: 1.5rem; }
-    .category-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
     .case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-    .case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; text-align: left; }
+    .how-it-works { padding: 12px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); font-size: 13px; color: var(--blue); line-height: 1.6; }
+    .random-btn { width: 100%; padding: 14px; background: var(--coral); border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; color: white; cursor: pointer; transition: background 0.15s, opacity 0.15s; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .random-btn:hover:not(:disabled) { background: #c94f0a; }
+    .random-btn:disabled { opacity: 0.4; cursor: default; }
+    .random-hint { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 1.25rem; }
+    .case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 14px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; text-align: left; display: flex; align-items: flex-start; gap: 10px; position: relative; }
     .case-card:hover { border-color: var(--border2); transform: translateY(-1px); }
     .case-card.active { border-color: var(--coral); background: var(--coral-bg); }
-    .case-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+    .case-check { width: 18px; height: 18px; border: 1.5px solid var(--border2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; cursor: pointer; }
+    .case-check.checked { background: var(--coral); border-color: var(--coral); }
+    .case-check.checked::after { content: ''; display: block; width: 4px; height: 7px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); }
+    .case-info { flex: 1; }
+    .case-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
     .case-meta { font-size: 12px; color: var(--text2); }
-    .how-it-works { margin-top: 1rem; padding: 12px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); font-size: 13px; color: var(--blue); line-height: 1.6; }
+    .runner-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 1rem; transition: color 0.15s; }
+    .runner-back:hover { color: var(--text); }
+    .runner-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     #caseRunner { display: none; }
     .zoll-screen { background: #0a0a0a; border-radius: 6px; padding: 10px 14px; margin: 14px 0; border: 1.5px solid #333; }
     .zoll-lbl { font-size: 10px; color: #4ade80; font-family: monospace; letter-spacing: 0.08em; margin-bottom: 4px; }
@@ -166,14 +174,26 @@
   </a>
 
   <div id="caseSelector">
-    <div class="section-label">Choose a case</div>
-    <div id="categoryList"></div>
-    <div class="how-it-works">
+    <div style="background:var(--coral-bg);border:1px solid var(--coral-border);border-radius:var(--radius);padding:16px;margin-bottom:1.25rem;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--coral);margin-bottom:8px;">Recommended</div>
+      <button class="random-btn" id="randomBtn" onclick="startRandomCase()" style="margin-bottom:8px;">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        Random case
+      </button>
+      <div style="font-size:12px;color:var(--coral);opacity:0.8;">You won't know what's coming — that's the point. Uncheck any cases below to exclude them from the pool.</div>
+    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Or choose a case</div>
+    <div class="case-grid" id="caseGrid"></div>
+    <div class="how-it-works" style="margin-top:1rem;">
       <strong style="font-weight:600;">How this works:</strong> You'll step through a real clinical scenario, making decisions at each inflection point. If you choose wrong, the case keeps going — you'll see the consequence and have to recover. That's intentional.
     </div>
   </div>
 
   <div id="caseRunner">
+    <button class="runner-back" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to cases
+    </button>
     <div class="patient-status" id="patientStatus"></div>
     <div class="progress-track">
       <span class="progress-label" id="progressLabel">Step 1</span>
@@ -203,7 +223,7 @@ registerCase({
   id: 'vtach-unstable',
   category: 'V-Tach',
   title: 'Unstable V-Tach with a Pulse',
-  meta: '8 decisions · High acuity',
+  meta: '8 decisions',
   vitalsProgression: [
     { hr: '168', bp: '82/50', spo2: '91%', rr: '22', label: 'Notified by monitor tech' },
     { hr: '172', bp: '78/44', spo2: '89%', rr: '24', label: 'RRT activated' },
@@ -217,6 +237,7 @@ registerCase({
   steps: [
     {
       phase: 'assess', phaseLabel: 'Recognition',
+      zoll:'vtach', zollLabel:'TELEMETRY  LEAD II  HR: 168  WIDE COMPLEX TACH',
       narrative: `It's 0220. You're the nurse for a 61-year-old man in the cardiac stepdown unit \u2014 post-op day 2 from a CABG. Your monitor tech calls: <strong>"Room 7 just went into a wide complex tach at 168 \u2014 looks like V-tach."</strong> You head to the room. He's diaphoretic, eyes half-open. You grab his wrist. Pulse present \u2014 weak and fast. His telemetry monitor confirms the rhythm. BP on the last cycle: 82/50.`,
       prompt: 'What do you do first?',
       choices: [
@@ -231,6 +252,7 @@ registerCase({
     },
     {
       phase: 'decide', phaseLabel: 'Bedside Setup',
+      zoll:'vtach', zollLabel:'MONITOR MODE  LEAD II  HR: 172  WIDE COMPLEX TACH',
       narrative: `Rapid response is activated. You're at the bedside. He says "what's happening" when you speak to him \u2014 grimacing, eyes opening to voice. BP now 78/44. The rapid response team is about 2 minutes out. The crash cart is in the room. He's still on the stepdown telemetry leads.`,
       prompt: 'What is the most important thing to do right now while you wait?',
       choices: [
@@ -245,6 +267,7 @@ registerCase({
     },
     {
       phase: 'decide', phaseLabel: 'Provider Pushback',
+      zoll:'vtach', zollLabel:'DEFIB MODE  LEAD II  HR: 174  WIDE COMPLEX TACH',
       narrative: `Pads are on. The overnight resident arrives with the rapid response team. He assesses quickly: wide complex tachycardia, BP 68/40, diaphoretic. He turns to you: <strong>"He needs cardioversion. Let's give him 1mg of Versed and some fentanyl first \u2014 I don't want to shock him awake."</strong> You call the patient's name loudly. He moans. Eyes stay closed. Not following commands.`,
       prompt: 'How do you respond?',
       choices: [
@@ -259,6 +282,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'Device Mode',
+      zoll:'vtach', zollLabel:'MONITOR MODE  LEAD II  HR: 174  WIDE COMPLEX TACH',
       narrative: `The resident agrees: "You're right \u2014 let's go without sedation." He turns to the ZOLL. He pauses, looks back at you. "I'm not very comfortable with this device \u2014 can you run it?" The charge RN is with you. The ZOLL is currently in <strong>Monitor mode</strong>.`,
       prompt: 'Before you can cardiovert, the device needs to be in the right mode. What do you select?',
       choices: [
@@ -273,6 +297,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'Sync Mode',
+      zoll:'vtach', zollLabel:'DEFIB MODE  LEAD II  HR: 176  — CONFIRM SYNC MARKERS ON QRS',
       narrative: `Device is in Defib mode. The charge RN is at your side. The resident is watching. The rhythm is still wide complex tachycardia \u2014 the patient is not following commands, BP 64/38. The ZOLL is showing his rhythm on the screen. <strong>You need to set up for synchronized cardioversion.</strong>`,
       prompt: 'What do you do next on the device?',
       choices: [
@@ -282,11 +307,14 @@ registerCase({
         { text: 'Ask the charge RN to confirm sync \u2014 they should verify the device settings', correct: false, consequence: 'You\'re running the device. You confirm sync. Delegating this step in a high-stakes moment without verifying it yourself introduces a gap in accountability. You press the button \u2014 you own the settings.' }
       ],
       correctFeedback: 'Right. Press Sync, then visually confirm \u2014 marker by marker \u2014 that each one is landing on an R wave. If any marker is sitting on a T wave, the device will deliver energy during the vulnerable period and can precipitate V-Fib. Adjust lead or gain until the markers are correct before charging.',
+      illustration: `<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  — MARKERS CONFIRMED ON QRS</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
       wrongFeedback: 'Sync mode must be active before you charge. An unsynchronized shock to a patient with a pulse can trigger V-Fib. Press Sync first, confirm the markers are on the QRS complexes, then set energy and charge.',
       pearl: 'Sync markers should sit cleanly on every R wave. If they\'re floating or landing on T waves, do not charge \u2014 adjust the lead or gain first. This is a visual check, not an assumption.'
     },
     {
       phase: 'act', phaseLabel: 'Pre-Cardioversion Checklist',
+      zoll:'vtach', zollLabel:'DEFIB MODE  LEAD II  SYNC ON  CHARGED 100J',
+      illustrationAlways:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-bottom:14px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  CHARGED 100J</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
       narrative: `Defib mode is active. Sync is on \u2014 markers confirmed on QRS complexes. Energy is set to 100J. The device is charged. The resident nods: <strong>"Ready when you are."</strong> Before you press that button, run your safety check.`,
       prompt: 'Complete the pre-cardioversion checklist.',
       isChecklist: true,
@@ -302,6 +330,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'First Shock \u2014 No Conversion',
+      zoll:'vtach', zollLabel:'DEFIB MODE  LEAD II  HR: 170  NO CONVERSION',
       narrative: `Shock delivered at 100J. The room goes quiet. Everyone looks at the monitor. The rhythm is unchanged \u2014 wide complex tachycardia, still 170 bpm. Next BP cycle: 62/36. <strong>No conversion.</strong> The resident turns to you: "We need to shock him again \u2014 let's go to 200J."`,
       prompt: 'The resident has confirmed 200J. What do you do next?',
       choices: [
@@ -311,11 +340,13 @@ registerCase({
         { text: 'Give amiodarone and wait to see if the rhythm breaks', correct: false, consequence: 'Amiodarone has a role in refractory V-tach, but this patient is profoundly unstable at 62/36. The resident just directed you to shock again. Chemical cardioversion takes time he doesn\'t have \u2014 another shock comes first.' }
       ],
       correctFeedback: 'Correct \u2014 and the order matters. Re-confirm sync first, then escalate. Some devices drop sync mode after delivering a shock. If you charge to 200J without checking, you may be about to deliver an unsynchronized shock to a patient who still has a pulse. Check sync every time, before every charge.',
+      illustration:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC RE-CONFIRMED  CHARGED 200J</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
       wrongFeedback: 'Failed cardioversion is a decision point, not a crisis. He still has a pulse \u2014 you are still in cardioversion territory. Escalate the energy per the algorithm: 100J \u2192 200J \u2192 300J \u2192 360J. And re-confirm sync before every charge \u2014 the device may have dropped it.',
       pearl: 'The ZOLL can drop sync mode after shock delivery. This is not a malfunction \u2014 it is a safety design. Re-confirm sync before every subsequent attempt. Always.'
     },
     {
       phase: 'manage', phaseLabel: 'Post-Conversion',
+      zoll:'nsr', zollLabel:'DEFIB MODE  LEAD II  HR: 74  SINUS RHYTHM',
       narrative: `Sync re-confirmed. Energy at 200J. Clear called, visual sweep done. Shock delivered. The monitor flickers \u2014 then settles into a narrow, regular rhythm at 74 bpm. <strong>Conversion to sinus rhythm.</strong> The room exhales. Repeat BP: 98/62. He opens his eyes and looks around, confused.`,
       prompt: 'Cardioversion was successful. What is your immediate priority in the next 2 minutes?',
       choices: [
@@ -334,8 +365,8 @@ registerCase({
 registerCase({
   id: 'vfib-pulseless',
   category: 'Pulseless Rhythms',
-  title: 'Pulseless V-Fib — Renal Transplant',
-  meta: '9 decisions · High acuity',
+  title: 'Pulseless V-Fib',
+  meta: '9 decisions',
   baseVitals: { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Cardiac arrest' },
   vitalsProgression: [
     { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Cardiac arrest — unwitnessed' },
@@ -380,6 +411,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'First Rhythm Check',
+      zoll:'vfib', zollLabel:'DEFIB MODE  LEAD II  CHARGED 200J', zollPreCharged:true,
       narrative: `You are coming up on the first pulse and rhythm check. You have been watching the clock. Pads are connected. The ZOLL is in Defib mode. As you approach the two-minute mark, you begin palpating for a carotid or femoral pulse while compressions are still ongoing.`,
       prompt: 'What do you do in the final seconds before calling the rhythm check?',
       choices: [
@@ -394,6 +426,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'Shock Delivery',
+      zoll:'vfib', zollLabel:'DEFIB MODE  LEAD II  CHARGED 200J  V-FIB', zollPreCharged:true,
       narrative: `Rhythm check called. Compressions stop. The monitor shows a chaotic waveform — V-Fib. The ZOLL is pre-charged at 200J. The code blue team has not yet arrived. You are at the device.`,
       prompt: 'What do you do?',
       choices: [
@@ -408,6 +441,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'Pre-Shock Safety Check',
+      zoll:'vfib', zollLabel:'DEFIB MODE  LEAD II  CHARGED 200J  V-FIB', zollPreCharged:true,
       narrative: `V-Fib on the monitor. ZOLL charged at 200J. You are delivering this shock.`,
       prompt: 'Run your safety check before delivering the shock.',
       isChecklist: true,
@@ -428,6 +462,7 @@ registerCase({
     },
     {
       phase: 'act', phaseLabel: 'Post-Shock / Backboard',
+      zoll:'vfib', zollLabel:'DEFIB MODE  LEAD II  V-FIB PERSISTS',
       narrative: `Shock delivered. The monitor shows a brief flat line — then the same chaotic pattern returns. V-Fib persists. Compressions resume immediately. The code blue team arrives in the room. The backboard is still not under the patient.`,
       prompt: 'What do you do about the backboard?',
       choices: [
@@ -456,6 +491,7 @@ registerCase({
     },
     {
       phase: 'manage', phaseLabel: 'Second Rhythm Check → ROSC',
+      zoll:'nsr', zollLabel:'DEFIB MODE  LEAD II  HR: 58  SINUS RHYTHM — ROSC',
       narrative: `Second two-minute cycle complete. Calcium chloride is on board. Rhythm check called. The monitor settles into a narrow, regular rhythm at 58 bpm. <strong>ROSC.</strong> Carotid pulse — weak, but present. He is unconscious. The team lead looks at you: <strong>"Good work. What do we need to make sure happens before he moves?"</strong>`,
       prompt: 'Before this patient leaves the unit, what needs to be in place?',
       isChecklist: true,
@@ -481,8 +517,8 @@ registerCase({
 registerCase({
   id: 'pea-asystole',
   category: 'Pulseless Arrest',
-  title: 'PEA Arrest — Hemorrhagic Shock',
-  meta: '8 steps · High acuity · Family present',
+  title: 'PEA Arrest',
+  meta: '8 steps',
   vitalsProgression: [
     { hr:'112', bp:'78/42',      spo2:'91%', rr:'18',       label:'RRT in progress' },
     { hr:'118', bp:'unreadable', spo2:'89%', rr:'agonal',   label:'Impending arrest' },
@@ -619,6 +655,8 @@ registerCase({
 // ── RHYTHM HELPERS ──
 function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
 function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
+function vtachWave(t){const r=0.34,p=t%r,u=p/r;if(u<0.12)return -0.15+u/0.12*0.30;if(u>=0.12&&u<0.22)return 0.15+(u-0.12)/0.10*0.35+0.12*Math.sin(Math.PI*(u-0.12)/0.10);if(u>=0.22&&u<0.38)return 0.50+(u-0.22)/0.16*0.48;if(u>=0.38&&u<0.52)return 0.98-0.22*(1-Math.cos(Math.PI*(u-0.38)/0.14));if(u>=0.52&&u<0.66)return 0.76-(u-0.52)/0.14*1.03;if(u>=0.66&&u<0.76)return -0.27-(u-0.66)/0.10*0.28;if(u>=0.76&&u<0.88)return -0.55+(u-0.76)/0.12*0.40;return -0.15;}
+function vfibWave(t){return 0.55*Math.sin(t*11.3+Math.sin(t*3.7))+0.30*Math.sin(t*17.1+Math.sin(t*5.2))+0.18*Math.sin(t*23.4)+0.10*Math.sin(t*7.8+1.2);}
 function drawRhythm(canvasId,waveFn){
   const cv=document.getElementById(canvasId);if(!cv)return;
   const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
@@ -636,8 +674,41 @@ function clockBlockHtml(c){
   if(!c)return '';
   return `<div class="code-clock"><div class="cc-item"><div class="cc-label">Code elapsed</div><div class="cc-value">${c.elapsed}</div></div><div class="cc-item"><div class="cc-label">Epi #1 given</div><div class="cc-value">${c.epiGiven}</div></div><div class="cc-item"><div class="cc-label">Next epi window</div><div class="cc-value ${c.epiDue?'due':''}">${c.epiNext}${c.epiDue?' ⚑':''}</div></div></div>`;
 }
+function drawSyncMarkers(){
+  const cv=document.getElementById('syncCanvas'); if(!cv)return;
+  const ctx=cv.getContext('2d'); const W=cv.width,H=cv.height;
+  ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#4ade80'; ctx.lineWidth=1.5; ctx.beginPath();
+  const peakXs=[];
+  for(let x=0;x<W;x++){
+    const t=(x/W)*4;
+    const u=(t%0.34)/0.34;
+    let y;
+    if(u<0.12)y=-0.15+u/0.12*0.30;
+    else if(u<0.22)y=0.15+(u-0.12)/0.10*0.35+0.12*Math.sin(Math.PI*(u-0.12)/0.10);
+    else if(u<0.38)y=0.50+(u-0.22)/0.16*0.48;
+    else if(u<0.52)y=0.98-0.22*(1-Math.cos(Math.PI*(u-0.38)/0.14));
+    else if(u<0.66)y=0.76-(u-0.52)/0.14*1.03;
+    else if(u<0.76)y=-0.27-(u-0.66)/0.10*0.28;
+    else if(u<0.88)y=-0.55+(u-0.76)/0.12*0.40;
+    else y=-0.15;
+    const cy=H/2-y*(H*0.36);
+    x===0?ctx.moveTo(x,cy):ctx.lineTo(x,cy);
+    if(u>=0.43&&u<=0.46){const last=peakXs[peakXs.length-1];if(!last||x-last>30)peakXs.push(x);}
+  }
+  ctx.stroke();
+  ctx.strokeStyle='#ffffff'; ctx.lineWidth=1;
+  peakXs.forEach(px=>{
+    const peakY=H/2-0.98*(H*0.36)-10; const s=3;
+    ctx.beginPath();ctx.moveTo(px,peakY-s);ctx.lineTo(px+s,peakY);ctx.lineTo(px,peakY+s);ctx.lineTo(px-s,peakY);ctx.closePath();ctx.stroke();
+  });
+}
+
 function scheduleRhythmDraw(step){
-  if(step.zoll)setTimeout(()=>drawRhythm('zollCanvas',step.zoll==='nsr'?nsrWave:asystoleWave),60);
+  if(!step.zoll)return;
+  const waveFns={nsr:nsrWave,asystole:asystoleWave,vtach:vtachWave,vfib:vfibWave};
+  const fn=waveFns[step.zoll]||nsrWave;
+  setTimeout(()=>drawRhythm('zollCanvas',fn),60);
 }
 
 // ── MULTI-SELECT STATE ──
@@ -682,25 +753,36 @@ let results = [];
 let choiceMade = false;
 
 function buildSelector() {
-  const categories = {};
-  REGISTRY.forEach(c => {
-    if (!categories[c.category]) categories[c.category] = [];
-    categories[c.category].push(c);
-  });
-  const list = document.getElementById('categoryList');
-  list.innerHTML = Object.entries(categories).map(([cat, cases]) => `
-    <div class="category-group">
-      <div class="category-label">${cat}</div>
-      <div class="case-grid">
-        ${cases.map(c => `
-          <div class="case-card" id="card-${c.id}" onclick="startCase('${c.id}')">
-            <div class="case-title">${c.title}</div>
-            <div class="case-meta">${c.meta}</div>
-          </div>
-        `).join('')}
+  const grid = document.getElementById('caseGrid');
+  grid.innerHTML = REGISTRY.map(c => `
+    <div class="case-card" id="card-${c.id}">
+      <div class="case-check checked" id="chk-rand-${c.id}" onclick="toggleRandom('${c.id}', event)"></div>
+      <div class="case-info" onclick="startCase('${c.id}')">
+        <div class="case-title">${c.title}</div>
+        <div class="case-meta">${c.meta}</div>
       </div>
     </div>
   `).join('');
+  updateRandomBtn();
+}
+
+function toggleRandom(id, e) {
+  e.stopPropagation();
+  const chk = document.getElementById('chk-rand-'+id);
+  chk.classList.toggle('checked');
+  updateRandomBtn();
+}
+
+function updateRandomBtn() {
+  const anyChecked = REGISTRY.some(c => document.getElementById('chk-rand-'+c.id)?.classList.contains('checked'));
+  document.getElementById('randomBtn').disabled = !anyChecked;
+}
+
+function startRandomCase() {
+  const pool = REGISTRY.filter(c => document.getElementById('chk-rand-'+c.id)?.classList.contains('checked'));
+  if(!pool.length) return;
+  const pick = pool[Math.floor(Math.random()*pool.length)];
+  startCase(pick.id);
 }
 
 function shuffleChoices(choices) {
@@ -781,7 +863,9 @@ function renderStep() {
   // ── CHECKLIST STEP ──
   if(step.isChecklist){
     card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span></div>
-      <div class="scene-body"><div class="scene-narrative">${step.narrative}</div>
+      <div class="scene-body">
+        ${step.illustrationAlways?`<div style="margin-bottom:4px;">${step.illustrationAlways}</div>`:''}
+        <div class="scene-narrative">${step.narrative}</div>
         <div class="scene-prompt">${step.checklistPrompt||'Check each item before delivering the shock'}</div>
         <div class="checklist-box"><div class="checklist-header">${step.checklistHeader||'Pre-shock safety checklist'}</div>
           ${step.checklistItems.map(item=>`<div class="checklist-item" id="chk-${item.id}" onclick="toggleCheck('${item.id}')"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">${item.text}</span></div>`).join('')}
@@ -790,7 +874,9 @@ function renderStep() {
         <div id="feedbackArea"></div>
         <div class="pearl-box" style="margin-top:14px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div>
       </div>`;
-    container.appendChild(card); return;
+    container.appendChild(card);
+    if(step.illustrationAlways) setTimeout(()=>drawSyncMarkers(),60);
+    return;
   }
 
   // ── STANDARD SINGLE-CHOICE STEP ──
@@ -860,6 +946,7 @@ function handleChoice(idx) {
       </div>
       <button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
     setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
+    if(step.illustration) setTimeout(()=>drawSyncMarkers(),100);
   } else {
     feedbackArea.innerHTML = `
       <div class="feedback-card wrong" id="fb">
