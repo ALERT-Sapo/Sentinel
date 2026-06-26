@@ -303,6 +303,7 @@ html, body {
 </head>
 <body>
 <div class="wrap">
+<a href="index.html" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4ade80;text-decoration:none;letter-spacing:0.04em;padding:12px 4px;font-family:var(--mono);opacity:0.8;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>BACK TO HOME</a>
 <div class="r" id="root"></div>
 <div class="footer">COMPRESS TO SUCCESS &nbsp;◆&nbsp; UCI HEALTH ALERT RN &nbsp;◆&nbsp; 2026</div>
 </div>
@@ -767,7 +768,6 @@ function render(){
   if(phase==='intro'){
     root.innerHTML=`
     <div class="intro">
-      <a href="index.html" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#2a6a2a;text-decoration:none;letter-spacing:0.05em;margin-bottom:16px;font-family:var(--mono);"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>BACK TO HOME</a>
       <div class="it">▶ ALERT TEAM TRAINING MODULE</div>
       <div class="is">SHOCK OR NO SHOCK?</div>
       <div class="id">CPR artifact → rhythm reveals → make your call.<br>10 rhythms &nbsp;•&nbsp; Randomized every attempt.</div>
@@ -816,7 +816,7 @@ function render(){
         +'<div style="margin-top:10px;padding:9px 12px;background:#0a0800;border:1px solid #554400;border-radius:5px;font-size:13px;color:#ccaa44;line-height:1.6;">ℹ The real ZOLL will let you analyze before charging — but that means 9.2s of analysis + 4.5s to charge before you can even press shock. That\'s nearly 14 seconds off the chest before a decision is made.</div>'
         +'<div class="precharge-tip"><div class="tip-label">▶ PRE-CHARGING — WHY IT MATTERS</div><p>Pre-charging during the last few seconds of a CPR cycle means the defibrillator is ready to fire the moment compressions pause. This shrinks the hands-off interval between the last compression and shock delivery — a gap that directly impacts outcomes. The goal is to resume compressions within 10 seconds of pausing. Pre-charging while CPR is still running costs nothing and buys critical time.</p></div>';
     })():''
-    root.innerHTML=`<div class="end"><a href="index.html" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#2a6a2a;text-decoration:none;letter-spacing:0.05em;margin-bottom:16px;font-family:var(--mono);"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>BACK TO HOME</a><div class="et">SESSION COMPLETE — ${mode==='zoll'?'ZOLL MODE':'RHYTHM MODE'}</div><div class="es">${score}/${qs.length}</div><div class="ep">${pct}% ACCURACY</div><div class="eg ${gc}">${g}</div><br><button class="rs" onclick="startQuiz()">RUN AGAIN</button>${switchBtn}${zExtra}${mh}</div>`;
+    root.innerHTML=`<div class="end"><div class="et">SESSION COMPLETE — ${mode==='zoll'?'ZOLL MODE':'RHYTHM MODE'}</div><div class="es">${score}/${qs.length}</div><div class="ep">${pct}% ACCURACY</div><div class="eg ${gc}">${g}</div><br><button class="rs" onclick="startQuiz()">RUN AGAIN</button>${switchBtn}${zExtra}${mh}</div>`;
     return;
   }
 
