@@ -434,6 +434,55 @@
 
     .algo-link:hover { text-decoration: underline; }
 
+    .def-divider { height: 1px; background: var(--border); margin: 10px 0; }
+
+    .contra-box { margin-top: 8px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 10px 12px; }
+
+    .def-dot.blue { background: var(--blue); }
+    .def-dot.coral { background: var(--coral); }
+
+    .quote-box { margin-top: 8px; border-left: 2px solid var(--amber); padding: 8px 12px; background: var(--bg3); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 13px; color: var(--text); font-style: italic; line-height: 1.5; }
+
+    .effects-box { margin-top: 10px; border: 1px solid var(--blue-border); border-radius: var(--radius-sm); background: var(--blue-bg); padding: 12px 14px; }
+    .effects-label { color: var(--blue) !important; }
+    .effects-note { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.5; font-style: italic; }
+
+    .caveat-box { margin-top: 10px; border: 1px solid var(--amber-border); border-radius: var(--radius-sm); background: var(--amber-bg); padding: 12px 14px; }
+    .caveat-label { color: var(--amber) !important; }
+    .caveat-item { margin-bottom: 10px; }
+    .caveat-item:last-child { margin-bottom: 0; }
+    .caveat-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .caveat-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+    .stopcock-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .stopcock-link:hover { background: var(--bg); }
+
+    .stopcock-thumb {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .stopcock-caption {
+      font-size: 13px;
+      color: var(--blue);
+      font-weight: 500;
+    }
+
     @media (max-width: 480px) {
       .scenario-grid { grid-template-columns: 1fr 1fr; }
       header h1 { font-size: 14px; }
@@ -611,43 +660,225 @@ const scenarios = [
     badgeClass: 'neutral',
     steps: [
       {
-        type: 'info',
-        tag: 'Stable means',
-        text: 'Patient is currently compensating — do not shock',
-        definition: true,
-        vitalsLabel: 'Vital signs — what stable looks like',
-        assessLabel: null,
-        vitals: [
-          'BP within acceptable limits — not hypotensive',
-          'MAP ≥ 65 mmHg',
-          'Heart rate elevated but patient alert and oriented',
-          'No respiratory distress or O₂ requirement',
-          'No chest pain or ischemic discomfort',
-          'No altered mental status or syncope',
-          'No diaphoresis or cool/clammy skin',
-          'No signs of pulmonary edema — crackles, increased work of breathing',
-          'Capillary refill < 2 seconds, skin warm and dry',
-          'Peripheral pulses present and equal'
-        ],
-        assessments: []
-      },
-      {
-        type: 'action',
-        tag: 'First',
-        text: 'Activate rapid response',
-        sub: 'Call now — stable does not mean safe. Condition can deteriorate rapidly. Acquire a full set of vitals.'
+        type: 'paired',
+        tag: 'Delegate immediately',
+        text: 'Team member activates rapid response + notifies EKG tech',
+        sub: 'Call before anything else — stable does not mean safe. V-tach can deteriorate without warning. The team takes 2–3 minutes; everything below happens while they\'re en route.'
       },
       {
         type: 'action',
         tag: 'Next',
         text: 'Apply pads',
-        sub: 'Be prepared in case the patient deteriorates before the acute response team arrives.'
+        sub: 'On immediately — if the patient deteriorates before the team arrives, you\'re ready.'
+      },
+      {
+        type: 'info',
+        tag: 'Assess',
+        text: 'Rhythm assessment + continuous monitoring',
+        definition: true,
+        sections: [
+          {
+            label: 'What stable V-tach looks like',
+            dot: 'blue',
+            items: [
+              'Wide complex, regular rhythm, rate 100–250 bpm',
+              'Monomorphic — QRS complexes look the same beat to beat',
+              'Patient alert — may report palpitations, dizziness, or chest discomfort',
+              'BP within acceptable limits, MAP ≥ 65, no respiratory distress'
+            ]
+          },
+          {
+            label: 'Signs of decreased cardiac output — watch for these',
+            dot: 'amber',
+            items: [
+              'Hypotension or significant drop from baseline',
+              'Altered mental status or decreased responsiveness',
+              'Diaphoresis, pallor, cool or clammy skin',
+              'Chest pain or ischemic discomfort',
+              'SpO₂ dropping, increased work of breathing',
+              'Syncope or near-syncope'
+            ]
+          },
+          {
+            label: 'Continuous monitoring means',
+            dot: 'blue',
+            items: [
+              'ZOLL in defib mode, BP cycling every 2–3 minutes, SpO₂ and patient responsiveness'
+            ]
+          },
+          {
+            label: '12-lead EKG',
+            dot: 'blue',
+            items: [
+              'Get it when you can — not a gate before acting',
+              'Helps characterize the rhythm and gives the arriving team a baseline',
+              'If deteriorating → cardioversion pathway takes over; 12-lead happens after'
+            ]
+          }
+        ]
       },
       {
         type: 'action',
-        tag: 'Then',
+        tag: 'Confirm',
+        text: 'Functional IV access',
+        sub: 'Confirm patency before the team arrives. If the rhythm deteriorates and amiodarone is needed, access needs to be ready — not something the team is troubleshooting on arrival.'
+      },
+      {
+        type: 'caution',
+        tag: 'Hold',
         text: 'Monitor and wait for acute response team',
-        sub: 'Continuous rhythm monitoring. Reassess every 1–2 minutes. If any instability signs develop, reassess pathway.'
+        sub: 'Reassess every 1–2 minutes. Do not leave the bedside. If any instability signs develop — hypotension, altered mentation, diaphoresis, SpO₂ dropping — the cardioversion pathway takes over.'
+      }
+    ]
+  },
+  {
+    id: 'usvt',
+    label: 'Unstable SVT',
+    pulse: true,
+    badge: 'Shockable',
+    badgeClass: 'shockable',
+    steps: [
+      {
+        type: 'paired',
+        tag: 'Delegate immediately',
+        text: 'Team member activates rapid response',
+        sub: 'Call now — do not wait to see if the patient improves.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'On immediately — regardless of what comes next.'
+      },
+      {
+        type: 'caution',
+        tag: 'Assess',
+        text: 'Is the patient conscious?',
+        branch: true,
+        branches: [
+          { icon: 'alert', text: 'Unresponsive or rapidly deteriorating → synchronized cardioversion 50–100J per provider order. Confirm sync mode is active on the ZOLL before delivering shock.' },
+          { icon: 'ok', text: 'Awake and communicating → prepare pads, monitor closely, wait for acute response team. Cardioversion in a conscious patient causes significant discomfort — provider makes sedation decision.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'ssvt',
+    label: 'Stable SVT',
+    pulse: true,
+    badge: 'Vagal / Adenosine',
+    badgeClass: 'neutral',
+    steps: [
+      {
+        type: 'paired',
+        tag: 'Delegate immediately',
+        text: 'Team member activates rapid response + notifies EKG tech',
+        sub: 'Call before anything else — the team takes 2–3 minutes to arrive. Everything below happens while they\'re en route. Notify EKG tech that rapid has been called for tachyarrhythmia.'
+      },
+      {
+        type: 'action',
+        tag: 'Next',
+        text: 'Apply pads',
+        sub: 'On before adenosine is considered — not optional. If the patient deteriorates, you\'re ready.'
+      },
+      {
+        type: 'info',
+        tag: 'Assess',
+        text: 'Rhythm assessment + continuous monitoring',
+        definition: true,
+        sections: [
+          {
+            label: 'What stable SVT looks like',
+            dot: 'blue',
+            items: [
+              'Narrow complex, regular rhythm, rate 150–250 bpm',
+              'P waves absent or buried in QRS or T wave',
+              'Patient alert — may report palpitations, near-syncope, or a racing heart',
+              'BP within acceptable limits, MAP ≥ 65, no respiratory distress'
+            ]
+          },
+          {
+            label: 'Signs of decreased cardiac output — watch for these',
+            dot: 'amber',
+            items: [
+              'Hypotension or significant drop from baseline',
+              'Altered mental status or decreased responsiveness',
+              'Diaphoresis, pallor, cool or clammy skin',
+              'Chest pain or ischemic discomfort',
+              'SpO₂ dropping, increased work of breathing',
+              'Syncope or near-syncope'
+            ]
+          },
+          {
+            label: 'Continuous monitoring means',
+            dot: 'blue',
+            items: [
+              'ZOLL in defib mode, BP cycling every 2–3 minutes, SpO₂ and patient responsiveness'
+            ]
+          },
+          {
+            label: '12-lead EKG',
+            dot: 'blue',
+            items: [
+              'Get it when you can — not a gate before acting',
+              'If stable → get before adenosine to characterize rhythm and screen for WPW',
+              'If deteriorating → cardioversion pathway takes over; 12-lead happens after'
+            ]
+          }
+        ]
+      },
+      {
+        type: 'action',
+        tag: 'Attempt',
+        text: 'Vagal maneuvers',
+        sub: 'Have the patient bear down forcefully, cough hard, or blow into a syringe with lips sealed tight or block the end of a straw with a finger. If vagals fail, the responding team will likely consider adenosine.',
+        contra: [
+          'Recent eye surgery',
+          'Known aortic aneurysm',
+          'Recent stroke or TIA',
+          'Severe hypertension'
+        ],
+        quote: 'If you feel a vagal maneuver may cause harm to this patient, do not proceed until given guidance by the responding team.',
+        quoteSub: 'Modified Valsalva and carotid massage are excluded — most inpatients are not candidates, and carotid massage is outside nursing scope.'
+      },
+      {
+        type: 'action',
+        tag: 'Administer',
+        text: 'Adenosine — three-way stopcock method',
+        sub: 'Use the antecubital or most proximal, largest-bore IV available. Load adenosine into one port, 20 mL NS flush into the other. Push adenosine, then immediately flush without breaking the line — speed of delivery is critical. First dose: 6 mg rapid IVP. Second dose: 12 mg if first fails.',
+        quote: '"It\'s going to feel like everything is not okay for a bit."',
+        quoteSub: 'Warn the patient before you push. You can add: "…but the feeling will pass quickly, and we\'ll be right here the whole time." Use your own words.',
+        stopcockImg: 'assets/stopcock.jpg',
+        effects: [
+          'Chest tightness or pressure',
+          'Flushing and warmth',
+          'Shortness of breath or urge to breathe deeply',
+          'Sense of impending doom or intense anxiety',
+          'Brief asystole on the monitor — expected, do not panic',
+          'Headache or lightheadedness'
+        ],
+        effectsNote: 'These effects are transient — typically seconds. The patient warning exists precisely because this list is alarming to experience unprepared.'
+      },
+      {
+        type: 'caution',
+        tag: 'Know before you push',
+        text: 'Adenosine caveats',
+        caveats: [
+          {
+            title: 'WPW (Wolff-Parkinson-White syndrome)',
+            desc: 'WPW is an accessory pathway that bypasses the AV node. Adenosine blocks conduction through the AV node — in WPW, this can force all electrical activity down the accessory pathway at an uncontrolled rate, precipitating ventricular fibrillation. This is why pads go on before adenosine is ever considered.'
+          },
+          {
+            title: 'Asthma / COPD',
+            desc: 'Adenosine is a bronchoconstrictive agent. In patients with reactive airway disease, it can trigger severe bronchospasm. Use with caution — provider makes this call.'
+          }
+        ]
+      },
+      {
+        type: 'caution',
+        tag: 'Watch for',
+        text: 'Signs of deterioration',
+        sub: 'Reassess continuously. If any instability signs develop — hypotension, altered mentation, diaphoresis, SpO₂ dropping — the cardioversion pathway takes over. Do not wait for the rhythm to self-terminate.'
       }
     ]
   },
@@ -672,9 +903,15 @@ const scenarios = [
       },
       {
         type: 'action',
+        tag: 'Confirm',
+        text: 'IV/IO access',
+        sub: 'Epinephrine must go in as soon as possible — confirm access is patent or establish IO if no IV available. Do not interrupt CPR to do this.'
+      },
+      {
+        type: 'action',
         tag: 'Then',
-        text: 'Push epinephrine as soon as IV/IO access is available — target within 5 minutes of arrest',
-        sub: 'Continue CPR without interruption. Do not delay compressions to establish access.'
+        text: 'Push epinephrine — target within 5 minutes of arrest',
+        sub: 'Continue CPR without interruption. 1 mg IV/IO every 3–5 minutes.'
       }
     ]
   },
@@ -699,9 +936,15 @@ const scenarios = [
       },
       {
         type: 'action',
+        tag: 'Confirm',
+        text: 'IV/IO access',
+        sub: 'Epinephrine must go in as soon as possible — confirm access is patent or establish IO if no IV available. Do not interrupt CPR to do this.'
+      },
+      {
+        type: 'action',
         tag: 'Then',
-        text: 'Push epinephrine as soon as IV/IO access is available — target within 5 minutes of arrest',
-        sub: 'Continue CPR without interruption. Do not delay compressions to establish access.'
+        text: 'Push epinephrine — target within 5 minutes of arrest',
+        sub: 'Continue CPR without interruption. 1 mg IV/IO every 3–5 minutes.'
       }
     ]
   }
@@ -722,6 +965,19 @@ function renderScenarios() {
 }
 
 function renderDefinitionBox(step) {
+  if (step.sections) {
+    return `
+      <div class="definition-box">
+        ${step.sections.map((sec, si) => `
+          ${si > 0 ? '<div class="def-divider"></div>' : ''}
+          <div class="def-section">
+            <div class="def-label">${sec.label}</div>
+            ${sec.items.map(item => `<div class="def-row"><div class="def-dot ${sec.dot || 'blue'}"></div><span>${item}</span></div>`).join('')}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
   const vitalsLabel = step.vitalsLabel || 'Vital signs — stable looks like';
   const assessLabel = step.assessLabel;
   const hasAssessments = step.assessments && step.assessments.length > 0;
@@ -736,6 +992,43 @@ function renderDefinitionBox(step) {
         <div class="def-label">${assessLabel}</div>
         ${step.assessments.map(a => `<div class="def-row"><div class="def-dot amber"></div><span>${a}</span></div>`).join('')}
       </div>` : ''}
+    </div>
+  `;
+}
+
+function renderContraBox(items) {
+  return `
+    <div class="contra-box">
+      <div class="def-label">Contraindications — do not attempt if:</div>
+      ${items.map(i => `<div class="def-row"><div class="def-dot coral"></div><span>${i}</span></div>`).join('')}
+    </div>
+  `;
+}
+
+function renderQuoteBox(text) {
+  return `<div class="quote-box">${text}</div>`;
+}
+
+function renderEffectsBox(items, note) {
+  return `
+    <div class="effects-box">
+      <div class="def-label effects-label">Expected transient effects — normal, not an emergency</div>
+      ${items.map(i => `<div class="def-row"><div class="def-dot blue"></div><span>${i}</span></div>`).join('')}
+      ${note ? `<div class="effects-note">${note}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderCaveatBox(items) {
+  return `
+    <div class="caveat-box">
+      <div class="def-label caveat-label">Clinical caveats</div>
+      ${items.map(c => `
+        <div class="caveat-item">
+          <div class="caveat-title">${c.title}</div>
+          <div class="caveat-desc">${c.desc}</div>
+        </div>
+      `).join('')}
     </div>
   `;
 }
@@ -764,6 +1057,12 @@ function renderWalkthrough(scenario) {
           <div class="step-text">${step.text}</div>
           ${step.sub ? `<div class="step-sub">${step.sub}</div>` : ''}
           ${step.definition ? renderDefinitionBox(step) : ''}
+          ${step.contra ? renderContraBox(step.contra) : ''}
+          ${step.quote ? renderQuoteBox(step.quote) : ''}
+          ${step.quoteSub ? `<div class="step-sub" style="margin-top:6px;">${step.quoteSub}</div>` : ''}
+          ${step.stopcockImg ? `<a href="${step.stopcockImg}" target="_blank" rel="noopener" class="stopcock-link"><img src="${step.stopcockImg}" alt="Three-way stopcock setup for adenosine administration" class="stopcock-thumb" /><span class="stopcock-caption">Tap to view stopcock setup</span></a>` : ''}
+          ${step.effects ? renderEffectsBox(step.effects, step.effectsNote) : ''}
+          ${step.caveats ? renderCaveatBox(step.caveats) : ''}
           ${step.branch ? `
             <div class="branch-box">
               ${step.branches.map(b => `
