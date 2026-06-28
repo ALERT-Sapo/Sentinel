@@ -309,16 +309,34 @@
 
     .footer-note {
       margin-top: 1.5rem;
-      padding: 12px 16px;
+      padding: 14px 16px 14px 20px;
       background: var(--amber-bg);
       border: 1px solid var(--amber-border);
+      border-left: 4px solid var(--amber);
       border-radius: var(--radius);
-      font-size: 12px;
-      color: var(--amber);
-      line-height: 1.6;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.7;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
     }
 
-    .footer-note strong { font-weight: 600; }
+    .footer-note-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .footer-note strong {
+      font-weight: 600;
+      color: var(--amber);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
 
     a.back-link {
       display: inline-flex;
@@ -523,7 +541,8 @@
   </div>
 
   <div class="footer-note">
-    <strong>Scope of practice reminder:</strong> Pulseless rhythms require immediate CPR + code blue activation simultaneously. For unstable V-tach with a pulse, floor nurses are credentialed to perform synchronized cardioversion without a provider present. If the patient is awake, defer to the acute response team for sedation decision.
+    <div class="footer-note-icon">⚠️</div>
+    <div><strong>Scope of practice reminder</strong>Pulseless rhythms require immediate CPR + code blue activation simultaneously. For unstable V-tach with a pulse, floor nurses are credentialed to perform synchronized cardioversion without a provider present. If the patient is awake, defer to the acute response team for sedation decision.</div>
   </div>
 
   <div class="references-section">
