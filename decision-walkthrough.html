@@ -472,6 +472,51 @@
     .caveat-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
     .caveat-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
 
+    .wt-zoll-screen {
+      background: #0a0a0a;
+      border-radius: 6px;
+      padding: 8px 12px;
+      border: 1.5px solid #333;
+      margin: 0 0 1.25rem;
+    }
+
+    .wt-zoll-lbl {
+      font-size: 10px;
+      color: #4ade80;
+      font-family: monospace;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .pea-note {
+      font-size: 11px;
+      color: #9ca3af;
+      font-family: monospace;
+      margin-top: 6px;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+
+    .examples-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0 16px;
+      padding: 8px 12px;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      font-size: 13px;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      font-weight: 500;
+    }
+
+    .examples-link:hover { opacity: 0.88; }
+    .examples-arr { margin-left: auto; font-size: 14px; }
+
     .stopcock-link {
       display: flex;
       align-items: center;
@@ -597,6 +642,9 @@ const scenarios = [
     pulse: false,
     badge: 'Shockable',
     badgeClass: 'shockable',
+    zoll: 'vfib',
+    zollLabel: 'DEFIB MODE  LEAD II  HR: ---  V-FIB',
+    examples: ['assets/vfib-1.jpg','assets/vfib-2.jpg','assets/vfib-3.jpg'],
     steps: [
       {
         type: 'paired',
@@ -624,6 +672,9 @@ const scenarios = [
     pulse: true,
     badge: 'Shockable',
     badgeClass: 'shockable',
+    zoll: 'vtach',
+    zollLabel: 'DEFIB MODE  LEAD II  HR: 172  WIDE COMPLEX TACH',
+    examples: ['assets/vtach-1.jpg','assets/vtach-2.jpg'],
     steps: [
       {
         type: 'info',
@@ -677,6 +728,9 @@ const scenarios = [
     pulse: true,
     badge: 'Monitor / RRT',
     badgeClass: 'neutral',
+    zoll: 'vtach',
+    zollLabel: 'MONITOR MODE  LEAD II  HR: 148  WIDE COMPLEX TACH',
+    examples: ['assets/vtach-1.jpg','assets/vtach-2.jpg'],
     steps: [
       {
         type: 'paired',
@@ -756,6 +810,10 @@ const scenarios = [
     pulse: true,
     badge: 'Shockable',
     badgeClass: 'shockable',
+    zoll: 'svt',
+    zollLabel: 'DEFIB MODE  LEAD II  HR: 192  NARROW COMPLEX TACH',
+    examples: ['assets/svt-1.jpg','assets/svt-2.jpg'],
+    examplesNote: 'SVT morphology varies — tap to see real examples',
     steps: [
       {
         type: 'paired',
@@ -787,6 +845,10 @@ const scenarios = [
     pulse: true,
     badge: 'Vagal / Adenosine',
     badgeClass: 'neutral',
+    zoll: 'svt',
+    zollLabel: 'MONITOR MODE  LEAD II  HR: 178  NARROW COMPLEX TACH',
+    examples: ['assets/svt-1.jpg','assets/svt-2.jpg'],
+    examplesNote: 'SVT morphology varies — tap to see real examples',
     steps: [
       {
         type: 'paired',
@@ -907,6 +969,9 @@ const scenarios = [
     pulse: false,
     badge: 'Non-shockable',
     badgeClass: 'nonshockable',
+    zoll: 'nsr',
+    zollLabel: 'DEFIB MODE  LEAD II  HR: 62  ORGANIZED RHYTHM — NO PULSE',
+    peaNote: true,
     steps: [
       {
         type: 'paired',
@@ -940,6 +1005,8 @@ const scenarios = [
     pulse: false,
     badge: 'Non-shockable',
     badgeClass: 'nonshockable',
+    zoll: 'asystole',
+    zollLabel: 'DEFIB MODE  LEAD II  HR: ---  ASYSTOLE',
     steps: [
       {
         type: 'paired',
@@ -971,16 +1038,61 @@ const scenarios = [
 
 let activeId = null;
 
+function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
+function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
+function vtachWave(t){const r=0.34,p=t%r,u=p/r;if(u<0.12)return -0.15+u/0.12*0.30;if(u>=0.12&&u<0.22)return 0.15+(u-0.12)/0.10*0.35+0.12*Math.sin(Math.PI*(u-0.12)/0.10);if(u>=0.22&&u<0.38)return 0.50+(u-0.22)/0.16*0.48;if(u>=0.38&&u<0.52)return 0.98-0.22*(1-Math.cos(Math.PI*(u-0.38)/0.14));if(u>=0.52&&u<0.66)return 0.76-(u-0.52)/0.14*1.03;if(u>=0.66&&u<0.76)return -0.27-(u-0.66)/0.10*0.28;if(u>=0.76&&u<0.88)return -0.55+(u-0.76)/0.12*0.40;return -0.15;}
+function vfibWave(t){const env=0.68-0.15*(t/4);return env*(0.42*Math.sin(t*58.3+Math.sin(t*7.1)*2.4)+0.28*Math.sin(t*79.7+Math.sin(t*11.3)*1.9)+0.20*Math.sin(t*43.1+Math.sin(t*14.2)*1.5)+0.15*Math.sin(t*97.2+Math.sin(t*5.7)*2.1)+0.10*Math.sin(t*67.8+2.3));}
+function svtWave(u){if(u<0.08)return 0;if(u>=0.08&&u<0.13)return(u-0.08)/0.05*1.15;if(u>=0.13&&u<0.17)return 1.15-(u-0.13)/0.04*1.15;if(u>=0.17&&u<0.23)return-(u-0.17)/0.06*0.52;if(u>=0.23&&u<0.26)return-0.52+(u-0.23)/0.03*0.52;if(u>=0.26&&u<0.38)return 0;if(u>=0.38&&u<0.56){const x=(u-0.38)/0.18;return 0.24*Math.pow(Math.sin(Math.PI*x),1.6);}return 0;}
+
+function drawWalkthroughRhythm(canvasId, waveFn, isSvt){
+  const cv = document.getElementById(canvasId); if(!cv) return;
+  const dpr = window.devicePixelRatio || 2;
+  const W = cv.parentElement.clientWidth - 24;
+  const H = 80;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.2; ctx.beginPath();
+  const r = 0.22;
+  for(let x=0;x<W;x++){
+    const t=(x/W)*4;
+    const y = isSvt
+      ? H/2 - svtWave((t%r)/r)*(H*0.40)
+      : H/2 - waveFn(t)*(H*0.38);
+    x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function renderZollBlock(scenario){
+  if(!scenario.zoll) return '';
+  const peaNote = scenario.peaNote
+    ? '<div class="pea-note">PEA can present as any organized rhythm — sinus, bradycardic, idioventricular. The rhythm on the monitor does not make this diagnosis. The absence of a palpable pulse does.</div>'
+    : '';
+  const examplesLink = scenario.examples
+    ? '<a href="' + scenario.examples[0] + '" target="_blank" rel="noopener" class="examples-link"><span class="examples-icon">⬡</span><span>' + (scenario.examplesNote || 'Tap to see rhythm examples') + '</span><span class="examples-arr">→</span></a>'
+    : '';
+  return '<div class="wt-zoll-screen"><div class="wt-zoll-lbl">' + (scenario.zollLabel||'LEAD II') + '</div><canvas id="wtZollCanvas" style="display:block;width:100%;"></canvas>' + peaNote + '</div>' + examplesLink;
+}
+
+function scheduleWtRhythmDraw(scenario){
+  if(!scenario.zoll) return;
+  const waveFns={nsr:nsrWave,asystole:asystoleWave,vtach:vtachWave,vfib:vfibWave,svt:null};
+  const isSvt = scenario.zoll==='svt';
+  const fn = waveFns[scenario.zoll]||nsrWave;
+  setTimeout(()=>drawWalkthroughRhythm('wtZollCanvas', fn, isSvt), 100);
+}
+
+
 function renderScenarios() {
   const grid = document.getElementById('scenarioGrid');
-  grid.innerHTML = scenarios.map(s => `
-    <button class="scenario-btn ${s.badgeClass} ${activeId === s.id ? 'active' : ''}"
-            onclick="selectScenario('${s.id}')"
-            aria-pressed="${activeId === s.id}">
-      ${s.badge ? `<div class="sc-badge ${s.badgeClass}">${s.badge}</div>` : ''}
-      <div class="sc-label">${s.label}</div>
-    </button>
-  `).join('');
+  grid.innerHTML = scenarios.map(s => {
+    const badgeHtml = s.badge ? '<div class="sc-badge ' + s.badgeClass + '">' + s.badge + '</div>' : '';
+    const activeClass = activeId === s.id ? 'active' : '';
+    return '<button class="scenario-btn ' + s.badgeClass + ' ' + activeClass + '" onclick="selectScenario(\'' + s.id + '\')" aria-pressed="' + (activeId === s.id) + '">' + badgeHtml + '<div class="sc-label">' + s.label + '</div></button>';
+  }).join('');
 }
 
 function renderDefinitionBox(step) {
@@ -1068,6 +1180,7 @@ function renderWalkthrough(scenario) {
         </div>
       </div>
     </div>
+    ${renderZollBlock(scenario)}
     ${scenario.steps.map((step, i) => `
       <div class="step-item" id="step-${i}">
         <div class="step-num ${step.type}">${i + 1}</div>
@@ -1099,6 +1212,8 @@ function renderWalkthrough(scenario) {
 
   progress.style.width = '0%';
   setTimeout(() => { progress.style.width = '100%'; }, 50);
+
+  scheduleWtRhythmDraw(scenario);
 
   scenario.steps.forEach((_, i) => {
     setTimeout(() => {
