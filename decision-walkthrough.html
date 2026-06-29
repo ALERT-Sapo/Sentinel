@@ -531,6 +531,9 @@
     }
 
     .stopcock-link:hover { background: var(--bg); }
+    .stopcock-link { flex-wrap: wrap; }
+    .stopcock-expanded { display: none; width: 100%; }
+    .stopcock-expanded.open { display: block; }
 
     .stopcock-thumb {
       width: 52px;
@@ -1258,7 +1261,7 @@ function renderWalkthrough(scenario) {
           ${step.contra ? renderContraBox(step.contra) : ''}
           ${step.quote ? renderQuoteBox(step.quote) : ''}
           ${step.quoteSub ? `<div class="step-sub" style="margin-top:6px;">${step.quoteSub}</div>` : ''}
-          ${step.stopcockImg ? `<a href="${step.stopcockImg}" target="_blank" rel="noopener" class="stopcock-link"><img src="${step.stopcockImg}" alt="Three-way stopcock setup for adenosine administration" class="stopcock-thumb" /><span class="stopcock-caption">Tap to view stopcock setup</span></a>` : ''}
+          ${step.stopcockImg ? `<div class="stopcock-link" onclick="var exp=this.querySelector('.stopcock-expanded');exp.classList.toggle('open');this.querySelector('.stopcock-caption').textContent=exp.classList.contains('open')?'Tap to close':'Tap to view stopcock setup';"><img src="${step.stopcockImg}" alt="Three-way stopcock setup" class="stopcock-thumb" /><span class="stopcock-caption">Tap to view stopcock setup</span><div class="stopcock-expanded"><img src="${step.stopcockImg}" alt="Three-way stopcock setup for adenosine administration" style="width:100%;border-radius:6px;display:block;margin-top:10px;" /></div></div>` : ''}
           ${step.effects ? renderEffectsBox(step.effects, step.effectsNote) : ''}
           ${step.caveats ? renderCaveatBox(step.caveats) : ''}
           ${step.branch ? `
