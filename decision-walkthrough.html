@@ -137,6 +137,9 @@
     .sc-badge.nonshockable { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
     .sc-badge.caution { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
     .sc-badge.neutral { background: rgba(156,163,175,0.12); color: #6b7280; border: 1px solid rgba(156,163,175,0.35); }
+    .sc-badge.badge2-defib { background: rgba(220,38,38,0.10); color: #b91c1c; border: 1px solid rgba(220,38,38,0.28); }
+    .sc-badge.badge2-sync { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .sc-badge.badge2-tcp { background: rgba(124,58,237,0.10); color: #7c3aed; border: 1px solid rgba(124,58,237,0.28); }
 
     .sc-label { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
 
@@ -1336,7 +1339,11 @@ function renderScenarios() {
   const grid = document.getElementById('scenarioGrid');
   grid.innerHTML = scenarios.map(s => {
     const badgeHtml = s.badge ? '<div class="sc-badge ' + s.badgeClass + '">' + s.badge + '</div>' : '';
-    const badge2Html = s.badge2 ? '<div class="sc-badge neutral">' + s.badge2 + '</div>' : '';
+    const badge2Class = s.badge2 === 'Defibrillation' ? 'badge2-defib'
+      : (s.badge2 === 'Sync Cardioversion') ? 'badge2-sync'
+      : (s.badge2 === 'TCP' || s.badge2 === 'Atropine / TCP') ? 'badge2-tcp'
+      : 'neutral';
+    const badge2Html = s.badge2 ? '<div class="sc-badge ' + badge2Class + '">' + s.badge2 + '</div>' : '';
     const activeClass = activeId === s.id ? 'active' : '';
     return '<button class="scenario-btn ' + s.badgeClass + ' ' + activeClass + '" onclick="selectScenario(\'' + s.id + '\')" aria-pressed="' + (activeId === s.id) + '">' + badgeHtml + badge2Html + '<div class="sc-label">' + s.label + '</div></button>';
   }).join('');
