@@ -546,6 +546,54 @@
       font-weight: 500;
     }
 
+    .examples-panel {
+      margin: 6px 0 16px;
+      border: 1px solid var(--blue-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .examples-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .examples-panel-header:hover { opacity: 0.88; }
+    .examples-panel-close { margin-left: auto; font-size: 16px; line-height: 1; }
+
+    .examples-panel-body {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      background: var(--bg3);
+    }
+
+    .examples-panel-body.open { display: flex; }
+
+    .examples-panel-body img {
+      width: 100%;
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      display: block;
+    }
+
+    .examples-panel-caption {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: right;
+      margin-top: -6px;
+      font-style: italic;
+    }
+
     @media (max-width: 480px) {
       .scenario-grid { grid-template-columns: 1fr 1fr; }
       header h1 { font-size: 14px; }
@@ -1071,10 +1119,28 @@ function renderZollBlock(scenario){
   const peaNote = scenario.peaNote
     ? '<div class="pea-note">PEA can present as any organized rhythm — sinus, bradycardic, idioventricular. The rhythm on the monitor does not make this diagnosis. The absence of a palpable pulse does.</div>'
     : '';
-  const examplesLink = scenario.examples
-    ? '<a href="' + scenario.examples[0] + '" target="_blank" rel="noopener" class="examples-link"><span class="examples-icon">⬡</span><span>' + (scenario.examplesNote || 'Tap to see rhythm examples') + '</span><span class="examples-arr">→</span></a>'
+  const examplesBlock = scenario.examples && scenario.examples.length
+    ? '<div class="examples-panel">'
+      + '<div class="examples-panel-header" onclick="toggleExamples(this)">'
+      + '<span>⬡</span>'
+      + '<span>' + (scenario.examplesNote || 'Tap to see rhythm examples') + '</span>'
+      + '<span class="examples-panel-close">＋</span>'
+      + '</div>'
+      + '<div class="examples-panel-body">'
+      + scenario.examples.map((src, i) =>
+          '<img src="' + src + '" alt="Rhythm example ' + (i+1) + '" loading="lazy">'
+          + '<div class="examples-panel-caption">Example ' + (i+1) + ' of ' + scenario.examples.length + ' · Source: LITFL</div>'
+        ).join('')
+      + '</div>'
+      + '</div>'
     : '';
-  return '<div class="wt-zoll-screen"><div class="wt-zoll-lbl">' + (scenario.zollLabel||'LEAD II') + '</div><canvas id="wtZollCanvas" style="display:block;width:100%;"></canvas>' + peaNote + '</div>' + examplesLink;
+  return '<div class="wt-zoll-screen"><div class="wt-zoll-lbl">' + (scenario.zollLabel||'LEAD II') + '</div><canvas id="wtZollCanvas" style="display:block;width:100%;"></canvas>' + peaNote + '</div>' + examplesBlock;
+}
+
+function toggleExamples(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.toggle('open');
+  header.querySelector('.examples-panel-close').textContent = isOpen ? '－' : '＋';
 }
 
 function scheduleWtRhythmDraw(scenario){
