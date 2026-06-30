@@ -49,8 +49,9 @@
     }
 
     header {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
+      background: #151c30;
+      border-bottom: 3px solid;
+      border-image: linear-gradient(90deg, #ea580c 0%, #2563eb 100%) 1;
       padding: 1.25rem 1.5rem;
       display: flex;
       align-items: center;
@@ -72,8 +73,8 @@
       width: 38px; height: 38px;
     }
 
-    .header-text h1 { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
-    .header-text p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .header-text h1 { font-size: 16px; font-weight: 700; color: #f3f4f6; letter-spacing: -0.01em; }
+    .header-text p { font-size: 12px; color: #9ca3af; margin-top: 2px; }
 
     .header-badge {
       margin-left: auto;
@@ -81,9 +82,9 @@
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--text3);
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      color: #9ca3af;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       padding: 4px 10px;
       border-radius: 20px;
     }
@@ -296,7 +297,7 @@
           <stop offset="100%" stop-color="#2563eb"/>
         </linearGradient>
       </defs>
-      <rect width="120" height="120" fill="#0a0e1a"/>
+      <rect width="120" height="120" fill="#151c30"/>
       <path d="M60 14 C60 14 38 22 26 26 V58 C26 84 44 100 60 108 C76 100 94 84 94 58 V26 C82 22 60 14 60 14 Z"
             fill="none" stroke="url(#headerShieldGrad)" stroke-width="6" stroke-linejoin="round"/>
       <polyline points="36,64 44,64 48,58 52,64 56,64 60,40 64,82 68,64 72,58 76,64 84,64"
@@ -305,7 +306,7 @@
   </div>
   <div class="header-text">
     <h1>ALERT Team</h1>
-    <p>UCI Health · Clinical Training Tools</p>
+    <p>Clinical Training Tools</p>
   </div>
   <span class="header-badge">Nursing Reference</span>
 </header>
