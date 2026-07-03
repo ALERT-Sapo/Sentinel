@@ -40,9 +40,14 @@
     .case-check { width: 18px; height: 18px; border: 1.5px solid var(--border2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; cursor: pointer; }
     .case-check.checked { background: var(--coral); border-color: var(--coral); }
     .case-check.checked::after { content: ''; display: block; width: 4px; height: 7px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); }
+    .case-check.completed-dim { opacity: 0.4; }
     .case-info { flex: 1; }
     .case-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
     .case-meta { font-size: 12px; color: var(--text2); }
+    .case-done-note { font-size: 11px; color: var(--green); margin-top: 5px; line-height: 1.4; }
+    .case-card.completed { border-color: var(--green-border); background: var(--green-bg); }
+    .case-done-badge { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 600; color: var(--green); background: var(--bg2); border: 1px solid var(--green-border); border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
+    .all-done-note { text-align: center; font-size: 13px; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); border-radius: var(--radius-sm); padding: 12px; }
     .runner-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 1rem; transition: color 0.15s; }
     .runner-back:hover { color: var(--text); }
     .runner-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -751,6 +756,7 @@ let activeCase = null;
 let currentStep = 0;
 let results = [];
 let choiceMade = false;
+let completedCases = new Set(); // session-only — resets on page reload
 
 function buildSelector() {
   const grid = document.getElementById('caseGrid');
@@ -760,10 +766,25 @@ function buildSelector() {
       <div class="case-info" onclick="startCase('${c.id}')">
         <div class="case-title">${c.title}</div>
         <div class="case-meta">${c.meta}</div>
+        <div class="case-done-note" id="done-note-${c.id}" style="display:none;">✓ Completed this session — uncheck if you'd rather it not come up on random pick</div>
       </div>
+      <div class="case-done-badge" id="done-badge-${c.id}" style="display:none;">✓ Done</div>
     </div>
   `).join('');
   updateRandomBtn();
+  updateSelectorCompletionState();
+}
+
+function updateSelectorCompletionState() {
+  REGISTRY.forEach(c => {
+    const done = completedCases.has(c.id);
+    document.getElementById('card-'+c.id)?.classList.toggle('completed', done);
+    const badge = document.getElementById('done-badge-'+c.id);
+    if(badge) badge.style.display = done ? 'inline-block' : 'none';
+    const note = document.getElementById('done-note-'+c.id);
+    if(note) note.style.display = done ? 'block' : 'none';
+    document.getElementById('chk-rand-'+c.id)?.classList.toggle('completed-dim', done);
+  });
 }
 
 function toggleRandom(id, e) {
@@ -822,9 +843,14 @@ function renderStep() {
 
   // ── LANDING CARD ──
   if(step.isLanding){
+    completedCases.add(activeCase.id);
+    const uncompletedPool = REGISTRY.filter(c => c.id !== activeCase.id && !completedCases.has(c.id));
+    const nextHtml = uncompletedPool.length
+      ? `<button class="action-btn btn-coral" onclick="startCase('${uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)].id}')">Next case study →</button>`
+      : `<div class="all-done-note">You've completed every available case this session — nice work.</div>`;
     container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
       <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
-      ${REGISTRY.filter(c=>c.id!==activeCase.id).map(c=>`<button class="action-btn btn-coral" onclick="startCase('${c.id}')">${c.title} →</button>`).join('')}
+      ${nextHtml}
       <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
     return;
   }
@@ -844,13 +870,14 @@ function renderStep() {
   // ── MULTI-SELECT STEP ──
   if(step.isMulti){
     multiSelected=[];
+    const shuffledMulti = shuffleChoices(step.choices);
     card.innerHTML=`<div class="scene-header"><span class="scene-num">Step ${currentStep+1} of ${total}</span><span class="scene-phase ${phaseClasses[step.phase]}">${step.phaseLabel}</span></div>
       <div class="scene-body">
         <div class="scene-narrative">${step.narrative}</div>
         ${zollBlockHtml(step)}${clockBlockHtml(step.clock)}
         <div class="scene-prompt">${step.prompt||'Select all that apply.'}</div>
         <div class="choices" id="choices">
-          ${step.choices.map((c,i)=>`<button class="choice-btn" onclick="toggleMultiChoice(${i})" id="choice-${i}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
+          ${shuffledMulti.map((c,i)=>`<button class="choice-btn" onclick="toggleMultiChoice(${c._origIdx})" id="choice-${c._origIdx}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
         </div>
         <button class="multi-confirm-btn" id="multiConfirmBtn" onclick="confirmMultiChoices()" disabled>Confirm selections</button>
         <div id="feedbackArea"></div>
@@ -1049,6 +1076,7 @@ function backToSelector() {
   document.querySelectorAll('.case-card').forEach(c=>c.classList.remove('active'));
   document.getElementById('caseRunner').style.display='none';
   document.getElementById('caseSelector').style.display='block';
+  updateSelectorCompletionState();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
