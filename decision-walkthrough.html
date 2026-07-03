@@ -44,8 +44,9 @@
     }
 
     header {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
+      background: #151c30;
+      border-bottom: 3px solid;
+      border-image: linear-gradient(90deg, #ea580c 0%, #2563eb 100%) 1;
       padding: 1.25rem 1.5rem;
       display: flex;
       align-items: center;
@@ -58,8 +59,8 @@
     .header-icon {
       width: 36px;
       height: 36px;
-      background: var(--red-bg);
-      border: 1px solid var(--red-border);
+      background: rgba(234,88,12,0.12);
+      border: 1px solid rgba(234,88,12,0.30);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
@@ -67,10 +68,10 @@
       flex-shrink: 0;
     }
 
-    .header-icon svg { width: 18px; height: 18px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .header-icon svg { width: 18px; height: 18px; stroke: #ea580c; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    header h1 { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
-    header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    header h1 { font-size: 16px; font-weight: 600; color: #f3f4f6; letter-spacing: -0.01em; }
+    header p { font-size: 12px; color: #9ca3af; margin-top: 1px; }
 
     .tag {
       margin-left: auto;
@@ -78,14 +79,39 @@
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--text3);
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      color: #9ca3af;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
       padding: 4px 10px;
       border-radius: 20px;
     }
 
     main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text2);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin-bottom: 1rem;
+      transition: opacity 0.4s ease, max-height 0.4s ease, margin 0.4s ease, padding 0.4s ease;
+      overflow: hidden;
+      max-height: 60px;
+    }
+    .scroll-hint.dismissed {
+      opacity: 0;
+      max-height: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      pointer-events: none;
+    }
+    .scroll-hint svg { width: 14px; height: 14px; stroke: var(--text3); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 
     .section-label {
       font-size: 10px;
@@ -637,7 +663,7 @@
   </div>
   <div>
     <h1>ACLS Clinical Decision Walkthrough</h1>
-    <p>UCI Health · ALERT Team</p>
+    <p>ALERT Team</p>
   </div>
   <span class="tag">Nursing Reference</span>
 </header>
@@ -650,6 +676,11 @@
   </a>
 
   <div class="section-label">Select a scenario</div>
+
+  <div class="scroll-hint" id="scrollHint">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    Tap a card, then scroll down to see the walkthrough
+  </div>
 
   <div class="scenario-grid" id="scenarioGrid"></div>
 
@@ -1485,7 +1516,23 @@ function selectScenario(id) {
   activeId = id;
   renderScenarios();
   renderWalkthrough(scenarios.find(s => s.id === id));
+  // Dismiss scroll hint on first tap
+  const hint = document.getElementById('scrollHint');
+  if (hint && !hint.classList.contains('dismissed')) {
+    hint.classList.add('dismissed');
+    try { localStorage.setItem('sentinel_scroll_hint_dismissed', '1'); } catch(e) {}
+  }
 }
+
+// Hide hint immediately if already dismissed in a prior session
+(function() {
+  try {
+    if (localStorage.getItem('sentinel_scroll_hint_dismissed') === '1') {
+      const hint = document.getElementById('scrollHint');
+      if (hint) { hint.style.display = 'none'; }
+    }
+  } catch(e) {}
+})();
 
 renderScenarios();
 </script>
