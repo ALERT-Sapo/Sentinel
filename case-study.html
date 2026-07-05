@@ -657,6 +657,83 @@ registerCase({
   ]
 });
 
+// ── ASYMPTOMATIC SINUS BRADYCARDIA CASE ──
+registerCase({
+  id: 'sbrad-asymptomatic',
+  category: 'Sinus Bradycardia',
+  title: 'Sinus Bradycardia',
+  meta: '4 decisions',
+  vitalsProgression: [
+    { hr: '44', bp: '126/76', spo2: '97%', rr: '16', label: 'Monitor tech call' },
+    { hr: '44', bp: '124/74', spo2: '97%', rr: '16', label: 'At bedside — assessing' },
+    { hr: '46', bp: '122/76', spo2: '98%', rr: '16', label: 'Assessment complete' },
+    { hr: '44', bp: '124/74', spo2: '97%', rr: '16', label: 'Team notified — monitoring' },
+  ],
+  steps: [
+    {
+      phase: 'assess', phaseLabel: 'Recognition',
+      zoll: 'sbrad', zollLabel: 'TELEMETRY  LEAD II  HR: 44  SINUS BRADY',
+      narrative: `It's 0300. You're the nurse for a 74-year-old woman on the telemetry floor, post-op day 1 from a total knee replacement. Your monitor tech calls: <strong>"Room 12 has been sitting at 44, sinus brady, for the last few minutes."</strong> No other alarms have fired. You haven't been in the room in about an hour.`,
+      prompt: 'What’s your first move?',
+      choices: [
+        { text: 'Go assess the patient directly — mentation, vitals, symptoms', correct: true },
+        { text: 'Activate rapid response — a rate of 44 warrants immediate escalation', correct: false, consequence: 'The team arrives to find her asleep and comfortable, easily arousable, vitals at her baseline. Nothing was wrong — you just hadn’t looked yet. RRT is a resource for instability, not for a number alone, and calling it before you’ve assessed anyone erodes how seriously the next call is taken.' },
+        { text: 'Ask the charge nurse to bring atropine to the bedside just in case', correct: false, consequence: 'Atropine is for symptomatic bradycardia — you don’t know yet whether that’s what this is. Staging a drug before you’ve assessed the patient treats the monitor, not the person, and can put pressure on the situation to become an emergency before it’s been established as one.' },
+        { text: 'Silence the alarm and recheck in 15 minutes', correct: false, consequence: 'A sustained rate change deserves eyes on the patient now, not a deferred check. If this progresses — a new block, a med effect, early instability — you want to catch it at the bedside, not on a delay.' }
+      ],
+      correctFeedback: 'Right instinct. The number on the monitor doesn’t tell you whether this is an emergency — the patient does. Go look before you decide anything else.',
+      wrongFeedback: 'Every path here skips the one step that actually answers the question: is she tolerating this rate? Go assess first — everything else follows from what you find.',
+      pearl: 'Acute, new-onset sinus bradycardia warrants immediate assessment — it can signal ischemia, a new conduction block, or a medication effect. But once you’re at the bedside, it’s her presentation that decides whether this is an emergency, not the number alone. A rate in the 40s in a sleeping post-op patient who wakes easily is a very different situation than the same rate in someone who’s diaphoretic and confused.'
+    },
+    {
+      phase: 'assess', phaseLabel: 'Assessment',
+      narrative: `You're at the bedside. She wakes easily when you say her name — opens her eyes, oriented, a little groggy from being woken up but tracking fine. Telemetry still shows a rate in the mid-40s with a clear P wave before every QRS.`,
+      prompt: 'What are you assessing right now?',
+      choices: [
+        { text: 'Full clinical picture — mentation, BP against her baseline, skin, symptoms, urine output', correct: true },
+        { text: 'Recheck her pulse manually to confirm the monitor isn’t malfunctioning', correct: false, consequence: 'Worth doing at some point, but confirming the rate only tells you the monitor is accurate — it doesn’t tell you whether she’s compromised. You still need the rest of the picture.' },
+        { text: 'Request a stat 12-lead to confirm sinus rhythm before doing anything else', correct: false, consequence: 'A 12-lead may be reasonable later, but it’s not the first move. The bedside assessment is faster, tells you far more about how she’s tolerating this, and doesn’t require waiting on anyone else to act.' },
+        { text: 'Document the rate and return to your other patients', correct: false, consequence: 'This skips the assessment entirely. A sustained rate change deserves a real look — documenting the number without knowing how she’s tolerating it means you’d be reporting a data point, not a clinical picture.' }
+      ],
+      correctFeedback: 'Exactly — mentation, vitals against her own baseline (not just a normal range), skin signs, any complaints of dizziness, chest pain, or near-syncope, and how she’s been putting out urine. That’s the full picture that tells you whether this rate is a problem.',
+      wrongFeedback: 'A rate alone — confirmed or not — doesn’t answer the only question that matters: is she compromised? Full assessment first.',
+      pearl: 'Each piece answers a different question. Mentation: is cerebral perfusion adequate? BP: is she holding her own baseline, not just a textbook normal — 108/64 might be concerning for one patient and unremarkable for another. Skin: warm and dry means adequate peripheral perfusion; cool and clammy doesn’t. Symptoms: dizziness, chest pain, or near-syncope are her own early warning system. Urine output: a proxy for renal perfusion over time. Together, they tell you whether this rate is being tolerated or starting to cost her something.'
+    },
+    {
+      phase: 'decide', phaseLabel: 'Escalation Decision',
+      narrative: `Your assessment: she's awake, alert, and oriented. BP 124/74 — consistent with what's been charted since admission. Skin warm and dry. She denies dizziness, chest pain, or lightheadedness, and ambulated to the bathroom earlier this shift without any issue. Telemetry still shows sinus brady in the mid-40s.`,
+      prompt: 'What’s your next move?',
+      choices: [
+        { text: 'Document the rate and full assessment, notify the primary team with the complete picture, and await guidance', correct: true },
+        { text: 'Activate rapid response — the rate is still under 60', correct: false, consequence: 'Pulling a team to the bedside for a well-tolerated, asymptomatic finding isn’t what RRT is for. It also means the next call — the one that’s actually urgent — lands with a little less weight behind it.' },
+        { text: 'No action needed since she’s asymptomatic — just continue routine care', correct: false, consequence: 'Asymptomatic doesn’t mean insignificant. A sustained rate this low deserves the primary team’s awareness — it could be medication-related, an early conduction change, or something worth a closer look — even if nothing needs to happen tonight.' },
+        { text: 'Give her something with caffeine and see if the rate responds', correct: false, consequence: 'This isn’t a nursing-initiated intervention, and it isn’t indicated here regardless. You’d be treating the number on the monitor instead of the patient in front of you — exactly what a stable assessment should be steering you away from.' }
+      ],
+      correctFeedback: 'Right call. A well-tolerated rate doesn’t need an emergency response — it needs the full picture in front of the team who can decide if anything changes (like reviewing her AV nodal blocking meds). Document, notify, and wait for direction.',
+      wrongFeedback: 'The middle path is the correct one here — this isn’t nothing, and it isn’t an emergency. It’s a finding that belongs in front of the primary team with your full assessment attached.',
+      pearl: 'Notifying the team isn’t the same as escalating to rapid response. Giving them a complete clinical picture — not just a number — lets them make the call on whether anything needs to change tonight.'
+    },
+    {
+      phase: 'manage', phaseLabel: 'Monitoring Plan',
+      narrative: `The primary team reviews your assessment. No new orders for now — they agree she's tolerating the rate well and ask you to continue routine monitoring. Telemetry still shows sinus brady in the mid-40s with a clear P wave before every QRS.`,
+      prompt: 'What would change this from a routine finding into something that needs to be escalated?',
+      choices: [
+        { text: 'New symptoms, a further drop in rate, or a new conduction block appearing on the strip', correct: true },
+        { text: 'Nothing — this rate is her new normal, no further reassessment needed', correct: false, consequence: 'Even a stable, well-tolerated bradycardia can progress. Treating it as permanently settled means you might miss the moment it stops being asymptomatic.' },
+        { text: 'Only if the monitor alarms again', correct: false, consequence: 'A slow, gradual change — rate drifting down, a widening PR interval — might not trigger a threshold alarm at all. Passive monitoring can miss exactly the progression you’re watching for.' },
+        { text: 'Apply pacing pads now, prophylactically, in case she deteriorates', correct: false, consequence: 'There’s no pacing indication here — she’s asymptomatic and stable. Pre-staging pads for a well-tolerated rhythm is a resource and comfort cost without a clinical reason behind it yet.' }
+      ],
+      correctFeedback: 'That’s the watch list — new symptoms, further rate drop, or a change in the conduction pattern (like a new pause or a dropped QRS). Any of those moves this from a routine finding to a call worth making again.',
+      wrongFeedback: 'Stable tonight doesn’t mean settled for good. Know what would actually change the picture, and keep reassessing for it — don’t just wait for the monitor to tell you.',
+      pearl: 'Asymptomatic bradycardia isn’t a one-time check-box — it’s a different tempo of vigilance, not less vigilance. Reassess on your normal rounding cadence and stay alert to the specific things that would change the plan.'
+    },
+    {
+      isLanding: true,
+      landingText: `<p>Nothing dramatic happened in this case. That was the point.</p><p>A rate of 44 is a number, not a diagnosis. The only thing that turns it into an emergency is how the patient in front of you is tolerating it — and the only way to know that is to go look, every time, before you decide what it means.</p><p>The instinct to escalate hard and fast is a good one to have in your back pocket for the nights it's actually needed. Tonight wasn't one of those nights, and knowing the difference — assess, document, notify with the full picture, keep watching — is its own clinical skill.</p><p>You didn't fix anything. You didn't need to. You just paid attention.</p>`
+    }
+  ]
+});
+
 // ── RHYTHM HELPERS ──
 function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
 function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
