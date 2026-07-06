@@ -734,6 +734,127 @@ registerCase({
   ]
 });
 
+// ── SYMPTOMATIC BRADYCARDIA CASE ──
+registerCase({
+  id: 'sbrad-symptomatic',
+  category: 'Symptomatic Bradycardia',
+  title: 'Symptomatic Bradycardia',
+  meta: '7 decisions',
+  vitalsProgression: [
+    { hr: '42', bp: '98/58', spo2: '96%', rr: '16', label: 'Monitor tech call' },
+    { hr: '40', bp: '86/54', spo2: '95%', rr: '18', label: 'At bedside — assessing' },
+    { hr: '40', bp: '82/50', spo2: '95%', rr: '18', label: 'RRT + team notified — prepping' },
+    { hr: '46', bp: '92/56', spo2: '96%', rr: '16', label: 'Atropine #1 given' },
+    { hr: '50', bp: '94/58', spo2: '96%', rr: '16', label: 'Atropine #2 given — 12-lead pulled' },
+    { hr: '75', bp: '108/64', spo2: '97%', rr: '16', label: 'TCP captured at 75' },
+    { hr: '75', bp: '110/66', spo2: '97%', rr: '16', label: 'Packaged for ICU — transvenous pacer planned' },
+  ],
+  steps: [
+    {
+      phase: 'assess', phaseLabel: 'Recognition',
+      zoll: 'sbrad', zollLabel: 'TELEMETRY  LEAD II  HR: 42  SINUS BRADY',
+      narrative: `It's 0300. You're the nurse for a 74-year-old woman on the telemetry floor, post-op day 1 from a total knee replacement. Your monitor tech calls: <strong>"Room 12 has been sitting at 42, sinus brady, for the last few minutes."</strong> No other alarms have fired. You haven't been in the room in about an hour.`,
+      prompt: 'What\u2019s your first move?',
+      choices: [
+        { text: 'Go assess the patient directly — mentation, vitals, symptoms', correct: true },
+        { text: 'Activate rapid response — a rate of 42 warrants immediate escalation', correct: false, consequence: 'You haven\u2019t looked yet. RRT is a resource for instability, not for a number alone — calling it before you\u2019ve assessed anyone erodes how seriously the next call is taken.' },
+        { text: 'Ask the charge nurse to bring atropine to the bedside just in case', correct: false, consequence: 'Atropine is for symptomatic bradycardia — you don\u2019t know yet whether that\u2019s what this is. Staging a drug before you\u2019ve assessed the patient treats the monitor, not the person.' },
+        { text: 'Silence the alarm and recheck in 15 minutes', correct: false, consequence: 'A sustained rate change deserves eyes on the patient now, not a deferred check. If this progresses, you want to catch it at the bedside, not on a delay.' }
+      ],
+      correctFeedback: 'Right instinct. The number on the monitor doesn\u2019t tell you whether this is an emergency — the patient does. Go look before you decide anything else.',
+      wrongFeedback: 'Every path here skips the one step that actually answers the question: is she tolerating this rate? Go assess first — everything else follows from what you find.',
+      pearl: 'Acute, new-onset sinus bradycardia warrants immediate assessment — it can signal ischemia, a new conduction block, or a medication effect. But once you\u2019re at the bedside, it\u2019s her presentation that decides whether this is an emergency, not the number alone.'
+    },
+    {
+      phase: 'assess', phaseLabel: 'Assessment',
+      narrative: `You're at the bedside. She's slow to answer, words dragging a little, and when you ask how she's feeling she says she's lightheaded and a little "off" — worse when you raised the head of the bed. Her skin is cool and faintly damp. BP 86/54, against a baseline that's run in the 120s since admission. Telemetry still shows a rate in the low 40s.`,
+      prompt: 'What does this change?',
+      choices: [
+        { text: 'This is symptomatic bradycardia — activate rapid response and notify the primary team, both right now', correct: true },
+        { text: 'Reposition her flat and recheck vitals in 10 minutes', correct: false, consequence: 'She\u2019s already showing hypoperfusion — altered mentation, cool clammy skin, a BP well under her baseline. Waiting to recheck loses time you don\u2019t have.' },
+        { text: 'Ask her to lie flat and reassess for orthostatic changes', correct: false, consequence: 'This isn\u2019t an orthostatic workup. She\u2019s symptomatic at rest, on telemetry, with a rate in the 40s — this calls for escalation, not a positional vitals check.' },
+        { text: 'Page the primary team but hold off on rapid response since she\u2019s still verbal', correct: false, consequence: 'Being verbal isn\u2019t the same as being stable. Altered mentation, cool clammy skin, and a BP this far under baseline is symptomatic bradycardia — both calls go out together, not one deferred.' }
+      ],
+      correctFeedback: 'Exactly — altered mentation, cool clammy skin, and a BP well under her own baseline means this rate is no longer being tolerated. Both calls go out now, together.',
+      wrongFeedback: 'She\u2019s already showing you hypoperfusion. This isn\u2019t a "wait and recheck" situation — activate rapid response and notify the primary team at the same time.',
+      pearl: 'Symptomatic bradycardia is defined by the patient, not the number: altered mentation, hypotension, diaphoresis, chest pain, or syncope/near-syncope. Once any of those show up, this becomes an emergency and both calls — rapid response and the primary team — go out simultaneously, not sequentially.'
+    },
+    {
+      phase: 'decide', phaseLabel: 'Pre-Team Prep',
+      isMulti: true,
+      zoll: 'sbrad', zollLabel: 'MONITOR MODE  LEAD II  HR: 40  SINUS BRADY',
+      narrative: `Rapid response and the primary team have both been called. While you wait for them to arrive, there's work to do at the bedside.`,
+      prompt: 'Select all that apply, then confirm.',
+      choices: [
+        { text: 'Apply pacing pads — anterior-posterior placement', correct: true },
+        { text: 'Confirm IV access is patent', correct: true },
+        { text: 'Pull atropine to the bedside from the crash cart', correct: true },
+        { text: 'Position the crash cart in the room', correct: true },
+        { text: 'Since she\u2019s clearly unstable, go ahead and initiate transcutaneous pacing now', correct: false, consequence: 'Pacing is a provider-initiated intervention. Your job right now is pads on and the room staged — not making the call to start pacing yourself.' },
+        { text: 'Give atropine yourself since the order is obvious', correct: false, consequence: 'Atropine isn\u2019t a nurse-initiated medication here. Have it drawn up and ready, but the order comes from the team at the bedside.' }
+      ],
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`,
+      correctFeedback: 'Pads on, IV confirmed patent, atropine at the bedside, cart positioned. Everything the team needs is ready the second they walk in.',
+      wrongFeedback: 'Staging the room is the job right now — pads, access, medication ready, cart positioned. The interventions themselves wait for the team.',
+      pearl: 'Anterior-posterior pad placement: anterior over the left precordium, posterior at the left infrascapular region, between the spine and scapula at the same level. Having this done before the team arrives buys real time if this progresses.'
+    },
+    {
+      phase: 'act', phaseLabel: 'Atropine #1',
+      zoll: 'sbrad', zollLabel: 'MONITOR MODE  LEAD II  HR: 46  SINUS BRADY',
+      narrative: `The team is at the bedside. The provider confirms the rhythm and orders atropine 1mg IV push. You confirm the order back, push it, and note the time. A few minutes later: HR 46, but she's still groggy and BP is still soft.`,
+      prompt: 'What now?',
+      choices: [
+        { text: 'Anticipate a repeat dose per protocol (up to 3mg total) and continue reassessing', correct: true },
+        { text: 'Tell the team atropine didn\u2019t work and request pacing immediately', correct: false, consequence: 'One dose isn\u2019t a full trial. Atropine can be repeated every 3–5 minutes up to a total of 3mg — give the protocol a real chance before assuming it\u2019s failed.' },
+        { text: 'Push a second dose yourself since the first one clearly wasn\u2019t enough', correct: false, consequence: 'Repeat dosing still comes from the team, confirmed with closed-loop communication — not initiated independently just because the first dose fell short.' },
+        { text: 'Document the response and move on to other tasks', correct: false, consequence: 'She\u2019s still symptomatic. This is an ongoing bedside emergency, not a finding to chart and leave.' }
+      ],
+      correctFeedback: 'Right call. One dose rarely tells the whole story — stay at the bedside, keep reassessing, and expect the team to consider a repeat dose.',
+      wrongFeedback: 'Atropine gets a real trial before it\u2019s written off — up to 3mg total, given in repeat doses a few minutes apart. Stay with her and keep reassessing.',
+      pearl: 'Atropine: 1mg IV push, may repeat every 3–5 minutes, maximum total dose 3mg. A single dose with a partial response doesn\u2019t mean the drug has failed — it means the protocol isn\u2019t finished yet.'
+    },
+    {
+      phase: 'decide', phaseLabel: 'Atropine #2 + 12-Lead',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/mobitz2-hay-1.jpg" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="12-lead ECG showing Mobitz II AV block"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Image: LITFL ECG Library — AV Block: 2nd degree, Mobitz II (Hay block)</div></div>`,
+      narrative: `A second dose of atropine 1mg IV is given per protocol. HR ticks up to 50 — better, but she's still symptomatic. While the team reassesses, a 12-lead is pulled.`,
+      prompt: 'What does the 12-lead tell you, and what happens next?',
+      choices: [
+        { text: 'This is Mobitz II — atropine won\u2019t fix this. The team should stop further doses and move toward pacing', correct: true },
+        { text: 'This is Mobitz II — request a third dose of atropine before considering pacing', correct: false, consequence: 'Recognizing the block type is the whole point of pulling this 12-lead. A third dose targets the wrong mechanism — it\u2019s time to move toward pacing, not repeat a drug that can\u2019t reach this level of the conduction system.' },
+        { text: 'This looks like a rate-related artifact — recheck the 12-lead in a few minutes', correct: false, consequence: 'A dropped beat with a constant PR interval beforehand is a real finding, not an artifact to wait out. This changes the plan now.' },
+        { text: 'This is complete heart block — prepare for immediate transcutaneous pacing with no further discussion needed', correct: false, consequence: 'Close on urgency, but this isn\u2019t complete heart block — there\u2019s still a relationship between the P waves and the QRS complexes here, just an intermittent one. Naming the right block matters for how the team communicates it.' }
+      ],
+      correctFeedback: 'Exactly right. This is Mobitz II. The team stops further atropine and starts moving toward pacing — the mechanism at play here isn\u2019t one atropine can reach.<br><br>Here\u2019s why: atropine works by blocking vagal (parasympathetic) input to the SA and AV nodes, which speeds up automaticity and conduction <em>at the AV node itself</em>. Mobitz II is a failure below that point, in the His-Purkinje system — vagal tone doesn\u2019t reach down there, so a drug that works by removing vagal tone has nothing to act on.',
+      wrongFeedback: 'The 12-lead is telling you this is Mobitz II — a block below the level atropine can influence. That\u2019s the signal to stop repeating the drug and start moving toward pacing.',
+      pearl: `Don't let a narrow QRS here throw you. Most Mobitz II blocks happen lower in the conduction system and look wide and ugly — but a smaller slice happen right at the AV node's exit point and still look narrow. Either way, it's the same "all or nothing" failure, and it's why atropine — a drug that works higher up, at the AV node itself — never had a real shot here.`
+    },
+    {
+      phase: 'act', phaseLabel: 'Pacing',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/paced-capture-1.jpg" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="12-lead ECG showing captured ventricular pacing"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Image: LITFL ECG Library — ventricular paced rhythm</div></div>`,
+      narrative: `Pads are already on and confirmed in place. The provider states the order out loud: <strong>"Set rate 75, start at 0 mA, and titrate up for capture."</strong> Pacing begins. As the mA climbs, the 12-lead — left in place the whole time — shows a change: a pacer spike before every complex, followed by a wide QRS, at a steady paced rate. A palpable pulse matches it beat for beat. She winces with each pulse.`,
+      prompt: 'What\u2019s your role right now?',
+      choices: [
+        { text: 'Confirm the order back out loud, watch for electrical capture (wide QRS after every spike) and mechanical capture (a pulse matching the paced rate), and support her with reassurance and sedation per orders', correct: true },
+        { text: 'Adjust the mA yourself since she\u2019s clearly still uncomfortable', correct: false, consequence: 'The output belongs to the team. Your job is confirming capture and supporting the patient — not changing the settings because of her discomfort.' },
+        { text: 'Focus only on her comfort and let the team manage the settings without confirming the order back', correct: false, consequence: 'Closed-loop communication matters here just as much as anywhere else in a code. Confirm the order back out loud — don\u2019t just quietly go along with it.' },
+        { text: 'Increase the rate since 75 seems low for her level of instability', correct: false, consequence: 'Rate isn\u2019t a nursing decision, and 75 is a reasonable target — this isn\u2019t about picking a number that feels right, it\u2019s about confirming capture at the rate that was ordered.' }
+      ],
+      correctFeedback: 'Right. Closed-loop confirmation, watching for both electrical and mechanical capture, and keeping her as comfortable as possible — that\u2019s the full job right now.<br><br>Want to see it in action? <a href="https://www.youtube.com/watch?v=Ok9rNkPZUx4" target="_blank" rel="noopener">Watch how pacing works on the ZOLL R Series →</a>',
+      wrongFeedback: 'The settings belong to the team. Your role is confirming the order back, watching for capture, and supporting her through it — not adjusting the pacer yourself.',
+      pearl: 'Capture has two signatures: electrical (a wide QRS following every pacer spike on the monitor) and mechanical (a palpable pulse matching the paced rate). Electrical capture without a corresponding pulse means there\u2019s no real perfusion happening — that\u2019s a "call it out immediately" moment, not a "keep watching" one.'
+    },
+    {
+      phase: 'manage', phaseLabel: 'Disposition',
+      isNarrative: true,
+      narrative: `Pacing is capturing reliably at 75, both electrically and mechanically. Her BP has come up to 108/64 and her mentation is clearing. Cardiology is at the bedside and reviews the rhythm strip — given the Mobitz II pattern, they recommend a transvenous pacer and ICU-level monitoring going forward.<p>You give report to the ICU team as she's packaged for transfer: rate and rhythm on arrival, atropine doses given and response, the 12-lead findings, when pacing was initiated and at what settings, and her current vitals.</p>`
+    },
+    {
+      isLanding: true,
+      landingText: `<p>Same call, same time of night, same rate on the monitor as a hundred other shifts — and this one needed everything you had.</p><p>The first assessment is what told you this wasn\u2019t routine. Everything after that — the rapid response call, the pads, the atropine, the 12-lead, the pacing — followed from what you found at the bedside, not from the number alone.</p><p>Atropine not fully working wasn\u2019t a failure of anyone\u2019s judgment. It was the system telling you where the problem actually was. Recognizing that, and moving the team toward pacing instead of chasing a third dose, is exactly the kind of clinical read that changes how fast a patient gets the right treatment.</p><p>Document it fully. Check in with your team. This was a real one.</p>`
+    }
+  ]
+});
+
 // ── RHYTHM HELPERS ──
 function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
 function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
@@ -804,7 +925,7 @@ function toggleMultiChoice(idx){
     document.getElementById('choice-'+idx).classList.add('wrong');
     const nextLabel=currentStep+1<activeCase.steps.length?'Continue →':'See results →';
     results.push({stepIndex:currentStep,correct:false,choiceText:choice.text,correctChoice:step.choices.filter(c=>c.correct).map(c=>c.text).join(' + '),phaseLabel:step.phaseLabel});
-    document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card correct" id="fb"><div class="fb-head">✓ Correct</div><div class="fb-body">${step.correctFeedback}</div>${step.illustrationAlways ? `<div style="margin-top:12px;">${step.illustrationAlways}</div>` : ''}<div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
+    document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card wrong" id="fb"><div class="fb-head">Not quite</div><div class="fb-body">${step.wrongFeedback}</div></div><div class="consequence-scene" id="consequence"><div class="consequence-label">▸ Here's what happens</div><div class="consequence-text">${choice.consequence}</div><div class="pearl-box" style="margin-top:10px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn" id="continueBtn" onclick="nextStep()">${nextLabel}</button>`;
     setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
     setTimeout(()=>document.getElementById('consequence')?.classList.add('visible'),300);
     setTimeout(()=>document.getElementById('continueBtn')?.classList.add('visible'),600);
@@ -824,7 +945,7 @@ function confirmMultiChoices(){
   document.getElementById('multiConfirmBtn').disabled=true;
   results.push({stepIndex:currentStep,correct:true,choiceText:'All correct items selected',correctChoice:'All correct items selected',phaseLabel:step.phaseLabel});
   const nextLabel=currentStep+1<activeCase.steps.length?'Continue →':'See results →';
-  document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card correct" id="fb"><div class="fb-head">✓ Correct</div><div class="fb-body">${step.correctFeedback}</div><div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
+  document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card correct" id="fb"><div class="fb-head">✓ Correct</div><div class="fb-body">${step.correctFeedback}</div>${step.illustrationAlways ? `<div style="margin-top:12px;">${step.illustrationAlways}</div>` : ''}<div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
   setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
   setTimeout(()=>document.getElementById('feedbackArea').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
 }
