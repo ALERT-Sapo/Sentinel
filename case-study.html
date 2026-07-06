@@ -796,7 +796,7 @@ registerCase({
       illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`,
       correctFeedback: 'Pads on, IV confirmed patent, atropine at the bedside, cart positioned. Everything the team needs is ready the second they walk in.',
       wrongFeedback: 'Staging the room is the job right now — pads, access, medication ready, cart positioned. The interventions themselves wait for the team.',
-      pearl: 'Anterior-posterior pad placement: anterior over the left precordium, posterior at the left infrascapular region, between the spine and scapula at the same level. Having this done before the team arrives buys real time if this progresses.'
+      pearl: 'Anterior-posterior pad placement: anterior over the left precordium, posterior at the left infrascapular region, between the spine and scapula at the same level. Having this done before the team arrives buys real time if this progresses.<br><br>Sometimes the primary team will put in a PRN atropine order ahead of time for a specific patient they\u2019re watching for symptomatic bradycardia \u2014 if that order is already in place, read the administration instructions and parameters the team has set before you act on it. But that\u2019s not the situation here: there\u2019s no PRN order in place for her, so it waits for the team\u2019s order at the bedside.'
     },
     {
       phase: 'act', phaseLabel: 'Atropine #1',
@@ -815,7 +815,7 @@ registerCase({
     },
     {
       phase: 'decide', phaseLabel: 'Atropine #2 + 12-Lead',
-      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/mobitz2-hay-1.jpg" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="12-lead ECG showing Mobitz II AV block"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Image: LITFL ECG Library — AV Block: 2nd degree, Mobitz II (Hay block)</div></div>`,
+      illustrationBefore: `<div style="margin:14px 0;"><img src="assets/mobitz2-hay-1.jpg" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="12-lead ECG rhythm strip"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Image: LITFL ECG Library</div></div>`,
       narrative: `A second dose of atropine 1mg IV is given per protocol. HR ticks up to 50 — better, but she's still symptomatic. While the team reassesses, a 12-lead is pulled.`,
       prompt: 'What does the 12-lead tell you, and what happens next?',
       choices: [
@@ -824,6 +824,7 @@ registerCase({
         { text: 'This looks like a rate-related artifact — recheck the 12-lead in a few minutes', correct: false, consequence: 'A dropped beat with a constant PR interval beforehand is a real finding, not an artifact to wait out. This changes the plan now.' },
         { text: 'This is complete heart block — prepare for immediate transcutaneous pacing with no further discussion needed', correct: false, consequence: 'Close on urgency, but this isn\u2019t complete heart block — there\u2019s still a relationship between the P waves and the QRS complexes here, just an intermittent one. Naming the right block matters for how the team communicates it.' }
       ],
+      illustrationAlways: `<div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">Image: LITFL ECG Library — AV Block: 2nd degree, Mobitz II (Hay block)</div>`,
       correctFeedback: 'Exactly right. This is Mobitz II. The team stops further atropine and starts moving toward pacing — the mechanism at play here isn\u2019t one atropine can reach.<br><br>Here\u2019s why: atropine works by blocking vagal (parasympathetic) input to the SA and AV nodes, which speeds up automaticity and conduction <em>at the AV node itself</em>. Mobitz II is a failure below that point, in the His-Purkinje system — vagal tone doesn\u2019t reach down there, so a drug that works by removing vagal tone has nothing to act on.',
       wrongFeedback: 'The 12-lead is telling you this is Mobitz II — a block below the level atropine can influence. That\u2019s the signal to stop repeating the drug and start moving toward pacing.',
       pearl: `Don't let a narrow QRS here throw you. Most Mobitz II blocks happen lower in the conduction system and look wide and ugly — but a smaller slice happen right at the AV node's exit point and still look narrow. Either way, it's the same "all or nothing" failure, and it's why atropine — a drug that works higher up, at the AV node itself — never had a real shot here.`
@@ -1073,6 +1074,7 @@ function renderStep() {
       <div class="scene-body">
         <div class="scene-narrative">${step.narrative}</div>
         ${zollBlockHtml(step)}${clockBlockHtml(step.clock)}
+        ${step.illustrationBefore ? `<div style="margin-bottom:14px;">${step.illustrationBefore}</div>` : ''}
         <div class="scene-prompt">${step.prompt||'Select all that apply.'}</div>
         <div class="choices" id="choices">
           ${shuffledMulti.map((c,i)=>`<button class="choice-btn" onclick="toggleMultiChoice(${c._origIdx})" id="choice-${c._origIdx}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
@@ -1110,6 +1112,7 @@ function renderStep() {
     <div class="scene-body">
       <div class="scene-narrative">${step.narrative}</div>
       ${zollBlockHtml(step)}${clockBlockHtml(step.clock)}
+      ${step.illustrationBefore ? `<div style="margin-bottom:14px;">${step.illustrationBefore}</div>` : ''}
       <div class="scene-prompt">${step.prompt||'What do you do?'}</div>
       <div class="choices" id="choices">
         ${shuffled.map((c,i)=>`<button class="choice-btn" onclick="handleChoice(${c._origIdx})" id="choice-${c._origIdx}"><span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${c.text}</span></button>`).join('')}
