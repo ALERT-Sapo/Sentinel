@@ -1049,7 +1049,7 @@ function renderStep() {
       ? `<button class="action-btn btn-coral" onclick="startCase('${uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)].id}')">Next case study →</button>`
       : `<div class="all-done-note">You've completed every available case this session — nice work.</div>`;
     const reviewHtml = activeCase.reviewLink
-      ? `<a class="action-btn btn-neutral" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;" href="${activeCase.reviewLink.url}">${activeCase.reviewLink.label}</a>`
+      ? `<a class="action-btn btn-neutral" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;" href="${activeCase.reviewLink.url}" target="_blank" rel="noopener">${activeCase.reviewLink.label}</a>`
       : '';
     container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
       ${reviewHtml}
