@@ -804,7 +804,7 @@ function toggleMultiChoice(idx){
     document.getElementById('choice-'+idx).classList.add('wrong');
     const nextLabel=currentStep+1<activeCase.steps.length?'Continue →':'See results →';
     results.push({stepIndex:currentStep,correct:false,choiceText:choice.text,correctChoice:step.choices.filter(c=>c.correct).map(c=>c.text).join(' + '),phaseLabel:step.phaseLabel});
-    document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card wrong" id="fb"><div class="fb-head">Not quite</div><div class="fb-body">${step.wrongFeedback}</div></div><div class="consequence-scene" id="consequence"><div class="consequence-label">▸ Here's what happens</div><div class="consequence-text">${choice.consequence}</div><div class="pearl-box" style="margin-top:10px;"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn" id="continueBtn" onclick="nextStep()">${nextLabel}</button>`;
+    document.getElementById('feedbackArea').innerHTML=`<div class="feedback-card correct" id="fb"><div class="fb-head">✓ Correct</div><div class="fb-body">${step.correctFeedback}</div>${step.illustrationAlways ? `<div style="margin-top:12px;">${step.illustrationAlways}</div>` : ''}<div class="pearl-box"><div class="pearl-label">Clinical pearl</div><div class="pearl-text">${step.pearl}</div></div></div><button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
     setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
     setTimeout(()=>document.getElementById('consequence')?.classList.add('visible'),300);
     setTimeout(()=>document.getElementById('continueBtn')?.classList.add('visible'),600);
