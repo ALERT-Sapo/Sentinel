@@ -740,6 +740,7 @@ registerCase({
   category: 'Symptomatic Bradycardia',
   title: 'Symptomatic Bradycardia',
   meta: '7 decisions',
+  reviewLink: { url: 'decision-walkthrough.html?scenario=sbrad-s', label: 'Review these rhythms in the walkthrough →' },
   vitalsProgression: [
     { hr: '42', bp: '98/58', spo2: '96%', rr: '16', label: 'Monitor tech call' },
     { hr: '40', bp: '86/54', spo2: '95%', rr: '18', label: 'At bedside — assessing' },
@@ -1047,7 +1048,11 @@ function renderStep() {
     const nextHtml = uncompletedPool.length
       ? `<button class="action-btn btn-coral" onclick="startCase('${uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)].id}')">Next case study →</button>`
       : `<div class="all-done-note">You've completed every available case this session — nice work.</div>`;
+    const reviewHtml = activeCase.reviewLink
+      ? `<a class="action-btn btn-neutral" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;" href="${activeCase.reviewLink.url}">${activeCase.reviewLink.label}</a>`
+      : '';
     container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
+      ${reviewHtml}
       <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
       ${nextHtml}
       <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
