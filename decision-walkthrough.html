@@ -1543,6 +1543,19 @@ function selectScenario(id) {
 })();
 
 renderScenarios();
+
+// Deep-link support: ?scenario=ID auto-selects and scrolls to that rhythm's detail view
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const deepLinkId = params.get('scenario');
+  if (deepLinkId && scenarios.some(s => s.id === deepLinkId)) {
+    selectScenario(deepLinkId);
+    setTimeout(() => {
+      document.getElementById('walkthrough')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+})();
+
 </script>
 </body>
 </html>
