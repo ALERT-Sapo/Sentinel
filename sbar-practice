@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Short Version — SBAR Practice Tool (Prototype) — ALERT Team</title>
+  <style>
+    :root {
+      --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f5f7fa;
+      --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+      --text: #111827; --text2: #4b5563; --text3: #9ca3af;
+      --green: #059669; --green-bg: rgba(5,150,105,0.08); --green-border: rgba(5,150,105,0.25);
+      --red: #dc2626; --red-bg: rgba(220,38,38,0.08); --red-border: rgba(220,38,38,0.25);
+      --blue: #2563eb; --blue-bg: rgba(37,99,235,0.08); --blue-border: rgba(37,99,235,0.25);
+      --amber: #d97706; --amber-bg: rgba(217,119,6,0.08); --amber-border: rgba(217,119,6,0.25);
+      --coral: #ea580c; --coral-bg: rgba(234,88,12,0.08); --coral-border: rgba(234,88,12,0.25);
+      --purple: #7c3aed; --purple-bg: rgba(124,58,237,0.08); --purple-border: rgba(124,58,237,0.25);
+      --radius: 10px; --radius-sm: 6px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 5rem; }
+    header { background: #151c30; border-bottom: 3px solid; border-image: linear-gradient(90deg, #ea580c 0%, #2563eb 100%) 1; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; }
+    .header-icon { width: 36px; height: 36px; background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header-icon svg { width: 18px; height: 18px; stroke: var(--purple); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    header h1 { font-size: 16px; font-weight: 600; color: #f3f4f6; letter-spacing: -0.01em; }
+    header p { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+    .tag { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9ca3af; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; }
+    main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+    a.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; margin-bottom: 1.5rem; transition: color 0.15s; }
+    a.back-link:hover { color: var(--text); }
+    a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .view-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 1.25rem; transition: color 0.15s; }
+    .view-back:hover { color: var(--text); }
+    .view-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .intro { margin-bottom: 1.25rem; }
+    .intro h2 { font-size: 19px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; margin-bottom: 6px; }
+    .intro p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    .mode-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+    .mode-badge.example { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+    .mode-badge.practice { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+    .mode-row { margin-bottom: 14px; }
+
+    .mode-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 18px; margin-bottom: 12px; cursor: pointer; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; }
+    .mode-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    .mode-card.example:hover { border-color: var(--coral); }
+    .mode-card.practice:hover { border-color: var(--blue); }
+    .mode-card-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .mode-card.example .mode-card-tag { color: var(--coral); }
+    .mode-card.practice .mode-card-tag { color: var(--blue); }
+    .mode-card-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    .mode-card-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .mode-card-footer { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .mode-card-footer svg { width: 16px; height: 16px; stroke: var(--text3); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .landing-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 22px; margin-bottom: 1rem; }
+    .landing-text { font-size: 15px; line-height: 1.75; color: var(--text); }
+    .landing-text p { margin-bottom: 0.9rem; }
+    .landing-text p:last-child { margin-bottom: 0; }
+    mark.pull { background: transparent; color: inherit; border-bottom: 1.5px dotted var(--border2); padding: 0; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    mark.pull.active { background: var(--purple-bg); color: var(--purple); border-bottom-color: transparent; border-radius: 4px; padding: 0 2px; }
+    .pull-hint { font-size: 12px; color: var(--text3); margin: 0.5rem 0 1.25rem; }
+
+    .reminder { padding: 12px 16px; background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); font-size: 13px; color: var(--blue); line-height: 1.6; margin-bottom: 1.25rem; }
+    .disagree-note { padding: 12px 16px; background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: var(--radius); font-size: 13px; color: var(--purple); line-height: 1.6; margin-bottom: 1.25rem; }
+
+    .audience-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+    .audience-row { display: flex; gap: 8px; margin-bottom: 0.75rem; }
+    .aud-btn { flex: 1; padding: 12px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; transition: border-color 0.15s, background 0.15s, color 0.15s; }
+    .aud-btn:hover { border-color: var(--border2); }
+    .aud-btn.active { border-color: var(--purple); background: var(--purple-bg); color: var(--purple); }
+    .audience-note { display: none; padding: 10px 14px; background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); font-size: 13px; color: var(--amber); margin-bottom: 1.25rem; line-height: 1.5; }
+    .audience-note.show { display: block; }
+
+    .script-box { font-size: 14px; line-height: 1.7; font-style: italic; color: var(--text); background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.25rem; }
+
+    .tap-label { font-size: 13px; font-weight: 600; color: var(--text2); margin: 0 0 8px; }
+    .tap-row { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; overflow: hidden; cursor: pointer; background: var(--bg2); }
+    .tap-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; }
+    .tap-top span.txt { flex: 1; color: var(--text); }
+    .tap-chevron { font-size: 12px; color: var(--text3); transition: transform 0.15s; }
+    .tap-row.open .tap-chevron { transform: rotate(180deg); }
+    .tap-body { display: none; padding: 0 12px 12px; }
+    .tap-row.open .tap-body { display: block; }
+    .tap-note { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 6px; }
+
+    .target-hint { font-size: 13px; color: var(--text2); margin-bottom: 0.75rem; }
+    .target-hint strong { color: var(--text); font-weight: 600; }
+
+    .builder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1rem; }
+    .builder-col-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+    #counter { font-size: 11px; color: var(--text3); font-weight: 400; }
+    #counter.over { color: var(--amber); }
+    .snippet-well { display: flex; flex-direction: column; gap: 6px; min-height: 130px; padding: 8px; border: 1.5px dashed var(--border2); border-radius: var(--radius-sm); }
+    .snippet-well.report-well { border: 1px solid var(--border); background: var(--bg2); }
+    .snippet-card { padding: 9px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg2); font-size: 13px; line-height: 1.4; color: var(--text); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .snippet-card:hover { border-color: var(--purple); background: var(--purple-bg); }
+    .report-row { display: flex; align-items: flex-start; gap: 6px; padding: 9px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg2); font-size: 13px; line-height: 1.4; }
+    .report-row span.txt { flex: 1; }
+    .row-btn { border: none; background: none; color: var(--text3); cursor: pointer; padding: 2px 4px; font-size: 12px; line-height: 1; }
+    .row-btn:hover:not(:disabled) { color: var(--text); }
+    .row-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .feedback-btn { width: 100%; padding: 13px; background: var(--purple); border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600; color: white; cursor: pointer; margin-bottom: 1rem; transition: background 0.15s; }
+    .feedback-btn:hover { background: #6d28d9; }
+
+    .anno-row { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; }
+    .anno-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .anno-top span.txt { font-size: 13px; flex: 1; color: var(--text); }
+    .anno-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+    .anno-note { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+    .badge-essential { background: var(--green-bg); color: var(--green); }
+    .badge-important { background: var(--blue-bg); color: var(--blue); }
+    .badge-optional { background: var(--bg3); color: var(--text3); }
+    .badge-fluff { background: var(--red-bg); color: var(--red); }
+    .badge-mismatch { background: var(--amber-bg); color: var(--amber); }
+    .badge-context-needed { background: var(--green-bg); color: var(--green); }
+    .badge-context-optional { background: var(--bg3); color: var(--text3); }
+
+    .missing-head { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 6px; }
+    .missing-row { padding: 10px 12px; border: 1.5px dashed var(--border2); border-radius: var(--radius-sm); margin-bottom: 6px; }
+    .missing-row p.txt { font-size: 13px; font-style: italic; color: var(--text); margin-bottom: 4px; }
+    .missing-row p.note { font-size: 12px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+    .feedback-ask { display: none; margin-top: 1.5rem; padding: 14px 16px; background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: var(--radius); font-size: 13px; color: var(--purple); line-height: 1.6; }
+    .feedback-ask.show { display: block; }
+
+    .ideal-reveal { display: none; margin-top: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg2); overflow: hidden; }
+    .ideal-reveal.show { display: block; }
+    .ideal-reveal summary { padding: 12px 16px; font-size: 13px; font-weight: 600; color: var(--purple); cursor: pointer; list-style: none; }
+    .ideal-reveal summary::-webkit-details-marker { display: none; }
+    .ideal-reveal summary::before { content: '\25b8  '; }
+    .ideal-reveal[open] summary::before { content: '\25be  '; }
+    .ideal-body { padding: 0 16px 16px; }
+    .ideal-body p.lead { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+    .ideal-body p.script { font-size: 14px; line-height: 1.7; color: var(--text); font-style: italic; }
+
+    footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 2rem; }
+
+    @media (max-width: 600px) {
+      .builder-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+  </div>
+  <div>
+    <h1>The Short Version</h1>
+    <p>SBAR practice tool</p>
+  </div>
+  <span class="tag">Prototype</span>
+</header>
+
+<main>
+
+  <div id="landingView">
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to tools
+    </a>
+
+    <div class="intro">
+      <h2>Give the short version</h2>
+      <p>See a fully worked example, then try building your own report from a different case. This is a first-pass prototype with one practice scenario &mdash; expect rough edges.</p>
+    </div>
+
+    <div class="audience-label">Who's receiving this report?</div>
+    <div class="audience-row">
+      <button class="aud-btn active" data-audience="primary">Paging the primary team</button>
+      <button class="aud-btn" data-audience="rapid">Rapid response just arrived</button>
+    </div>
+    <div class="audience-note">Remember, the rapid response team does not know this patient.</div>
+
+    <div class="mode-card example" id="cardWorked">
+      <div class="mode-card-tag">Walkthrough</div>
+      <div class="mode-card-title">Worked example</div>
+      <div class="mode-card-desc">See a fully assembled report with the reasoning behind every piece, including what's deliberately left out.</div>
+      <div class="mode-card-footer">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <div class="mode-card practice" id="cardPractice">
+      <div class="mode-card-tag">Practice</div>
+      <div class="mode-card-title">Try it yourself</div>
+      <div class="mode-card-desc">Read a different case, pull out what matters, and build your own short report.</div>
+      <div class="mode-card-footer">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div id="workedView" style="display:none;">
+    <button class="view-back" id="backFromWorked">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+
+    <div class="mode-row"><span class="mode-badge example">Worked example</span></div>
+
+    <div class="audience-label">Who's receiving this report?</div>
+    <div class="audience-row">
+      <button class="aud-btn active" data-audience="primary">Paging the primary team</button>
+      <button class="aud-btn" data-audience="rapid">Rapid response just arrived</button>
+    </div>
+    <div class="audience-note">Remember, the rapid response team does not know this patient.</div>
+
+    <div class="landing-card">
+      <div class="landing-text">
+        <p>Ms. Chen is POD#1 following a lumbar fusion. She's been tolerating a regular diet, ambulated with PT earlier today without difficulty, and takes gabapentin at home at baseline. Her admission chest x-ray showed no acute findings, and she voided without difficulty earlier in the shift. Family visited and were glad to see her progress.</p>
+        <p>She received hydromorphone 1mg IV for pain 45 minutes ago. Her pain was rated 8 out of 10 prior to hydromorphone administration, and she received the same medication six hours ago without any issue. On your hourly check, she is difficult to arouse and responds only to a sternal rub. Her respiratory rate is 8, and her SpO2 is 90% on room air. Her respirations are shallow and snoring, and her pupils are pinpoint. Her temperature is 98.2, her blood pressure is 118/76 and unchanged from baseline, and a fingerstick glucose checked this shift was 104.</p>
+      </div>
+    </div>
+
+    <div class="disagree-note">These are judgment calls, not hard rules. You might disagree with some of these &mdash; that's a normal, healthy part of learning to give report.</div>
+
+    <p class="tap-label">Here's how that sounds out loud:</p>
+    <div class="script-box" id="workedScript"></div>
+
+    <p class="tap-label">Tap each piece to see the reasoning, in order:</p>
+    <div id="workedIdealList"></div>
+
+    <p class="tap-label" style="margin-top: 1rem;">Left out, and why:</p>
+    <div id="workedLeftOutList"></div>
+  </div>
+
+  <div id="practiceView" style="display:none;">
+    <button class="view-back" id="backFromPractice">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+
+    <div class="mode-row"><span class="mode-badge practice">Try it yourself</span></div>
+
+    <div class="audience-label">Who's receiving this report?</div>
+    <div class="audience-row">
+      <button class="aud-btn active" data-audience="primary">Paging the primary team</button>
+      <button class="aud-btn" data-audience="rapid">Rapid response just arrived</button>
+    </div>
+    <div class="audience-note">Remember, the rapid response team does not know this patient.</div>
+
+    <div class="landing-card">
+      <div class="landing-text">
+        <p>Mr. Alvarez is <mark class="pull" data-id="b1">post-operative day 2 following a right total hip arthroplasty</mark>. He's been recovering appropriately, tolerating a regular diet, and progressing with physical therapy &mdash; this morning's goal was <mark class="pull" data-id="x2">150 feet with a walker</mark>. His baseline oxygen saturation has been <mark class="pull" data-id="b4">96 to 98 percent on room air</mark>, and he has <mark class="pull" data-id="b3">no prior cardiac or pulmonary history</mark>. Yesterday's vitals were unremarkable, with <mark class="pull" data-id="x3">a respiratory rate of 18 and an oxygen saturation of 97 percent on room air</mark>. His <mark class="pull" data-id="b2">enoxaparin dose was held yesterday due to a delay in his procedure</mark>. His <mark class="pull" data-id="x1">incision site has been clean, dressing dry and intact</mark>.</p>
+        <p>Over the last hour, his <mark class="pull" data-id="s1">respiratory rate has climbed from 18 to 34</mark>, and his <mark class="pull" data-id="s2">oxygen saturation has dropped from 95 to 88 percent on 2 liters nasal cannula</mark>. He's <mark class="pull" data-id="s3">reporting sudden, sharp pain with breathing</mark>, and <mark class="pull" data-id="s4">appears anxious and diaphoretic</mark>. On assessment, his <mark class="pull" data-id="a1">heart rate is 118 and blood pressure is 108 over 68, down from 130 over 82</mark> earlier this shift. His <mark class="pull" data-id="a2">lung sounds are clear bilaterally</mark>. He's showing <mark class="pull" data-id="a3">increased work of breathing with accessory muscle use</mark>, and you notice <mark class="pull" data-id="a4">new swelling and tenderness in his left calf</mark>.</p>
+      </div>
+    </div>
+    <p class="pull-hint">The highlighted phrases above become the chart snippets below.</p>
+
+    <div class="reminder">
+      This is your opening report, not the whole conversation. The team will ask follow-up questions afterward &mdash; your job here is to get them the essential picture fast.
+    </div>
+
+    <p class="target-hint">Try to tell the whole story in around <strong id="targetLabel">7</strong> cards. There's no hard limit.</p>
+
+    <div class="builder-grid">
+      <div>
+        <div class="builder-col-label">Chart snippets</div>
+        <div class="snippet-well" id="pool"></div>
+      </div>
+      <div>
+        <div class="builder-col-label">Your report <span id="counter">0 selected</span></div>
+        <div class="snippet-well report-well" id="report"></div>
+      </div>
+    </div>
+
+    <button class="feedback-btn" id="feedbackBtn">Get feedback</button>
+
+    <div id="feedback"></div>
+
+    <details class="ideal-reveal" id="idealReveal">
+      <summary>See a strong example for this audience</summary>
+      <div class="ideal-body">
+        <p class="lead">One reasonable way to tell this story &mdash; not the only right answer.</p>
+        <p class="script" id="idealScript"></p>
+      </div>
+    </details>
+
+    <div class="feedback-ask" id="feedbackAsk">
+      Was this useful? Let Cristian know &mdash; good, bad, or "please never make me do this again."
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  UCI Health &middot; ALERT Team &middot; For staff training use only &middot; Prototype, first scenario
+</footer>
+
+<script>
+  var TARGETS = { primary: 7, rapid: 9 };
+  var audience = 'primary';
+  var hasGivenFeedback = false;
+
+  var landingView = document.getElementById('landingView');
+  var workedView = document.getElementById('workedView');
+  var practiceView = document.getElementById('practiceView');
+
+  function showLanding() {
+    landingView.style.display = 'block';
+    workedView.style.display = 'none';
+    practiceView.style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+  function showWorked() {
+    landingView.style.display = 'none';
+    workedView.style.display = 'block';
+    practiceView.style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+  function showPractice() {
+    landingView.style.display = 'none';
+    workedView.style.display = 'none';
+    practiceView.style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('cardWorked').addEventListener('click', showWorked);
+  document.getElementById('cardPractice').addEventListener('click', showPractice);
+  document.getElementById('backFromWorked').addEventListener('click', showLanding);
+  document.getElementById('backFromPractice').addEventListener('click', showLanding);
+
+  /* ---------- shared badge helpers ---------- */
+  function badgeInfo(kind) {
+    if (kind === 'essential') return { label: 'essential', cls: 'badge-essential' };
+    if (kind === 'important') return { label: 'worth including', cls: 'badge-important' };
+    if (kind === 'optional') return { label: 'supporting detail', cls: 'badge-optional' };
+    if (kind === 'fluff') return { label: 'fluff, leave out', cls: 'badge-fluff' };
+    if (kind === 'mismatch') return { label: "doesn't fit here", cls: 'badge-mismatch' };
+    if (kind === 'context-needed') return { label: 'needed here', cls: 'badge-context-needed' };
+    if (kind === 'context-optional') return { label: 'optional here', cls: 'badge-context-optional' };
+    return { label: kind, cls: 'badge-optional' };
+  }
+
+  function resolveWeight(c, aud) {
+    if (c.weight === 'context-rapid') return aud === 'rapid' ? 'context-needed' : 'context-optional';
+    if (c.weight === 'audience') return aud === 'rapid' ? 'mismatch' : 'important';
+    return c.weight;
+  }
+
+  /* ---------- worked example (opioid oversedation, read-only, tap to reveal) ---------- */
+  var workedCards = [
+    { id: 's1', text: 'RR is 8 breaths per minute', note: 'The core objective abnormality. This is what should make anyone move faster.', weight: 'essential' },
+    { id: 's2', text: 'SpO2 90% on room air', note: 'Confirms the respiratory depression is affecting oxygenation, not just rate.', weight: 'essential' },
+    { id: 's3', text: 'Received hydromorphone 1mg IV 45 minutes ago', note: 'The timing ties the event to a likely cause. Without this, the team is guessing.', weight: 'essential' },
+    { id: 'a1', text: 'Difficult to arouse, responds only to sternal rub', note: 'Level of consciousness is often the earliest and most telling sign here.', weight: 'essential' },
+    { id: 'a2', text: 'Pupils pinpoint', note: 'A classic, specific sign of opioid effect, not just generic sedation.', weight: 'essential' },
+    { id: 'a3', text: 'Snoring, shallow respirations', note: 'Describes the quality of breathing, not just the number. Tells the team what to expect walking in.', weight: 'essential' },
+    { id: 'r1', text: 'Requesting provider at bedside now', note: 'Appropriate when paging the primary team. Does not fit once rapid response is already at bedside.', weight: 'audience' },
+    { id: 'r2', text: 'No naloxone order currently in place', note: 'Names the gap without requesting a specific medication. That\u2019s enough for the provider to act on, and it keeps this within scope.', weight: 'essential' },
+    { id: 'r3', text: 'Holding further opioid doses until reassessed', note: 'An action already taken. Saying so keeps the team from wondering if it\u2019s still an open risk.', weight: 'essential' },
+    { id: 'b1', text: 'POD#1 following a lumbar fusion', note: 'Context. Needed if the team does not already know this patient.', weight: 'context-rapid' },
+    { id: 'b2', text: 'Also takes gabapentin at home at baseline', note: 'Relevant to sedation risk in general, but not essential to say out loud in the acute moment.', weight: 'optional' },
+    { id: 'b3', text: 'Ambulated with PT earlier today without difficulty', note: 'Baseline function from earlier in the day. Doesn\u2019t change what happens in the next five minutes.', weight: 'fluff' },
+    { id: 'b4', text: 'Pain rated 8 out of 10 before the dose', note: 'Explains why she got the medication, but isn\u2019t part of the current emergency.', weight: 'fluff' },
+    { id: 'b5', text: 'Previous dose given 6 hours ago without issue', note: 'Worth knowing this reaction is new, but not essential to lead with.', weight: 'optional' },
+    { id: 'x1', text: 'Temperature 98.2, unremarkable', note: 'A vital that isn\u2019t pertinent here. It doesn\u2019t change the respiratory picture in either direction.', weight: 'fluff' },
+    { id: 'x2', text: 'Blood pressure 118/76, unchanged from baseline', note: 'A real negative finding, worth knowing, but not one that needs a seat in a short report.', weight: 'optional' },
+    { id: 'x3', text: 'Fingerstick glucose 104, checked this shift', note: 'A diagnostic that was collected but doesn\u2019t bear on this problem. Leave it out.', weight: 'fluff' },
+    { id: 'x4', text: 'Admission chest x-ray showed no acute findings', note: 'Old imaging from before this event. It doesn\u2019t tell the team anything about what\u2019s happening right now.', weight: 'fluff' },
+    { id: 'x5', text: 'Voided without difficulty this shift', note: 'Unrelated to the respiratory event. Pure noise here.', weight: 'fluff' },
+    { id: 'x6', text: 'Family visited earlier and were glad to see her progress', note: 'A nice detail, but has no bearing on an acute clinical report.', weight: 'fluff' }
+  ];
+
+  var workedIdealOrder = {
+    primary: ['s1', 's2', 's3', 'a1', 'a2', 'a3', 'r2', 'r3', 'r1'],
+    rapid: ['b1', 's1', 's2', 's3', 'a1', 'a2', 'a3', 'r2', 'r3']
+  };
+
+  function workedCardById(id) {
+    var m = workedCards.filter(function (c) { return c.id === id; });
+    return m.length ? m[0] : null;
+  }
+
+  function buildTapRow(c, kind, numLabel) {
+    var row = document.createElement('div');
+    row.className = 'tap-row';
+    var top = document.createElement('div');
+    top.className = 'tap-top';
+    var label = document.createElement('span');
+    label.className = 'txt';
+    label.textContent = (numLabel ? numLabel + '. ' : '') + c.text;
+    var chevron = document.createElement('span');
+    chevron.className = 'tap-chevron';
+    chevron.textContent = '\u25be';
+    top.appendChild(label);
+    top.appendChild(chevron);
+    var body = document.createElement('div');
+    body.className = 'tap-body';
+    var info = badgeInfo(kind);
+    var badge = document.createElement('span');
+    badge.className = 'anno-badge ' + info.cls;
+    badge.textContent = info.label;
+    var note = document.createElement('p');
+    note.className = 'tap-note';
+    note.textContent = c.note;
+    body.appendChild(badge);
+    body.appendChild(note);
+    row.appendChild(top);
+    row.appendChild(body);
+    row.addEventListener('click', function () { row.classList.toggle('open'); });
+    return row;
+  }
+
+  function renderWorked() {
+    var idealListEl = document.getElementById('workedIdealList');
+    var leftOutListEl = document.getElementById('workedLeftOutList');
+    var scriptEl = document.getElementById('workedScript');
+    idealListEl.innerHTML = '';
+    leftOutListEl.innerHTML = '';
+
+    var idealIds = workedIdealOrder[audience];
+    idealIds.forEach(function (id, idx) {
+      var c = workedCardById(id);
+      var kind = resolveWeight(c, audience);
+      idealListEl.appendChild(buildTapRow(c, kind, idx + 1));
+    });
+
+    scriptEl.textContent = idealIds.map(function (id) { return workedCardById(id).text; }).join('. ') + '.';
+
+    var leftOutIds = workedCards.map(function (c) { return c.id; }).filter(function (id) { return idealIds.indexOf(id) === -1; });
+    leftOutIds.forEach(function (id) {
+      var c = workedCardById(id);
+      var kind = resolveWeight(c, audience);
+      leftOutListEl.appendChild(buildTapRow(c, kind, null));
+    });
+  }
+
+  /* ---------- practice exercise (POD#2 THA / possible PE) ---------- */
+  var allCards = [
+    { id: 's1', text: 'RR climbed from 18 to 34 over the last hour', cat: 'S', note: 'Shows how fast this is progressing, not just that something is currently abnormal.', weight: 'important' },
+    { id: 's2', text: 'SpO2 dropped from 95% to 88% on 2L NC', cat: 'S', note: 'The core objective abnormality driving this whole report.', weight: 'essential' },
+    { id: 's3', text: 'Patient reports sudden sharp pain with breathing', cat: 'S', note: 'Useful color, but less urgent than the objective findings below.', weight: 'optional' },
+    { id: 's4', text: 'Patient appears anxious and diaphoretic', cat: 'S', note: 'Supports the picture, but not essential on its own.', weight: 'optional' },
+    { id: 'b1', text: 'POD#2, right total hip arthroplasty', cat: 'B', note: 'Context. Needed if the team does not already know this patient.', weight: 'context-rapid' },
+    { id: 'b2', text: 'Enoxaparin dose held yesterday for procedure delay', cat: 'B', note: 'Matters most paired with the calf finding below, raises clot risk.', weight: 'essential' },
+    { id: 'b3', text: 'No prior cardiac or pulmonary history', cat: 'B', note: 'A negative finding, rarely worth leading with.', weight: 'optional' },
+    { id: 'b4', text: 'Baseline SpO2 96 to 98 percent on room air', cat: 'B', note: 'A comparison point, not the acute problem itself.', weight: 'optional' },
+    { id: 'a1', text: 'HR 118, BP 108/68, down from 130/82', cat: 'A', note: 'Objective vitals, almost always earn a place.', weight: 'important' },
+    { id: 'a2', text: 'Lung sounds clear bilaterally', cat: 'A', note: 'Key negative finding, points away from pneumonia or fluid overload.', weight: 'essential' },
+    { id: 'a3', text: 'Increased work of breathing, accessory muscle use', cat: 'A', note: 'Shows how hard the body is working right now, not just a number.', weight: 'essential' },
+    { id: 'a4', text: 'New left calf swelling and tenderness', cat: 'A', note: 'Paired with the held anticoagulant, this is what should raise clot concern.', weight: 'essential' },
+    { id: 'r1', text: 'Requesting provider at bedside now', cat: 'R', note: 'Appropriate when paging the primary team. Does not fit once rapid response is already at bedside.', weight: 'audience' },
+    { id: 'r2', text: 'Requesting STAT chest x-ray, EKG, and ABG', cat: 'R', note: "A concrete, appropriate ask, within a nurse's scope.", weight: 'important' },
+    { id: 'r3', text: 'Should we screen this patient for a possible blood clot?', cat: 'R', note: 'Raises the concern as a question, not a diagnosis, the right way to voice it.', weight: 'essential' },
+    { id: 'x1', text: 'Incision dressing dry and intact', cat: 'X', note: 'Does not change what happens in the next five minutes.', weight: 'fluff' },
+    { id: 'x2', text: 'PT ambulation goal: 150 feet with walker', cat: 'X', note: 'Unrelated to the acute event.', weight: 'fluff' },
+    { id: 'x3', text: "Yesterday's vitals: RR 18, SpO2 97% on room air", cat: 'X', note: 'Old data, can create false reassurance without the current trend.', weight: 'fluff' },
+    { id: 'x4', text: 'Diet order: regular, no restrictions', cat: 'X', note: 'Not relevant to an acute respiratory or vascular concern.', weight: 'fluff' }
+  ];
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  var selected = [];
+  var poolEl = document.getElementById('pool');
+  var reportEl = document.getElementById('report');
+  var counterEl = document.getElementById('counter');
+  var targetLabel = document.getElementById('targetLabel');
+  var feedbackEl = document.getElementById('feedback');
+  var feedbackAsk = document.getElementById('feedbackAsk');
+  var idealReveal = document.getElementById('idealReveal');
+  var idealScript = document.getElementById('idealScript');
+
+  var idealExamples = {
+    primary: ['s2', 's1', 'a3', 'a2', 'a4', 'r3', 'r1'],
+    rapid: ['b1', 's1', 's2', 'a3', 'a2', 'a4', 'b2', 'r3']
+  };
+
+  function buildIdealText(aud) {
+    var ids = idealExamples[aud];
+    var parts = ids.map(function (id) {
+      var match = allCards.filter(function (c) { return c.id === id; });
+      return match.length ? match[0].text : '';
+    });
+    return parts.join('. ') + '.';
+  }
+
+  function setAudience(a) {
+    audience = a;
+    document.querySelectorAll('.aud-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.audience === a);
+    });
+    document.querySelectorAll('.audience-note').forEach(function (note) {
+      note.classList.toggle('show', a === 'rapid');
+    });
+    targetLabel.textContent = TARGETS[a];
+    selected = [];
+    feedbackEl.innerHTML = '';
+    feedbackAsk.classList.remove('show');
+    idealReveal.classList.remove('show');
+    idealReveal.removeAttribute('open');
+    renderWorked();
+    render();
+  }
+  document.querySelectorAll('.aud-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () { setAudience(btn.dataset.audience); });
+  });
+
+  function updateCounter() {
+    counterEl.textContent = selected.length + ' selected';
+    counterEl.classList.toggle('over', selected.length > TARGETS[audience]);
+  }
+
+  function findSelected(id) {
+    for (var i = 0; i < selected.length; i++) { if (selected[i].id === id) return true; }
+    return false;
+  }
+
+  function setMarkActive(id, on) {
+    var m = document.querySelector('mark.pull[data-id="' + id + '"]');
+    if (m) m.classList.toggle('active', on);
+  }
+
+  function render() {
+    poolEl.innerHTML = '';
+    reportEl.innerHTML = '';
+    var remaining = shuffle(allCards.filter(function (c) { return !findSelected(c.id); }));
+    remaining.forEach(function (c) {
+      var el = document.createElement('div');
+      el.className = 'snippet-card';
+      el.textContent = c.text;
+      el.addEventListener('mouseenter', function () { setMarkActive(c.id, true); });
+      el.addEventListener('mouseleave', function () { setMarkActive(c.id, false); });
+      el.addEventListener('click', function () { selected.push(c); feedbackEl.innerHTML = ''; render(); });
+      poolEl.appendChild(el);
+    });
+    selected.forEach(function (c, idx) {
+      var row = document.createElement('div');
+      row.className = 'report-row';
+      row.addEventListener('mouseenter', function () { setMarkActive(c.id, true); });
+      row.addEventListener('mouseleave', function () { setMarkActive(c.id, false); });
+      var txt = document.createElement('span');
+      txt.className = 'txt';
+      txt.textContent = c.text;
+      row.appendChild(txt);
+
+      var up = document.createElement('button');
+      up.className = 'row-btn';
+      up.setAttribute('aria-label', 'Move up');
+      up.textContent = '\u2191';
+      up.disabled = idx === 0;
+      up.addEventListener('click', function () {
+        var tmp = selected[idx - 1]; selected[idx - 1] = selected[idx]; selected[idx] = tmp;
+        feedbackEl.innerHTML = ''; render();
+      });
+
+      var down = document.createElement('button');
+      down.className = 'row-btn';
+      down.setAttribute('aria-label', 'Move down');
+      down.textContent = '\u2193';
+      down.disabled = idx === selected.length - 1;
+      down.addEventListener('click', function () {
+        var tmp = selected[idx + 1]; selected[idx + 1] = selected[idx]; selected[idx] = tmp;
+        feedbackEl.innerHTML = ''; render();
+      });
+
+      var remove = document.createElement('button');
+      remove.className = 'row-btn';
+      remove.setAttribute('aria-label', 'Remove');
+      remove.textContent = '\u2715';
+      remove.addEventListener('click', function () {
+        selected.splice(idx, 1); feedbackEl.innerHTML = ''; render();
+      });
+
+      row.appendChild(up);
+      row.appendChild(down);
+      row.appendChild(remove);
+      reportEl.appendChild(row);
+    });
+    updateCounter();
+  }
+
+  function essentialIdsFor(aud) {
+    var base = ['s2', 'a2', 'a3', 'a4', 'b2', 'r3'];
+    return aud === 'rapid' ? base.concat(['b1']) : base;
+  }
+
+  document.getElementById('feedbackBtn').addEventListener('click', function () {
+    feedbackEl.innerHTML = '';
+    if (selected.length === 0) {
+      var p = document.createElement('p');
+      p.style.fontSize = '13px';
+      p.style.color = 'var(--text2)';
+      p.textContent = 'Add some snippets to your report first.';
+      feedbackEl.appendChild(p);
+      return;
+    }
+
+    hasGivenFeedback = true;
+    feedbackAsk.classList.add('show');
+    idealScript.textContent = buildIdealText(audience);
+    idealReveal.classList.add('show');
+
+    selected.forEach(function (c) {
+      var kind = resolveWeight(c, audience);
+      var info = badgeInfo(kind);
+      var row = document.createElement('div');
+      row.className = 'anno-row';
+
+      var top = document.createElement('div');
+      top.className = 'anno-top';
+      var label = document.createElement('span');
+      label.className = 'txt';
+      label.textContent = c.text;
+      var badge = document.createElement('span');
+      badge.className = 'anno-badge ' + info.cls;
+      badge.textContent = info.label;
+      top.appendChild(label);
+      top.appendChild(badge);
+
+      var note = document.createElement('div');
+      note.className = 'anno-note';
+      note.textContent = c.note;
+
+      row.appendChild(top);
+      row.appendChild(note);
+      feedbackEl.appendChild(row);
+    });
+
+    var essentials = essentialIdsFor(audience);
+    var missing = allCards.filter(function (c) {
+      return essentials.indexOf(c.id) !== -1 && !findSelected(c.id);
+    });
+    if (missing.length > 0) {
+      var hdr = document.createElement('div');
+      hdr.className = 'missing-head';
+      hdr.textContent = 'Worth also considering:';
+      feedbackEl.appendChild(hdr);
+      missing.forEach(function (c) {
+        var row = document.createElement('div');
+        row.className = 'missing-row';
+        var t = document.createElement('p');
+        t.className = 'txt';
+        t.textContent = c.text;
+        var n = document.createElement('p');
+        n.className = 'note';
+        n.textContent = c.note;
+        row.appendChild(t);
+        row.appendChild(n);
+        feedbackEl.appendChild(row);
+      });
+    }
+  });
+
+  renderWorked();
+  render();
+  showLanding();
+</script>
+
+</body>
+</html>
