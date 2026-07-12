@@ -229,7 +229,6 @@ registerCase({
   category: 'V-Tach',
   title: 'Unstable V-Tach with a Pulse',
   meta: '8 decisions',
-  reviewLink: { url: 'decision-walkthrough.html?scenario=uvt', label: 'Review these rhythms in the walkthrough →' },
   vitalsProgression: [
     { hr: '168', bp: '82/50', spo2: '91%', rr: '22', label: 'Notified by monitor tech' },
     { hr: '172', bp: '78/44', spo2: '89%', rr: '24', label: 'RRT activated' },
@@ -373,7 +372,6 @@ registerCase({
   category: 'Pulseless Rhythms',
   title: 'Pulseless V-Fib',
   meta: '9 decisions',
-  reviewLink: { url: 'decision-walkthrough.html?scenario=pvf', label: 'Review these rhythms in the walkthrough →' },
   baseVitals: { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Cardiac arrest' },
   vitalsProgression: [
     { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Cardiac arrest — unwitnessed' },
@@ -526,7 +524,6 @@ registerCase({
   category: 'Pulseless Arrest',
   title: 'PEA Arrest',
   meta: '8 steps',
-  reviewLink: { url: 'decision-walkthrough.html?scenario=pea', label: 'Review these rhythms in the walkthrough →' },
   vitalsProgression: [
     { hr:'112', bp:'78/42',      spo2:'91%', rr:'18',       label:'RRT in progress' },
     { hr:'118', bp:'unreadable', spo2:'89%', rr:'agonal',   label:'Impending arrest' },
@@ -666,7 +663,6 @@ registerCase({
   category: 'Sinus Bradycardia',
   title: 'Sinus Bradycardia',
   meta: '4 decisions',
-  reviewLink: { url: 'decision-walkthrough.html?scenario=sbrad-a', label: 'Review these rhythms in the walkthrough →' },
   vitalsProgression: [
     { hr: '44', bp: '126/76', spo2: '97%', rr: '16', label: 'Monitor tech call' },
     { hr: '44', bp: '124/74', spo2: '97%', rr: '16', label: 'At bedside — assessing' },
@@ -744,7 +740,6 @@ registerCase({
   category: 'Symptomatic Bradycardia',
   title: 'Symptomatic Bradycardia',
   meta: '7 decisions',
-  reviewLink: { url: 'decision-walkthrough.html?scenario=sbrad-s', label: 'Review these rhythms in the walkthrough →' },
   vitalsProgression: [
     { hr: '42', bp: '98/58', spo2: '96%', rr: '16', label: 'Monitor tech call' },
     { hr: '40', bp: '86/54', spo2: '95%', rr: '18', label: 'At bedside — assessing' },
@@ -861,11 +856,137 @@ registerCase({
   ]
 });
 
+registerCase({
+  id: 'svt-stable',
+  category: 'SVT',
+  title: 'Stable SVT',
+  meta: '7 decisions',
+  vitalsProgression: [
+    { hr: '192', bp: '—', spo2: '97%', rr: '18', label: 'Monitor tech call' },
+    { hr: '190', bp: '128/78', spo2: '97%', rr: '18', label: 'At bedside — assessing' },
+    { hr: '188', bp: '126/76', spo2: '97%', rr: '18', label: 'RRT + EKG tech en route — staging' },
+    { hr: '190', bp: '124/76', spo2: '97%', rr: '18', label: 'Team at bedside — prepping for adenosine' },
+    { hr: '190', bp: '124/76', spo2: '97%', rr: '18', label: 'Warning given' },
+    { hr: '—', bp: '—', spo2: '96%', rr: '18', label: 'Adenosine pushed — brief pause' },
+    { hr: '78', bp: '122/74', spo2: '98%', rr: '16', label: 'Converted — sinus rhythm' },
+  ],
+  steps: [
+    {
+      phase: 'assess', phaseLabel: 'Recognition',
+      zoll: 'svt', zollLabel: 'TELEMETRY  LEAD II  HR: 192  NARROW COMPLEX TACH',
+      narrative: `It\u2019s 1440. You\u2019re the nurse for a 58-year-old woman on the trauma stepdown unit, day 1 after a mechanical fall \u2014 facial fractures, one eye swollen completely shut. No cardiac history in her chart. Your monitor tech calls: <strong>\u201cRoom 14 just jumped into a narrow complex tach, rate 192 \u2014 she\u2019s never been in this before.\u201d</strong>`,
+      prompt: 'What do you do first?',
+      choices: [
+        { text: 'Activate rapid response and head to assess her at the same time \u2014 and have someone notify the EKG tech for a stat 12-lead', correct: true },
+        { text: 'Go assess her first, and call rapid response once you know more', correct: false, consequence: 'You lose time deciding this alone with a brand-new rate this fast. Activating rapid response and assessing her happen together, not one before the other \u2014 the team travels while you gather information.' },
+        { text: 'Call rapid response and wait for them at the nurses station', correct: false, consequence: 'You call the team but you\u2019re not in the room. You have no idea how she\u2019s tolerating this rate by the time they arrive \u2014 and neither do they.' },
+        { text: 'Ask the charge nurse to bring adenosine to the bedside first', correct: false, consequence: 'You don\u2019t know yet whether this is even a pharmacologic-pathway rhythm. Staging a specific drug before you\u2019ve assessed her \u2014 or before any provider has weighed in \u2014 gets ahead of where this actually is.' }
+      ],
+      correctFeedback: 'Right. A brand-new rate this fast gets both: the team activated and you at the bedside, at the same time. Get the EKG tech notified too, while you\u2019re at it, so a 12-lead is ready the moment it\u2019s needed.',
+      wrongFeedback: 'Every wrong path here either delays the team or leaves you assessing blind. Activate rapid response and go assess her \u2014 together, not sequentially.',
+      pearl: 'New-onset tachyarrhythmia in a patient with no prior history of it deserves an immediate, parallel response: team activated and eyes on the patient, at the same time. Waiting to see how bad it is before calling costs you the minutes you\u2019ll want back later.'
+    },
+    {
+      phase: 'assess', phaseLabel: 'Assessment',
+      zoll: 'svt', zollLabel: 'MONITOR MODE  LEAD II  HR: 190  NARROW COMPLEX TACH',
+      narrative: `You\u2019re at the bedside. She\u2019s awake and oriented, tracking your questions, though she says she feels \u201ca little lightheaded.\u201d She denies chest pain or shortness of breath. Her skin is warm and dry. Repeat BP: 128/78. Rate on the monitor: still 190, narrow and regular.`,
+      prompt: 'What does this assessment tell you?',
+      choices: [
+        { text: 'Her pressure is holding and her symptoms are mild \u2014 this still reads as tolerable for now. Stay bedside, keep reassessing closely, and continue toward the vagal/adenosine pathway rather than cardioversion', correct: true },
+        { text: 'A rate this fast needs synchronized cardioversion regardless of her pressure', correct: false, consequence: 'Her BP is solid and she\u2019s alert and conversant \u2014 nothing here points to hemodynamic instability. Cardioversion is for patients who are decompensating, not for a number alone. Jumping there now skips real information you already have.' },
+        { text: 'Her pressure is fine, so this can wait for the team to arrive on their own time', correct: false, consequence: 'Tolerable right now doesn\u2019t mean settled. A rate at 190 can turn on you fast \u2014 this still needs continuous reassessment, not a step back.' },
+        { text: 'Mild lightheadedness means she\u2019s decompensating \u2014 prepare for immediate cardioversion', correct: false, consequence: 'Mild lightheadedness alone, with a stable pressure and clear mentation, isn\u2019t decompensation. Save the escalation for if and when her presentation actually changes.' }
+      ],
+      correctFeedback: 'Exactly \u2014 a fast rate isn\u2019t the same as instability. Her pressure and mentation are telling you she\u2019s tolerating this, at least for now. That keeps you on the pharmacologic pathway, but it doesn\u2019t mean you stop watching her.',
+      wrongFeedback: 'The rate alone doesn\u2019t answer whether she\u2019s stable \u2014 her pressure and mentation do. Right now, both are reassuring. Stay close and keep reassessing.',
+      pearl: 'A profound rate with a normal-appearing pressure is a common source of hesitation. Stability is defined by perfusion and mentation, not by how fast the number looks. That said, a solid pressure at 190 can change quickly \u2014 this is a \u201cstay at the bedside\u201d situation, not a \u201cstep away\u201d one.'
+    },
+    {
+      phase: 'decide', phaseLabel: 'Staging',
+      isMulti: true,
+      zoll: 'svt', zollLabel: 'MONITOR MODE  LEAD II  HR: 188  NARROW COMPLEX TACH',
+      narrative: `Rapid response and the EKG tech are both en route. While you wait, there\u2019s work to do at the bedside.`,
+      prompt: 'Select all that apply, then confirm.',
+      choices: [
+        { text: 'Confirm or upsize IV access to an 18 or 20 gauge \u2014 something that can tolerate a fast push', correct: true },
+        { text: 'Grab an empty 10cc syringe in case vagal maneuvers are going to be attempted', correct: true },
+        { text: 'Continue reassessing her vitals and mentation while you wait', correct: true },
+        { text: 'Attempt a vagal maneuver now, since she seems stable enough to tolerate it', correct: false, consequence: 'Bearing down is a Valsalva-type strain \u2014 it raises intrathoracic and intraabdominal pressure, which can transiently raise intracranial and intraocular pressure too. With facial fractures and an eye you can\u2019t even fully examine, you don\u2019t know if that transient pressure spike is safe here. That\u2019s a question for the team, not a call to make on your own.' },
+        { text: 'Go ahead and page the physician for an adenosine order yourself', correct: false, consequence: 'You\u2019re not the one placing this order \u2014 the responding team makes that call once they\u2019ve seen her. Your job right now is staging the room, not directing the plan.' }
+      ],
+      correctFeedback: 'Good staging: access ready, supplies in hand in case they\u2019re needed, and you\u2019re still watching her closely. Nothing here commits you to an intervention you\u2019re not sure is safe.',
+      wrongFeedback: 'Remember \u2014 she has an eye swollen completely shut and a possible orbital fracture. Bearing down forcefully or blowing full force into a syringe could worsen either one. Staging the room is your job right now; the call on what\u2019s safe to attempt belongs to the team.',
+      pearl: 'Bearing-down maneuvers raise intrathoracic and intraabdominal pressure, which can transiently raise intracranial and intraocular pressure as well. That\u2019s a real consideration with facial fractures or eye trauma of unclear extent \u2014 and it\u2019s exactly the kind of thing you flag to the team as a question rather than deciding on your own.'
+    },
+    {
+      phase: 'act', phaseLabel: 'Pre-Adenosine Prep',
+      isChecklist: true,
+      zoll: 'svt', zollLabel: 'MONITOR MODE  LEAD II  HR: 190  NARROW COMPLEX TACH',
+      narrative: `The team is at the bedside. They review her history and the facial injuries, discuss vagal maneuvers, and decide to forgo them given the fracture and eye involvement. The physician orders adenosine.`,
+      checklistHeader: 'Pre-adenosine safety checklist',
+      checklistPrompt: 'Confirm each item before the push.',
+      checklistItems: [
+        { id: 'pads',     text: 'Pads on, anterior-posterior placement' },
+        { id: 'supplies', text: 'Gather the 3-way stopcock setup \u2014 stopcock, flush, and a 20cc syringe' },
+        { id: 'ekg',      text: 'Continuous 12-lead EKG running' },
+        { id: 'screen',   text: 'Patient screened safe for adenosine \u2014 team assesses for WPW, asthma/COPD history checked' },
+        { id: 'briefed',  text: 'Team briefed: the push will be rapid, with an immediate flush \u2014 everyone ready before it happens' }
+      ],
+      checklistButtonLabel: 'Ready for the order \u2192',
+      checklistCompleteLabel: 'Completed pre-adenosine safety checklist',
+      checklistCompleteFeedbackHead: 'All items confirmed',
+      checklistCompleteFeedback: 'Everything the team needs is ready the moment the order comes through \u2014 pads on, supplies gathered, 12-lead running, and everyone briefed on how this push is going to go.',
+      pearl: 'You can gather everything the push will need \u2014 stopcock, flush, syringe \u2014 but you can\u2019t prime the setup until there\u2019s an actual order in hand. Having the pieces ready cuts the delay down to seconds once the order comes through, without acting ahead of it.'
+    },
+    {
+      phase: 'act', phaseLabel: 'Patient Warning',
+      zoll: 'svt', zollLabel: 'MONITOR MODE  LEAD II  HR: 190  NARROW COMPLEX TACH',
+      narrative: `Adenosine 6mg is drawn up and ready at the three-way stopcock. Before it\u2019s pushed, you turn to her.`,
+      prompt: 'What do you tell her to expect?',
+      choices: [
+        { text: 'She may feel a wave of flushing, chest pressure, or a brief sense of impending doom, and the monitor may show a short pause \u2014 all expected, and it passes within seconds', correct: true },
+        { text: 'She could possibly die', correct: false, consequence: 'This is wildly out of proportion to what\u2019s actually about to happen. Adenosine causes a transient, expected pause \u2014 describing it as a possible death sentence terrifies a patient over a normal, well-understood medication response.' },
+        { text: 'Nothing \u2014 there\u2019s no need to say anything before the push', correct: false, consequence: 'Skipping the warning doesn\u2019t save time \u2014 it costs it. An unwarned patient who suddenly feels chest pressure and sees her own monitor flatline for a few seconds can panic, which slows everyone down right when you need her calm.' },
+        { text: 'It will feel like a mild headache that resolves in a few minutes', correct: false, consequence: 'This undersells what\u2019s actually coming and sets her up to be caught off guard by the real sensation \u2014 flushing, chest pressure, and a brief pause are far more intense than \u201ca mild headache.\u201d' }
+      ],
+      correctFeedback: 'Right. A brief, accurate warning \u2014 flushing, pressure, a sense of doom, a short pause on the monitor \u2014 prepares her for a jarring but expected few seconds without overstating the risk. It\u2019s also why the push has to go in fast: adenosine breaks down almost immediately, so a slow push means it\u2019s gone before it ever reaches her heart.',
+      wrongFeedback: 'The warning needs to be both honest and proportionate: what she\u2019ll actually feel, not an underplayed version and not a worst-case one.',
+      pearl: 'Adenosine\u2019s half-life is under 10 seconds \u2014 that\u2019s precisely why it has to be pushed in rapidly, immediately followed by a fast flush. A slow push lets the drug metabolize in the tubing and vein before it ever reaches central circulation, and the dose effectively goes to waste. The sensation she\u2019ll feel is intense but just as short-lived.'
+    },
+    {
+      phase: 'act', phaseLabel: 'The Push',
+      zoll: 'svtpause', zollLabel: 'MONITOR MODE  LEAD II  PUSH GIVEN \u2192 TRANSIENT PAUSE',
+      narrative: `6mg adenosine is pushed rapidly through the most proximal port, immediately followed by a fast 20cc flush. Three seconds later, the monitor goes flat. She grimaces and grips the rail.`,
+      prompt: 'What do you do?',
+      choices: [
+        { text: 'Stay calm and continue to monitor and assess the situation \u2014 this brief pause is the expected response', correct: true },
+        { text: 'Drop the head of the bed, pull the CPR handle, and start compressions', correct: false, consequence: 'The room turns to look at you mid-compression as her rhythm resumes on its own two seconds later, right on schedule. This pause is the adenosine working, not an arrest \u2014 compressions on a patient about to have a pulse back is its own kind of problem.' },
+        { text: 'Call a code blue immediately', correct: false, consequence: 'A brief expected pause after adenosine isn\u2019t cardiac arrest. Calling a code here pulls in a full team and resources for a response that\u2019s about to resolve on its own in a few seconds.' },
+        { text: 'Push a second dose right away since the first doesn\u2019t seem to be working', correct: false, consequence: 'The pause you\u2019re watching right now is the drug working, not failing. Give it the few seconds it needs before deciding whether a second dose is even necessary.' }
+      ],
+      correctFeedback: 'Correct. This brief pause \u2014 sometimes even a few seconds of asystole \u2014 is the expected mechanism of adenosine, not a complication. Stay with her, continue to monitor and assess, and let it play out.',
+      wrongFeedback: 'This pause is expected \u2014 adenosine works by transiently blocking AV node conduction, and a few seconds of flatline is a normal part of that. It resolves on its own; continue to monitor and assess rather than react.',
+      pearl: 'A brief pause, even a few seconds of asystole, is a known and expected response to adenosine \u2014 not a code. If the pause extends well beyond that or she doesn\u2019t recover, that\u2019s different, but a normal-duration pause needs your attention, not compressions.'
+    },
+    {
+      phase: 'manage', phaseLabel: 'Resolution',
+      isNarrative: true,
+      narrative: `The monitor picks back up \u2014 narrow, regular, rate 78. Sinus rhythm. She takes a breath and says the racing feeling is gone. Repeat BP: 122/74. The team confirms conversion and reviews the plan: continued telemetry monitoring, a repeat 12-lead, and documentation of the event.`
+    },
+    {
+      isLanding: true,
+      landingText: `<p>New rhythm, unfamiliar patient, and a physical exam that made one of the \u201cusual\u201d tools feel uncertain \u2014 that combination is exactly when the instinct to pause and ask, rather than act and hope, matters most.</p><p>Her pressure held the whole time, which made this a \u201cstay close and reassess\u201d case rather than a \u201ccardiovert now\u201d one. That distinction \u2014 reading perfusion and mentation instead of just the number on the monitor \u2014 is the harder skill, and you used it correctly here.</p><div class="pearl-box" style="margin-top:14px;"><div class="pearl-label">If you find yourself here again</div><div class="pearl-text">\u2022 Ask the provider to order both the 6mg and the 12mg doses up front. The team stays at bedside through the push either way \u2014 the real delay is pharmacy verifying and sending each dose, which can take longer than you\u2019d expect if you\u2019re waiting on the second one after the first fails.<br>\u2022 If a dose goes unused, make sure any leftover PRN adenosine order gets discontinued once the rhythm has resolved.<br>\u2022 Vagal maneuvers, when they are appropriate: modified bear-down, forceful coughing, or blowing into an occluded syringe or straw. Full Valsalva and carotid massage are outside what\u2019s typically attempted at the bedside here \u2014 most inpatients aren\u2019t candidates, and carotid massage falls outside nursing scope regardless.</div></div><p>Document it, and go recheck on her again in a few minutes \u2014 first conversions don\u2019t always stick.</p>`
+    }
+  ]
+});
+
 // ── RHYTHM HELPERS ──
 function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
 function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
 function vtachWave(t){const r=0.34,p=t%r,u=p/r;if(u<0.12)return -0.15+u/0.12*0.30;if(u>=0.12&&u<0.22)return 0.15+(u-0.12)/0.10*0.35+0.12*Math.sin(Math.PI*(u-0.12)/0.10);if(u>=0.22&&u<0.38)return 0.50+(u-0.22)/0.16*0.48;if(u>=0.38&&u<0.52)return 0.98-0.22*(1-Math.cos(Math.PI*(u-0.38)/0.14));if(u>=0.52&&u<0.66)return 0.76-(u-0.52)/0.14*1.03;if(u>=0.66&&u<0.76)return -0.27-(u-0.66)/0.10*0.28;if(u>=0.76&&u<0.88)return -0.55+(u-0.76)/0.12*0.40;return -0.15;}
 function vfibWave(t){return 0.55*Math.sin(t*11.3+Math.sin(t*3.7))+0.30*Math.sin(t*17.1+Math.sin(t*5.2))+0.18*Math.sin(t*23.4)+0.10*Math.sin(t*7.8+1.2);}
+function svtWave(t){const r=0.22,u=(t%r)/r;if(u<0.08)return 0;if(u>=0.08&&u<0.13)return(u-0.08)/0.05*1.15;if(u>=0.13&&u<0.17)return 1.15-(u-0.13)/0.04*1.15;if(u>=0.17&&u<0.23)return-(u-0.17)/0.06*0.52;if(u>=0.23&&u<0.26)return-0.52+(u-0.23)/0.03*0.52;if(u>=0.26&&u<0.38)return 0;if(u>=0.38&&u<0.56){const x=(u-0.38)/0.18;return 0.24*Math.pow(Math.sin(Math.PI*x),1.6);}return 0;}
+function svtPauseWave(t){return t<2 ? svtWave(t) : asystoleWave(t);}
 function drawRhythm(canvasId,waveFn){
   const cv=document.getElementById(canvasId);if(!cv)return;
   const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
@@ -915,7 +1036,7 @@ function drawSyncMarkers(){
 
 function scheduleRhythmDraw(step){
   if(!step.zoll)return;
-  const waveFns={nsr:nsrWave,asystole:asystoleWave,vtach:vtachWave,vfib:vfibWave};
+  const waveFns={nsr:nsrWave,asystole:asystoleWave,vtach:vtachWave,vfib:vfibWave,svt:svtWave,svtpause:svtPauseWave};
   const fn=waveFns[step.zoll]||nsrWave;
   setTimeout(()=>drawRhythm('zollCanvas',fn),60);
 }
@@ -960,7 +1081,7 @@ let activeCase = null;
 let currentStep = 0;
 let results = [];
 let choiceMade = false;
-let completedCases = new Set(JSON.parse(sessionStorage.getItem('sentinel_completed_cases') || '[]')); // persists across navigation within the same tab session; clears when the tab is closed
+let completedCases = new Set(); // session-only — resets on page reload
 
 function buildSelector() {
   const grid = document.getElementById('caseGrid');
@@ -1048,16 +1169,11 @@ function renderStep() {
   // ── LANDING CARD ──
   if(step.isLanding){
     completedCases.add(activeCase.id);
-    sessionStorage.setItem('sentinel_completed_cases', JSON.stringify([...completedCases]));
     const uncompletedPool = REGISTRY.filter(c => c.id !== activeCase.id && !completedCases.has(c.id));
     const nextHtml = uncompletedPool.length
       ? `<button class="action-btn btn-coral" onclick="startCase('${uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)].id}')">Next case study →</button>`
       : `<div class="all-done-note">You've completed every available case this session — nice work.</div>`;
-    const reviewHtml = activeCase.reviewLink
-      ? `<a class="action-btn btn-neutral" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;" href="${activeCase.reviewLink.url}" target="_blank" rel="noopener">${activeCase.reviewLink.label}</a>`
-      : '';
     container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
-      ${reviewHtml}
       <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
       ${nextHtml}
       <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
