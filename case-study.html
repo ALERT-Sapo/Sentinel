@@ -179,6 +179,9 @@
   </a>
 
   <div id="caseSelector">
+    <div class="how-it-works" style="margin-bottom:1rem;">
+      <strong style="font-weight:600;">How to get started:</strong> Tap <strong>Random case</strong> below to get a scenario pulled from the pool, or scroll down and tap any case directly to run that one specifically. Each case card has a checkbox — uncheck one to keep it out of the random pool, which is handy if you've already run it before and don't want a repeat.
+    </div>
     <div style="background:var(--coral-bg);border:1px solid var(--coral-border);border-radius:var(--radius);padding:16px;margin-bottom:1.25rem;">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--coral);margin-bottom:8px;">Recommended</div>
       <button class="random-btn" id="randomBtn" onclick="startRandomCase()" style="margin-bottom:8px;">
@@ -189,9 +192,6 @@
     </div>
     <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Or choose a case</div>
     <div class="case-grid" id="caseGrid"></div>
-    <div class="how-it-works" style="margin-top:1rem;">
-      <strong style="font-weight:600;">How this works:</strong> You'll step through a real clinical scenario, making decisions at each inflection point. If you choose wrong, the case keeps going — you'll see the consequence and have to recover. That's intentional.
-    </div>
   </div>
 
   <div id="caseRunner">
@@ -226,6 +226,7 @@ window.registerCase = function(caseObj) {
 // ── CASE DATA ──
 registerCase({
   id: 'vtach-unstable',
+  reviewLink: 'uvt',
   category: 'V-Tach',
   title: 'Unstable V-Tach with a Pulse',
   meta: '8 decisions',
@@ -369,6 +370,7 @@ registerCase({
 
 registerCase({
   id: 'vfib-pulseless',
+  reviewLink: 'pvf',
   category: 'Pulseless Rhythms',
   title: 'Pulseless V-Fib',
   meta: '9 decisions',
@@ -521,6 +523,7 @@ registerCase({
 // ── PEA / ASYSTOLE CASE ──
 registerCase({
   id: 'pea-asystole',
+  reviewLink: 'pea',
   category: 'Pulseless Arrest',
   title: 'PEA Arrest',
   meta: '8 steps',
@@ -660,6 +663,7 @@ registerCase({
 // ── ASYMPTOMATIC SINUS BRADYCARDIA CASE ──
 registerCase({
   id: 'sbrad-asymptomatic',
+  reviewLink: 'sbrad-a',
   category: 'Sinus Bradycardia',
   title: 'Sinus Bradycardia',
   meta: '4 decisions',
@@ -737,6 +741,7 @@ registerCase({
 // ── SYMPTOMATIC BRADYCARDIA CASE ──
 registerCase({
   id: 'sbrad-symptomatic',
+  reviewLink: 'sbrad-s',
   category: 'Symptomatic Bradycardia',
   title: 'Symptomatic Bradycardia',
   meta: '7 decisions',
@@ -858,6 +863,7 @@ registerCase({
 
 registerCase({
   id: 'svt-stable',
+  reviewLink: 'ssvt',
   category: 'SVT',
   title: 'Stable SVT',
   meta: '7 decisions',
@@ -1170,13 +1176,18 @@ function renderStep() {
   if(step.isLanding){
     completedCases.add(activeCase.id);
     const uncompletedPool = REGISTRY.filter(c => c.id !== activeCase.id && !completedCases.has(c.id));
-    const nextHtml = uncompletedPool.length
-      ? `<button class="action-btn btn-coral" onclick="startCase('${uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)].id}')">Next case study →</button>`
+    const nextPick = uncompletedPool.length ? uncompletedPool[Math.floor(Math.random()*uncompletedPool.length)] : null;
+    const reviewHtml = activeCase.reviewLink
+      ? `<a class="action-btn btn-neutral" style="display:block;text-align:center;text-decoration:none;" href="decision-walkthrough.html?scenario=${activeCase.reviewLink}" target="_blank" rel="noopener">View decision walkthrough ↗</a>`
+      : '';
+    const nextHtml = nextPick
+      ? `<button class="action-btn btn-coral" onclick="startCase('${nextPick.id}')">Next case →</button>`
       : `<div class="all-done-note">You've completed every available case this session — nice work.</div>`;
     container.innerHTML=`<div class="landing-card"><div class="landing-text">${step.landingText}</div></div>
-      <button class="action-btn btn-neutral" onclick="restartCase()">Run this case again</button>
+      ${reviewHtml}
       ${nextHtml}
-      <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← All cases</button>`;
+      <button class="action-btn btn-neutral" style="margin-top:4px;" onclick="backToSelector()">← Case study home</button>
+      <div style="text-align:center;margin-top:10px;"><button class="runner-back" style="margin:0 auto;" onclick="restartCase()">Run this case again</button></div>`;
     return;
   }
 
