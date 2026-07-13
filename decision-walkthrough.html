@@ -1544,18 +1544,20 @@ function selectScenario(id) {
 
 renderScenarios();
 
-// Deep-link support: ?scenario=ID auto-selects and scrolls to that rhythm's detail view
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const deepLinkId = params.get('scenario');
-  if (deepLinkId && scenarios.some(s => s.id === deepLinkId)) {
-    selectScenario(deepLinkId);
-    setTimeout(() => {
-      document.getElementById('walkthrough')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  }
+// Deep-link support: ?scenario=ID jumps straight to that rhythm's walkthrough
+// (used by the case study tool's "View decision walkthrough" link)
+(function initFromQuery() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get('scenario');
+    if (target && scenarios.some(s => s.id === target)) {
+      selectScenario(target);
+      setTimeout(() => {
+        document.getElementById('walkthrough')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+  } catch (e) {}
 })();
-
 </script>
 </body>
 </html>
