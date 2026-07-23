@@ -313,14 +313,14 @@ registerCase({
         { text: 'Ask the charge RN to confirm sync \u2014 they should verify the device settings', correct: false, consequence: 'You\'re running the device. You confirm sync. Delegating this step in a high-stakes moment without verifying it yourself introduces a gap in accountability. You press the button \u2014 you own the settings.' }
       ],
       correctFeedback: 'Right. Press Sync, then visually confirm \u2014 marker by marker \u2014 that each one is landing on an R wave. If any marker is sitting on a T wave, the device will deliver energy during the vulnerable period and can precipitate V-Fib. Adjust lead or gain until the markers are correct before charging.',
-      illustration: `<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  — MARKERS CONFIRMED ON QRS</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
+      illustration: `<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  — MARKERS CONFIRMED ON QRS</div><canvas id="syncCanvas"></canvas></div>`,
       wrongFeedback: 'Sync mode must be active before you charge. An unsynchronized shock to a patient with a pulse can trigger V-Fib. Press Sync first, confirm the markers are on the QRS complexes, then set energy and charge.',
       pearl: 'Sync markers should sit cleanly on every R wave. If they\'re floating or landing on T waves, do not charge \u2014 adjust the lead or gain first. This is a visual check, not an assumption.'
     },
     {
       phase: 'act', phaseLabel: 'Pre-Cardioversion Checklist',
       zoll:'vtach', zollLabel:'DEFIB MODE  LEAD II  SYNC ON  CHARGED 100J',
-      illustrationAlways:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-bottom:14px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  CHARGED 100J</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
+      illustrationAlways:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-bottom:14px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC ON  CHARGED 100J</div><canvas id="syncCanvas"></canvas></div>`,
       narrative: `Defib mode is active. Sync is on \u2014 markers confirmed on QRS complexes. Energy is set to 100J. The device is charged. The resident nods: <strong>"Ready when you are."</strong> Before you press that button, run your safety check.`,
       prompt: 'Complete the pre-cardioversion checklist.',
       isChecklist: true,
@@ -346,7 +346,7 @@ registerCase({
         { text: 'Give amiodarone and wait to see if the rhythm breaks', correct: false, consequence: 'Amiodarone has a role in refractory V-tach, but this patient is profoundly unstable at 62/36. The resident just directed you to shock again. Chemical cardioversion takes time he doesn\'t have \u2014 another shock comes first.' }
       ],
       correctFeedback: 'Correct \u2014 and the order matters. Re-confirm sync first, then escalate. Some devices drop sync mode after delivering a shock. If you charge to 200J without checking, you may be about to deliver an unsynchronized shock to a patient who still has a pulse. Check sync every time, before every charge.',
-      illustration:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC RE-CONFIRMED  CHARGED 200J</div><canvas id="syncCanvas" width="540" height="100"></canvas></div>`,
+      illustration:`<div style="background:#0a0a0a;border-radius:6px;padding:10px 14px;border:1.5px solid #333;margin-top:4px;"><div style="font-size:10px;color:#ffffff;font-family:monospace;letter-spacing:0.08em;margin-bottom:4px;">DEFIB MODE  LEAD II  ◆ SYNC RE-CONFIRMED  CHARGED 200J</div><canvas id="syncCanvas"></canvas></div>`,
       wrongFeedback: 'Failed cardioversion is a decision point, not a crisis. He still has a pulse \u2014 you are still in cardioversion territory. Escalate the energy per the algorithm: 100J \u2192 200J \u2192 300J \u2192 360J. And re-confirm sync before every charge \u2014 the device may have dropped it.',
       pearl: 'The ZOLL can drop sync mode after shock delivery. This is not a malfunction \u2014 it is a safety design. Re-confirm sync before every subsequent attempt. Always.'
     },
@@ -369,7 +369,152 @@ registerCase({
 });
 
 registerCase({
-  id: 'vfib-pulseless',
+  id: 'pvf',
+  reviewLink: 'pvf',
+  category: 'Pulseless Rhythms',
+  title: 'Pulseless V-Fib — Early Recognition',
+  meta: '7 decisions',
+  baseVitals: { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Cardiac arrest' },
+  vitalsProgression: [
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Found unresponsive — monitor read as artifact' },
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'CPR — anterior pad placed' },
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'CPR — coordinated turn, posterior pad & backboard placed' },
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'V-Fib confirmed — pre-charging' },
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'Shock delivered — CPR resumed' },
+    { hr: '---', bp: '---/---', spo2: '---%', rr: '---', label: 'SBAR given — calcium chloride ordered' },
+    { hr: '58',  bp: '94/60',  spo2: '94%',  rr: '---', label: 'ROSC — sinus rhythm' },
+  ],
+  steps: [
+    {
+      phase: 'assess', phaseLabel: 'Recognition',
+      narrative: `It's 0412. You're the nurse for a 58-year-old man — post-renal transplant day 2. His 0400 labs posted to the chart 10 minutes ago: potassium 6.8. No one has acted on it yet. Your monitor tech calls: <strong>"Room 4 is showing a ton of artifact — he probably knocked his pulse ox off again."</strong> You head to the room. His mouth is open, jaw slack — his chest rises once, slowly, then nothing. You press two fingers to his carotid. Nothing.`,
+      prompt: 'The monitor is not artifact. What do you do?',
+      choices: [
+        { text: 'Hit the code blue button and initiate compressions immediately while calling out for help', correct: true },
+        { text: 'Go get the crash cart while simultaneously getting help', correct: false, consequence: 'You leave the room to get the cart. He is alone, pulseless, with no one on the chest. The cart comes to the patient. You do not leave to get it.' },
+        { text: 'Start CPR and wait for someone to walk by before calling the code', correct: false, consequence: 'CPR starts — good instinct. But no code blue is called. The defibrillator is not coming. No one else knows. You are doing compressions alone with no end in sight and a shockable rhythm on the monitor that no one is going to treat.' },
+        { text: 'Attempt to take a blood pressure and replace the pulse oximeter', correct: false, consequence: 'Ninety seconds have passed. He has been pulseless the entire time and you are still trying to confirm what your hands already told you at the carotid.' }
+      ],
+      correctFeedback: 'Right. The code button and compressions happen in the same moment — there is no sequence here. Both happen now.',
+      wrongFeedback: 'Code blue and compressions are simultaneous — not sequential. The code button and the chest are your first two moves.',
+      pearl: '"Probably knocked his pulse ox off" is a possible way an unwitnessed arrest gets called in. Agonal respirations — slow, irregular, gasping — are not breathing. They are a dying brainstem reflex. If you walk into a room and see that pattern, you are looking at a cardiac arrest until proven otherwise. And knowing what you know about this patient — post-transplant, potassium of 6.8 — what rhythm do you think the monitor tech was actually seeing when they called it artifact?'
+    },
+    {
+      phase: 'act', phaseLabel: 'Pad Placement',
+      narrative: `You and another nurse entered the room together. She goes straight to the chest — compressions start immediately. Another nurse enters the room with the crash cart. You place the ZOLL at the foot of the bed where the compressor can see the screen and self-correct their depth and rate. The anterior pad is in your hands. CPR is running.`,
+      prompt: 'How do you get the anterior pad on without stopping compressions?',
+      choices: [
+        { text: 'Apply the anterior pad while compressions are ongoing — slip it, along with the CPR sensor, under the compressor\u2019s hand with coordination during a recoil off the chest', correct: true },
+        { text: 'Ask the compressor to pause briefly — you need a still chest to seat the pad correctly', correct: false, consequence: 'Compressions stop. The pad goes on. Fifteen seconds of hands-off time before it makes contact. In V-Fib, that gap is not recoverable — it is perfusion that did not happen.' },
+        { text: 'Place the anterior pad anywhere on the exposed chest — position can be fine-tuned after the first shock', correct: false, consequence: 'The pad ends up below the xiphoid. The CPR sensor is not over the mid sternum. The depth and rate feedback on the ZOLL screen is unreliable, and the current path to the heart is suboptimal. Where the pad goes matters — for feedback quality and for defibrillation success.' },
+        { text: 'Hold on to the anterior pad until the next pulse and rhythm check — you\u2019ll have a clean window to place it', correct: false, consequence: 'You wait for the rhythm check. Nearly two minutes pass before the anterior pad is even on. That delays everything downstream of it — the posterior pad, the charge, the shock. The anterior pad should be on within the first 30 seconds, not held for a scheduled pause.' }
+      ],
+      correctFeedback: 'Correct. The anterior pad goes on during active compressions. Watch the compressor\u2019s recoil — in that brief lift off the chest, you can slip the sternum pad and CPR sensor into position without breaking the cycle. The compressor does not stop. You work around them.',
+      wrongFeedback: 'The anterior pad can be placed without pausing compressions. It takes coordination — work with the compressor\u2019s recoil, not against it. Waiting for a pause or a rhythm check delays both the shock and the compression feedback the ZOLL provides. Get it on now.',
+      pearl: 'The CPR sensor belongs over the mid sternum — not drifting toward the lower chest. Repeated compression directly over the xiphoid process can fracture it and drive it into surrounding tissue — the liver, sitting just beneath, is the likely structure at risk. Proper placement protects the patient and gives the compressor accurate real-time feedback on the ZOLL screen.',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`
+    },
+    {
+      phase: 'act', phaseLabel: 'Coordinated Turn',
+      narrative: `The room is full — all-hands-on-deck for the unit, no shortage of people. The anterior pad is on, but the posterior pad and backboard still aren't in. Given the potassium and what the monitor tech described, you already suspect this could be a shockable rhythm.`,
+      prompt: 'If this turns out to be shockable, timely defibrillation is one of the only things that can bring this patient back. What do you do about the backboard and posterior pad?',
+      choices: [
+        { text: 'Now that the team and equipment are assembled, call a brief coordinated pause — compressor stops, team log-rolls the patient, board goes under and posterior pad is seated in one motion, compressions resume immediately after', correct: true },
+        { text: 'Roll the patient as soon as the anterior pad is on, before the rest of the team arrives', correct: false, consequence: 'Rolling early means you may be doing it short-staffed, without the board in hand yet, or needing to interrupt again once more people and equipment show up. Compressions keep running on a bare mattress in the meantime either way — better to consolidate this into one pause once everything you need is actually present.' },
+        { text: 'Wait until the next scheduled rhythm check to handle this at the same time', correct: false, consequence: 'That\u2019s another full cycle of compressions on an unsupported mattress and without a shockable pad set, for no real benefit — you\u2019re not saving a pause, you\u2019re just delaying one that\u2019s already needed once the team is ready.' },
+        { text: 'Try to slide the posterior pad under without stopping compressions, and leave the backboard for later', correct: false, consequence: 'A posterior pad needs to sit flat against the back for reliable contact — reaching underneath during active compressions almost never seats it correctly, and it risks dislodging the anterior pad or disrupting the compressor\u2019s rhythm in the process.' }
+      ],
+      correctFeedback: 'Right. Once the team and equipment are actually in the room, this becomes a real, planned interruption — one coordinated pause to log-roll, seat the pad, and slide the board in, done all at once rather than piecemeal. Call it, execute it as a team, and get back on the chest.',
+      wrongFeedback: 'With this many people in the room, there\u2019s no reason to delay or improvise around the turn. This pause is worth consolidating — it should happen once, with everyone and everything present, not early and not deferred to the rhythm check.',
+      pearl: 'A brief, coordinated interruption in CPR for something essential is appropriate, and costs very little time with adequate staffing. You\u2019re taking this pause now specifically because the suspected rhythm is shockable — if this looked like PEA or asystole instead, a backboard would still matter for compression quality, but there\u2019d be no defibrillation clock riding on the posterior pad. Worth holding onto the hunch you had walking in the door: a potassium of 6.8, and a rhythm the monitor tech waved off as artifact. This turn is about to confirm whether that hunch was right.',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`
+    },
+    {
+      phase: 'act', phaseLabel: 'The Decision',
+      zoll: 'vfib', zollLabel: 'MONITOR MODE  LEAD II', zollPreCharged: false,
+      narrative: `During the turn, Lead II is already visible on the monitor — coarse, chaotic, unmistakable V-Fib. You're nowhere near the scheduled two-minute mark.`,
+      prompt: 'If this turns out to be shockable, timely defibrillation is one of the only things that can bring this patient back. What do you do?',
+      choices: [
+        { text: 'Announce "V-Fib on the monitor, we need to shock ASAP" as the turn wraps up, then announce "pre-charging" as you charge the device — run your safety check, then shock', correct: true },
+        { text: 'Note the rhythm, but hold off charging until the scheduled two-minute check', correct: false, consequence: 'The two-minute mark is a floor for reassessment, not a permission slip. Waiting here costs real time against a rhythm that isn\u2019t going to look any more shockable in ninety seconds.' },
+        { text: 'Stop compressions briefly to check for a pulse before deciding whether to charge', correct: false, consequence: 'Pulselessness was already established before compressions even started. Re-checking it now only costs time.' },
+        { text: 'Wait for the code blue team lead to make the call to shock', correct: false, consequence: 'ACLS-certified nurses are credentialed to make this call themselves — waiting here delays a shock that\u2019s already indicated.' }
+      ],
+      correctFeedback: 'Right. Two announcements, back to back: name the rhythm and the urgency out loud, then "pre-charging" as you charge — the whole room knows what\u2019s happening and why.',
+      wrongFeedback: 'The two-minute cadence isn\u2019t a wait you owe once the rhythm is already unambiguous. Act on it, and say so out loud as you do.',
+      pearl: 'The two things that matter most in any code blue are efficient compressions with minimal time off the chest, and timely defibrillation. Charging to 200J takes about 4.5 seconds — announcing the rhythm and the plan out loud costs you nothing next to that, and builds the kind of trust that lets your team move fast with you next time.'
+    },
+    {
+      phase: 'act', phaseLabel: 'Pre-Shock Safety Check',
+      zoll: 'vfib', zollLabel: 'DEFIB MODE  LEAD II  CHARGED 200J  V-FIB', zollPreCharged: true,
+      narrative: `Board and posterior pad are in. You've announced pre-charging. Device is charged at 200J. V-Fib confirmed on the monitor.`,
+      prompt: 'Run your safety check before delivering the shock.',
+      isChecklist: true,
+      checklistPrompt: 'Confirm each item — then deliver the shock.',
+      checklistHeader: 'Pre-defibrillation safety checklist',
+      checklistButtonLabel: 'Deliver shock \u2192',
+      checklistCompleteLabel: 'Completed pre-defibrillation safety checklist',
+      checklistCompleteFeedbackHead: 'Clear — shock delivered',
+      checklistCompleteFeedback: 'You made the call and ran the checklist. That is the job. The verbal clear, the visual sweep, the oxygen moved away — these steps protect everyone in the room. Run them every time, even in controlled chaos.',
+      checklistItems: [
+        { id: 'precharge_announced', text: 'Your charge was announced out loud by saying the rhythm on the monitor and stating \u2018pre-charging\u2019 — the team knows this is intentional' },
+        { id: 'rhythm',       text: 'Rhythm confirmed shockable on the monitor — V-Fib or pulseless VT' },
+        { id: 'energy',       text: 'Energy at 200J — ZOLL default for defibrillation' },
+        { id: 'o2',           text: 'Oxygen source moved away from the patient — fire risk during shock delivery' },
+        { id: 'clear_verbal', text: 'Verbal clear called loudly — everyone in the room hears it' },
+        { id: 'clear_visual', text: 'Visual sweep complete — no one touching patient, bed rails, or lines' },
+        { id: 'deliver',      text: 'Deliver shock' }
+      ],
+      pearl: 'The ZOLL will automatically disarm after 30 seconds of being charged — do not pre-charge and then stall. If you are uncertain whether the rhythm is shockable, the analyze function can confirm, but it requires 9.2 seconds of hands-off time to read the rhythm, plus an additional 4.5 seconds to charge if you had not pre-charged beforehand. The ZOLL will not deliver the shock automatically after analyze — you still press the button, so the safety checklist applies regardless of which path you took to get here.'
+    },
+    {
+      phase: 'act', phaseLabel: 'SBAR + Epinephrine Decision',
+      narrative: `The code blue team lead steps up while CPR is running: <strong>"What do we have?"</strong> You give your report: 58-year-old, post-renal transplant day 2, found unresponsive at 0412, V-Fib on the monitor, CPR ongoing — potassium was 6.8 this morning and had not been addressed. The team lead turns to the pharmacist by the crash cart: <strong>"Prepare calcium chloride."</strong> Your report triggered that call. Someone asks: <strong>"Should epinephrine be administered in this scenario?"</strong>`,
+      prompt: 'Should epinephrine be administered at this point?',
+      choices: [
+        { text: 'Hold — a second shock needs to be delivered first. Epinephrine is not recommended before initial defibrillation attempts in shockable rhythms', correct: true },
+        { text: 'Yes — epinephrine is part of the cardiac arrest algorithm and should go in early', correct: false, consequence: 'Epi is pushed before the second shock. Early epinephrine in shockable rhythms has not been shown to improve outcomes and does not enhance defibrillation success. The algorithm is clear: shock first, then epi enters the rotation after initial attempts without ROSC.' },
+        { text: 'Yes — epinephrine will make the next shock more likely to convert the rhythm', correct: false, consequence: 'Epinephrine does not improve defibrillation success. It increases perfusion pressure during CPR — that is its role. The shock converts V-Fib. Epi supports the circulation between attempts. These are different jobs. Shock comes first.' },
+        { text: 'Hold epinephrine entirely — it has no role in shockable rhythms', correct: false, consequence: 'Epi does have a role in shockable arrest — just not yet. Once initial defibrillation attempts have been delivered without ROSC, epi enters the cycle every 3\u20135 minutes. Holding it indefinitely is not correct — the timing is what matters.' }
+      ],
+      correctFeedback: 'Correct. Defibrillation is the treatment for V-Fib. Epinephrine\u2019s role is to support perfusion pressure during CPR between shock attempts — not to improve the shock itself. The sequence: shock \u2192 CPR \u2192 rhythm check \u2192 shock again if still shockable \u2192 epi enters after initial attempts without ROSC.',
+      wrongFeedback: 'Epinephrine timing in shockable rhythms is specific. It follows initial defibrillation attempts — it does not precede them. Defibrillation is the priority. Once the first two shocks have been delivered without ROSC, epi enters the rotation every 3\u20135 minutes.',
+      pearl: 'In V-Fib and pulseless V-Tach, the shock is the treatment. Epinephrine supports perfusion during CPR — it does not enhance defibrillation. Per the 2025 AHA guidelines, epi is not recommended prior to the delivery of initial shocks in shockable rhythms. Shock first, every time. The SBAR you just gave was six sentences. The team lead called for calcium chloride before you finished — that\u2019s what a concise, targeted handoff does. A full chart review can wait. The potassium level could not.'
+    },
+    {
+      phase: 'manage', phaseLabel: 'Second Rhythm Check \u2192 ROSC',
+      zoll: 'nsr', zollLabel: 'DEFIB MODE  LEAD II  HR: 58  SINUS RHYTHM — ROSC',
+      narrative: `Second two-minute cycle complete. Calcium chloride is on board. Rhythm check called. The monitor settles into a narrow, regular rhythm at 58 bpm. <strong>ROSC.</strong> Carotid pulse — weak, but present. He is unconscious. The team lead looks at you: <strong>"Good work. What do we need to make sure happens before he moves?"</strong>`,
+      prompt: 'Before this patient leaves the unit, what needs to be in place?',
+      isChecklist: true,
+      checklistPrompt: 'Before handoff to the ICU team, confirm the following have been addressed.',
+      checklistHeader: 'Pre-transfer checklist',
+      checklistButtonLabel: 'Complete handoff report \u2192',
+      checklistCompleteLabel: 'Completed pre-transfer checklist',
+      checklistCompleteFeedbackHead: 'Handoff report complete',
+      checklistCompleteFeedback: 'You got him back. Now you keep him back. The potassium that put him in V-Fib is still in his system — calcium stabilized the membrane long enough to shock him out, but it did not lower his potassium. Insulin and D50 are what prevent him from arresting again on the way to the ICU. That follow-through is yours.',
+      checklistItems: [
+        { id: 'ecg',         text: '12-lead ECG ordered — post-arrest rhythm and ischemia evaluation' },
+        { id: 'insulin_d50', text: 'Insulin/D50 protocol initiated for hyperkalemia — this is what prevents re-arrest' },
+        { id: 'k_recheck',   text: 'Potassium recheck ordered — the 6.8 that caused this arrest needs a repeat level now' },
+        { id: 'icu',         text: 'ICU transfer initiated — post-arrest care requires continuous intensive monitoring' },
+        { id: 'handoff',     text: 'Handoff report given to ICU team — include arrest rhythm, shocks delivered, potassium level, calcium chloride given, current hemodynamics' },
+      ],
+      pearl: 'Calcium chloride stabilized his cardiac membrane against the hyperkalemia — it bought enough stability to defibrillate successfully. It did not lower his potassium. Insulin drives potassium into the cells. D50 prevents the resulting hypoglycemia. Without that protocol running, his potassium stays elevated and he is at risk of arresting again before he reaches the ICU bed.'
+    },
+    {
+      isLanding: true,
+      landingText: `<p>You caught this one before the equipment did.</p><p>The monitor tech saw artifact. You saw a potassium of 6.8, sitting unaddressed for ten minutes, in a patient who now wasn't breathing and had no pulse. That read — before anyone confirmed a rhythm, before the first pad was even on — is what bought this patient every second that followed.</p><p>Everything after that was execution: the anterior pad on during compressions, the posterior pad and board in one coordinated turn once the room was staffed, calling the shock the moment the rhythm was unambiguous instead of waiting on the clock, and a tight SBAR that got calcium chloride ordered before you'd even finished talking.</p><p>He came back. But notice where the case actually turned — it wasn't the shock. It was the moment you decided "artifact" wasn't good enough an answer and went to go look for yourself.</p><p><em>Note: this closing reflection was drafted for you to review — flag anything that doesn't sound right and I'll adjust it.</em></p>`
+    }
+  ]
+});
+
+// ── ARCHIVED: anterior-lateral pad placement version, retired pending institutional
+// approval of AL pad configuration — see 'pvf' below for the active AP-pad version.
+// Rename id back to 'vfib-pulseless' (and remove the '-ap-archived' suffix) to restore.
+/*
+registerCase({
+  id: 'vfib-pulseless-ap-archived',
   reviewLink: 'pvf',
   category: 'Pulseless Rhythms',
   title: 'Pulseless V-Fib',
@@ -519,6 +664,8 @@ registerCase({
     }
   ]
 });
+*/
+
 
 // ── PEA / ASYSTOLE CASE ──
 registerCase({
@@ -990,21 +1137,27 @@ registerCase({
 function nsrWave(t){const r=0.83,p=t%r;if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09);if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03);if(p>=0.14&&p<0.20)return 1.1*Math.sin(Math.PI*(p-0.14)/0.06);if(p>=0.20&&p<0.24)return -0.25*Math.sin(Math.PI*(p-0.20)/0.04);if(p>=0.26&&p<0.46)return 0.20*Math.sin(Math.PI*(p-0.26)/0.20);return 0;}
 function asystoleWave(t){return Math.sin(t*7.3)*0.025+Math.sin(t*13.1)*0.018;}
 function vtachWave(t){const r=0.34,p=t%r,u=p/r;if(u<0.12)return -0.15+u/0.12*0.30;if(u>=0.12&&u<0.22)return 0.15+(u-0.12)/0.10*0.35+0.12*Math.sin(Math.PI*(u-0.12)/0.10);if(u>=0.22&&u<0.38)return 0.50+(u-0.22)/0.16*0.48;if(u>=0.38&&u<0.52)return 0.98-0.22*(1-Math.cos(Math.PI*(u-0.38)/0.14));if(u>=0.52&&u<0.66)return 0.76-(u-0.52)/0.14*1.03;if(u>=0.66&&u<0.76)return -0.27-(u-0.66)/0.10*0.28;if(u>=0.76&&u<0.88)return -0.55+(u-0.76)/0.12*0.40;return -0.15;}
-function vfibWave(t){return 0.55*Math.sin(t*11.3+Math.sin(t*3.7))+0.30*Math.sin(t*17.1+Math.sin(t*5.2))+0.18*Math.sin(t*23.4)+0.10*Math.sin(t*7.8+1.2);}
+function vfibWave(t){const env=0.68-0.15*(t/4);return env*(0.42*Math.sin(t*58.3+Math.sin(t*7.1)*2.4)+0.28*Math.sin(t*79.7+Math.sin(t*11.3)*1.9)+0.20*Math.sin(t*43.1+Math.sin(t*14.2)*1.5)+0.15*Math.sin(t*97.2+Math.sin(t*5.7)*2.1)+0.10*Math.sin(t*67.8+2.3));}
 function svtWave(t){const r=0.22,u=(t%r)/r;if(u<0.08)return 0;if(u>=0.08&&u<0.13)return(u-0.08)/0.05*1.15;if(u>=0.13&&u<0.17)return 1.15-(u-0.13)/0.04*1.15;if(u>=0.17&&u<0.23)return-(u-0.17)/0.06*0.52;if(u>=0.23&&u<0.26)return-0.52+(u-0.23)/0.03*0.52;if(u>=0.26&&u<0.38)return 0;if(u>=0.38&&u<0.56){const x=(u-0.38)/0.18;return 0.24*Math.pow(Math.sin(Math.PI*x),1.6);}return 0;}
 function svtPauseWave(t){return t<2 ? svtWave(t) : asystoleWave(t);}
 function drawRhythm(canvasId,waveFn){
   const cv=document.getElementById(canvasId);if(!cv)return;
-  const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+  const dpr=window.devicePixelRatio||2;
+  const W=cv.parentElement.clientWidth-24;
+  const H=80;
+  cv.width=W*dpr;cv.height=H*dpr;
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
   ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#4ade80';ctx.lineWidth=1.5;ctx.beginPath();
+  ctx.strokeStyle='#4ade80';ctx.lineWidth=1.2;ctx.beginPath();
   for(let x=0;x<W;x++){const t=(x/W)*4;const y=H/2-waveFn(t)*(H*0.38);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
   ctx.stroke();
 }
 function zollBlockHtml(step){
   if(!step.zoll)return '';
   const cls=step.zollPreCharged?'zoll-lbl pre-charged':'zoll-lbl';
-  return `<div class="zoll-screen"><div class="${cls}">${step.zollLabel||'LEAD II'}</div><canvas id="zollCanvas" width="580" height="80"></canvas></div>`;
+  return `<div class="zoll-screen"><div class="${cls}">${step.zollLabel||'LEAD II'}</div><canvas id="zollCanvas"></canvas></div>`;
 }
 function clockBlockHtml(c){
   if(!c)return '';
@@ -1012,9 +1165,15 @@ function clockBlockHtml(c){
 }
 function drawSyncMarkers(){
   const cv=document.getElementById('syncCanvas'); if(!cv)return;
-  const ctx=cv.getContext('2d'); const W=cv.width,H=cv.height;
+  const dpr=window.devicePixelRatio||2;
+  const W=cv.parentElement.clientWidth-24;
+  const H=100;
+  cv.width=W*dpr;cv.height=H*dpr;
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
   ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#4ade80'; ctx.lineWidth=1.5; ctx.beginPath();
+  ctx.strokeStyle='#4ade80'; ctx.lineWidth=1.2; ctx.beginPath();
   const peakXs=[];
   for(let x=0;x<W;x++){
     const t=(x/W)*4;
