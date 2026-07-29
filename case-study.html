@@ -269,7 +269,8 @@ registerCase({
       ],
       correctFeedback: 'Yes. Get the defibrillator on him and apply the pads now. Telemetry monitors \u2014 pads prepare you to act. The team should walk into a room where the patient is already on the defib and ready for whatever comes next.',
       wrongFeedback: 'Pads go on now. Telemetry tells you what\'s happening \u2014 pads let you do something about it. Transitioning to the defibrillator before the team arrives means they can focus on the decision, not the setup.',
-      pearl: 'Pads are not a decision to shock \u2014 they are preparation for any outcome. Place them early, while the patient still has a pulse and you still have time to do it calmly.'
+      pearl: 'Pads are not a decision to shock \u2014 they are preparation for any outcome. Place them early, while the patient still has a pulse and you still have time to do it calmly.',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`
     },
     {
       phase: 'decide', phaseLabel: 'Provider Pushback',
@@ -716,7 +717,8 @@ registerCase({
       ],
       correctFeedback:'Pads on. Backboard in. Two compressors named. Roles locked. ZOLL in defib mode and ready.',
       wrongFeedback:'Staging the room before the arrest is the entire point of an RRT. Every item on the correct list reduces the time between pulse loss and organized response.',
-      pearl:'Nurse leader sets the stage and assigns roles. When the pulse disappears the team steps into structure — not scramble.'
+      pearl:'Nurse leader sets the stage and assigns roles. When the pulse disappears the team steps into structure — not scramble.',
+      illustrationAlways: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`
     },
     {
       phase:'act', phaseLabel:'Arrest',
@@ -1089,6 +1091,7 @@ registerCase({
       checklistCompleteLabel: 'Completed pre-adenosine safety checklist',
       checklistCompleteFeedbackHead: 'All items confirmed',
       checklistCompleteFeedback: 'Everything the team needs is ready the moment the order comes through \u2014 pads on, supplies gathered, 12-lead running, and everyone briefed on how this push is going to go.',
+      illustrationAfterComplete: `<div style="margin:14px 0;"><img src="assets/pad-placement-front-back.png" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,0.08);" alt="Anterior-posterior pacing pad placement, front and back views"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;">Anterior-posterior pad placement</div></div>`,
       pearl: 'You can gather everything the push will need \u2014 stopcock, flush, syringe \u2014 but you can\u2019t prime the setup until there\u2019s an actual order in hand. Having the pieces ready cuts the delay down to seconds once the order comes through, without acting ahead of it.'
     },
     {
@@ -1511,6 +1514,7 @@ function completeChecklist() {
     <div class="feedback-card correct" id="fb">
       <div class="fb-head">✓ ${step.checklistCompleteFeedbackHead || 'All items confirmed'}</div>
       <div class="fb-body">${step.checklistCompleteFeedback || 'Safety check complete. Every item on this list exists because something went wrong when it was skipped. The verbal clear, the O2 position, the sync markers — these are not bureaucratic steps. They are the difference between a controlled procedure and an incident report.'}</div>
+      ${step.illustrationAfterComplete ? `<div style="margin-top:12px;">${step.illustrationAfterComplete}</div>` : ''}
     </div>
     <button class="continue-btn visible" onclick="nextStep()">${nextLabel}</button>`;
   setTimeout(()=>document.getElementById('fb')?.classList.add('visible'),50);
