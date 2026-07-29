@@ -766,7 +766,17 @@ const scenarios = [
     badgeClass: 'shockable',
     zoll: 'vfib',
     zollLabel: 'DEFIB MODE  LEAD II  HR: ---  V-FIB',
-    examples: ['assets/vfib-1.jpg','assets/vfib-2.jpg','assets/vfib-3.jpg'],
+    zoll2: 'vtach',
+    zollLabel2: 'DEFIB MODE  LEAD II  HR: 165  V-TACH (PULSELESS)',
+    examplesNote: 'Tap to see V-fib and pulseless V-tach examples',
+    examples: ['assets/vfib-1.jpg','assets/vfib-2.jpg','assets/vfib-3.jpg','assets/vtach-1.jpg','assets/vtach-2.jpg'],
+    captions: [
+      'V-FIB — chaotic, disorganized waveform, no identifiable QRS complexes',
+      'V-FIB — coarse pattern',
+      'V-FIB — finer, lower-amplitude pattern (can look closer to asystole — confirm in a second lead)',
+      'PULSELESS V-TACH — wide, regular QRS complexes at a rapid rate; no pulse on exam despite organized rhythm',
+      'PULSELESS V-TACH — treat identically to V-fib: same algorithm, same shock'
+    ],
     steps: [
       {
         type: 'paired',
@@ -1356,7 +1366,10 @@ function renderZollBlock(scenario){
       + '</div>'
       + '</div>'
     : '';
-  return '<div class="wt-zoll-screen"><div class="wt-zoll-lbl">' + (scenario.zollLabel||'LEAD II') + '</div><canvas id="wtZollCanvas" style="display:block;width:100%;"></canvas>' + peaNote + '</div>' + examplesBlock;
+  const zollScreen2 = scenario.zoll2
+    ? '<div class="wt-zoll-screen" style="margin-top:10px;"><div class="wt-zoll-lbl">' + (scenario.zollLabel2||'LEAD II') + '</div><canvas id="wtZollCanvas2" style="display:block;width:100%;"></canvas></div>'
+    : '';
+  return '<div class="wt-zoll-screen"><div class="wt-zoll-lbl">' + (scenario.zollLabel||'LEAD II') + '</div><canvas id="wtZollCanvas" style="display:block;width:100%;"></canvas>' + peaNote + '</div>' + zollScreen2 + examplesBlock;
 }
 
 function toggleExamples(header) {
@@ -1371,6 +1384,11 @@ function scheduleWtRhythmDraw(scenario){
   const isSvt = scenario.zoll==='svt';
   const fn = waveFns[scenario.zoll]||nsrWave;
   setTimeout(()=>drawWalkthroughRhythm('wtZollCanvas', fn, isSvt), 100);
+  if(scenario.zoll2){
+    const isSvt2 = scenario.zoll2==='svt';
+    const fn2 = waveFns[scenario.zoll2]||nsrWave;
+    setTimeout(()=>drawWalkthroughRhythm('wtZollCanvas2', fn2, isSvt2), 100);
+  }
 }
 
 
