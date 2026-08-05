@@ -36,6 +36,9 @@
       --purple: #7c3aed;
       --purple-bg: rgba(124,58,237,0.08);
       --purple-border: rgba(124,58,237,0.25);
+      --amber: #d97706;
+      --amber-bg: rgba(217,119,6,0.08);
+      --amber-border: rgba(217,119,6,0.25);
       --radius: 12px;
       --radius-sm: 8px;
     }
@@ -150,6 +153,7 @@
     .tool-card.decision:hover { border-color: var(--blue); }
     .tool-card.cases:hover { border-color: var(--green); }
     .tool-card.sbar:hover { border-color: var(--purple); }
+    .tool-card.pacing:hover { border-color: var(--amber); }
 
     .card-icon {
       width: 44px;
@@ -165,6 +169,7 @@
     .card-icon.decision { background: var(--blue-bg); border: 1px solid var(--blue-border); }
     .card-icon.cases { background: var(--green-bg); border: 1px solid var(--green-border); }
     .card-icon.sbar { background: var(--purple-bg); border: 1px solid var(--purple-border); }
+    .card-icon.pacing { background: var(--amber-bg); border: 1px solid var(--amber-border); }
 
     .card-icon svg {
       width: 22px; height: 22px; fill: none;
@@ -175,6 +180,7 @@
     .card-icon.decision svg { stroke: var(--blue); }
     .card-icon.cases svg { stroke: var(--green); }
     .card-icon.sbar svg { stroke: var(--purple); }
+    .card-icon.pacing svg { stroke: var(--amber); fill: var(--amber); }
 
     .card-body { flex: 1; }
 
@@ -190,6 +196,7 @@
     .card-tag.decision { color: var(--blue); }
     .card-tag.cases { color: var(--green); }
     .card-tag.sbar { color: var(--purple); }
+    .card-tag.pacing { color: var(--amber); }
 
     .card-title {
       font-size: 16px;
@@ -230,6 +237,7 @@
     .card-arrow.decision { background: var(--blue-bg); }
     .card-arrow.cases { background: var(--green-bg); }
     .card-arrow.sbar { background: var(--purple-bg); }
+    .card-arrow.pacing { background: var(--amber-bg); }
 
     .card-arrow svg {
       width: 14px; height: 14px; fill: none;
@@ -240,6 +248,7 @@
     .card-arrow.decision svg { stroke: var(--blue); }
     .card-arrow.cases svg { stroke: var(--green); }
     .card-arrow.sbar svg { stroke: var(--purple); }
+    .card-arrow.pacing svg { stroke: var(--amber); }
 
     .divider {
       display: flex;
@@ -392,6 +401,23 @@
       <div class="card-footer">
         <span class="card-meta">Prototype · Desktop recommended</span>
         <div class="card-arrow sbar">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-card pacing" href="pacing-practice.html">
+      <div class="card-icon pacing">
+        <svg viewBox="0 0 24 24"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag pacing">Skills Drill</div>
+        <div class="card-title">Transcutaneous Pacing Practice</div>
+        <div class="card-desc">Titrate rate and output to capture on a randomized rhythm, then confirm mechanical capture.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta">Drill · Repeatable</span>
+        <div class="card-arrow pacing">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
