@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transcutaneous Pacing Practice — ALERT Team</title>
+<style>
+  :root {
+    --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f5f7fa;
+    --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+    --text: #111827; --text2: #4b5563; --text3: #9ca3af;
+    --green: #059669; --green-bg: rgba(5,150,105,0.08); --green-border: rgba(5,150,105,0.25);
+    --red: #dc2626; --red-bg: rgba(220,38,38,0.08); --red-border: rgba(220,38,38,0.25);
+    --blue: #2563eb; --blue-bg: rgba(37,99,235,0.08); --blue-border: rgba(37,99,235,0.25);
+    --amber: #d97706; --amber-bg: rgba(217,119,6,0.08); --amber-border: rgba(217,119,6,0.25);
+    --coral: #ea580c; --coral-bg: rgba(234,88,12,0.08); --coral-border: rgba(234,88,12,0.25);
+    --purple: #7c3aed; --purple-bg: rgba(124,58,237,0.08); --purple-border: rgba(124,58,237,0.25);
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 5rem; }
+  header { background: #151c30; border-bottom: 3px solid; border-image: linear-gradient(90deg, #ea580c 0%, #2563eb 100%) 1; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; }
+  .header-icon { width: 36px; height: 36px; background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-icon svg { width: 18px; height: 18px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  header h1 { font-size: 16px; font-weight: 600; color: #f3f4f6; letter-spacing: -0.01em; }
+  header p { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+  .tag { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9ca3af; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; }
+
+  main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  a.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; margin-bottom: 1.5rem; transition: color 0.15s; }
+  a.back-link:hover { color: var(--text); }
+  a.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .caveat-card { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.25rem; font-size: 13px; line-height: 1.6; color: var(--text); }
+  .caveat-card strong { color: var(--amber); }
+
+  .ref-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 1.5rem; }
+  .ref-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .ref-grid { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: start; }
+  .ref-grid img { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border2); display: block; }
+  .ref-text { font-size: 13px; line-height: 1.6; color: var(--text2); }
+  .ref-text strong { color: var(--text); }
+  .ref-text .ap-note { margin-top: 8px; padding: 8px 10px; background: var(--bg3); border-radius: var(--radius-sm); font-size: 12px; color: var(--text2); }
+  .cable-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 4px; }
+  .cable-grid figure { margin: 0; }
+  .cable-grid img { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border2); display: block; }
+  .cable-grid figcaption { font-size: 12px; color: var(--text2); margin-top: 6px; line-height: 1.4; }
+  .cable-grid figcaption strong { color: var(--text); display: block; margin-bottom: 2px; }
+  @media (max-width: 480px) { .cable-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .ref-grid { grid-template-columns: 1fr; } }
+
+  .drill-section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  #scenario { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; color: var(--text); }
+  #scenario .md-order { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--blue); }
+
+  .device { background: #0a0a0a; border-radius: var(--radius); padding: 16px; }
+  .device-hdr-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .device-hdr { font-family: 'SF Mono', Consolas, monospace; font-size: 10px; color: #4a8a4a; letter-spacing: 1px; }
+  .hr-readout { font-family: 'SF Mono', Consolas, monospace; font-size: 22px; font-weight: 700; color: #3fae3f; }
+  .hr-unit { font-size: 10px; font-weight: 400; color: #4a8a4a; letter-spacing: 1px; }
+  #strip { width: 100%; height: 200px; display: block; background: #050505; border-radius: 6px; }
+  #captureMsg { margin-top: 8px; font-family: 'SF Mono', Consolas, monospace; font-size: 11px; letter-spacing: 1px; color: #666; text-align: center; min-height: 16px; }
+
+  .dial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+  .dial-label-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+  .dial-label-row span.val { font-weight: 600; color: var(--text); }
+  input[type=range] { width: 100%; }
+
+  .q-block { margin-top: 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .q-prompt { font-size: 13px; color: var(--text2); margin-bottom: 10px; }
+  .q-choices { display: flex; flex-direction: column; gap: 8px; }
+  .q-choices button { text-align: left; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg2); color: var(--text); font-size: 13px; cursor: pointer; transition: background 0.15s; }
+  .q-choices button:hover:not(:disabled) { background: var(--bg3); }
+  .q-choices button:disabled { cursor: default; opacity: 0.7; }
+  .q-feedback { margin-top: 10px; font-size: 13px; line-height: 1.5; }
+  .q-feedback.correct { color: var(--green); }
+  .q-feedback.incorrect { color: var(--red); }
+  .q-note { margin-top: 10px; font-size: 12px; color: var(--amber); background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-sm); padding: 8px 10px; }
+
+  .new-scenario-btn { width: 100%; margin-top: 18px; padding: 13px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); transition: background 0.15s; }
+  .new-scenario-btn:hover { background: rgba(217,119,6,0.14); }
+
+  footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+  </div>
+  <div>
+    <h1>Transcutaneous Pacing Practice</h1>
+    <p>ALERT Team</p>
+  </div>
+  <span class="tag">Drill Mode</span>
+</header>
+
+<main>
+
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to home
+  </a>
+
+  <div class="caveat-card">
+    <strong>Why this matters:</strong> ZOLL familiarity varies a lot from nurse to nurse. Whatever the order of events for initiating pacing, the reason a patient doesn't get the therapy they need should never be that no one at the bedside knew how to run the device. This is a repeatable drill for the hands-on skill &mdash; rate, output, capture, and confirmation &mdash; not a scenario you have to answer your way through.
+  </div>
+
+  <div class="ref-card">
+    <div class="ref-title">A note on the rates in this drill</div>
+    <div class="ref-text">
+      <p><strong>What rate actually does:</strong> in demand (synchronous) mode — the standard mode on the ZOLL — the device watches the patient's intrinsic rhythm continuously. If the native rate stays at or above the set rate, the pacer holds off and doesn't fire at all. Once the interval since the last sensed native beat exceeds what the set rate calls for, the pacer fires. So rate isn't just a floor for the paced heart rate — it's the actual trigger for when a pacing stimulus gets delivered.</p>
+      <p style="margin-top: 8px;">The specific rates used here — the default, the MD's order, the capture threshold — are arbitrary and chosen for learning purposes. They are not clinical guidance.</p>
+      <p style="margin-top: 8px;">The ZOLL's default pacing rate is 70 ppm. At the bedside, the ordering provider will tell you what rate to set. If they don't say, ask what they want the ppm set to — don't assume the default is the target.</p>
+    </div>
+  </div>
+
+  <div class="ref-card">
+    <div class="ref-title">Reference — pad placement &amp; indications</div>
+    <div class="ref-grid">
+      <img src="assets/pad-placement-front-back.png" alt="Anterior-posterior pad placement diagram" />
+      <div class="ref-text">
+        <p><strong>Indications:</strong> symptomatic bradycardia unresponsive to atropine, especially with hypotension, altered mental status, or signs of shock.</p>
+        <div class="ap-note"><strong>Placement is anterior-posterior (AP), not AP/lateral.</strong> AP is the current standard here &mdash; it's the orientation this drill assumes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drill-section-label">The drill</div>
+  <div id="scenario"></div>
+
+  <div class="device">
+    <div class="device-hdr-row">
+      <span class="device-hdr">LEAD II &middot; PACING MODE</span>
+      <span class="hr-readout" id="hrReadout">-- <span class="hr-unit">bpm</span></span>
+    </div>
+    <canvas id="strip"></canvas>
+    <div id="captureMsg"></div>
+  </div>
+
+  <div class="dial-grid">
+    <div>
+      <div class="dial-label-row"><span>Rate</span><span class="val" id="rateOut">70 ppm</span></div>
+      <input type="range" id="rateDial" min="50" max="80" value="70" step="1" />
+    </div>
+    <div>
+      <div class="dial-label-row"><span>Output</span><span class="val" id="maOut">0 mA</span></div>
+      <input type="range" id="maDial" min="0" max="200" value="0" step="2" />
+    </div>
+  </div>
+
+  <div id="idQuestion"></div>
+  <div id="captureQuestion"></div>
+
+  <button class="new-scenario-btn" id="newScenarioBtn">New patient scenario</button>
+
+  <div class="ref-card">
+    <div class="ref-title">Troubleshooting</div>
+    <div class="ref-text">
+      <div class="cable-grid">
+        <figure>
+          <img src="assets/cable-3lead-ekg.jpg" alt="3-lead EKG cable and OneStep sensor cable, side view, labeled left to right" />
+          <figcaption><strong>Side view</strong>3-lead EKG cable on the left, OneStep sensor cable on the right.</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/cable-onestep-sensor.jpg" alt="3-lead EKG cable and OneStep sensor cable, connector end view, labeled left to right" />
+          <figcaption><strong>Connector end view</strong>Same two cables, same left-to-right order &mdash; this is the pin pattern you're actually matching up at the ZOLL.</figcaption>
+        </figure>
+      </div>
+      <p><strong>Using the 3-lead built into the One-Step Complete pads.</strong> The One-Step Complete pads have their own 3-lead EKG built in, which is what makes them an all-in-one device for TCP — but that means there are two different cables that both carry "3-lead," and they're not interchangeable. Placement matters here too: the pads have to go exactly where the package insert illustration shows in order to pace transcutaneously. The cable matters just as much: the standard 3-lead EKG cable needs to be disconnected, and the ZOLL OneStep Complete 3-lead sensor cable plugged in instead.</p>
+      <p style="margin-top: 8px;"><strong>If the rhythm sensed through the pads looks unreliable.</strong> You can still pace. Reconnect the 3-lead EKG cable to the ZOLL and place it on the patient as a backup method for rhythm sensing, while pacing continues through the pads.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  ALERT TEAM · Built by Cristian Rosa, RN, MSN, CCRN
+</footer>
+
+<script>
+const SCENARIOS=[
+  {rhythm:'3rd', label:'3rd-degree (complete) heart block',
+   text:'68-year-old, post-op day 1 from hip repair. Sudden dizziness and diaphoresis at the bedside. BP 76/48, HR displayed on the monitor looks slow and dissociated. Patient is symptomatic and hypotensive.'},
+  {rhythm:'2nd', label:'2nd-degree AV block',
+   text:'74-year-old with a history of MI, reports lightheadedness and near-syncope. BP 82/54. Monitor shows a regular atrial rate with intermittent dropped beats.'},
+  {rhythm:'brady', label:'Profound sinus bradycardia',
+   text:'81-year-old on a beta-blocker, found unresponsive to voice but arousable to touch. HR in the 30s on the monitor, BP 68/40. Atropine has already been given without effect.'}
+];
+const RHYTHM_OPTIONS=['2nd-degree AV block','3rd-degree (complete) heart block','Profound sinus bradycardia'];
+const DEFAULT_RATE=70;
+const HOLD_REQUIRED=3;
+
+let scenario, captureThreshold, mdOrderedRate, confirmed=false, idAnswered=false, mechAnswered=false;
+let rate=DEFAULT_RATE, ma=0, t=0, lastSpikeT=-999, holdTime=0, lastFrameT=0;
+const spikes=[];
+
+function newScenario(){
+  scenario = SCENARIOS[Math.floor(Math.random()*SCENARIOS.length)];
+  captureThreshold = Math.round((40+Math.random()*100)/2)*2;
+  mdOrderedRate = Math.round((50+Math.random()*30)/5)*5;
+  confirmed=false; idAnswered=false; mechAnswered=false; holdTime=0;
+  rate=DEFAULT_RATE; ma=0; t=0; lastSpikeT=-999;
+  spikes.length=0;
+  document.getElementById('rateDial').value=DEFAULT_RATE; document.getElementById('maDial').value=0;
+  document.getElementById('rateOut').textContent=DEFAULT_RATE+' ppm'; document.getElementById('maOut').textContent='0 mA';
+  document.getElementById('scenario').innerHTML='<strong>Patient scenario:</strong> '+scenario.text+
+    '<div class="md-order"><strong>MD at bedside:</strong> &ldquo;Set the rate to '+mdOrderedRate+'.&rdquo;</div>';
+  renderIdQuestion();
+  document.getElementById('captureQuestion').innerHTML='';
+}
+
+function renderIdQuestion(){
+  let html='<div class="q-block"><div class="q-prompt">What rhythm is the native monitor showing?</div><div class="q-choices">';
+  RHYTHM_OPTIONS.forEach(opt=>{ html+='<button class="idBtn" data-opt="'+opt+'">'+opt+'</button>'; });
+  html+='</div><div id="idFeedback" class="q-feedback"></div></div>';
+  document.getElementById('idQuestion').innerHTML=html;
+  document.querySelectorAll('.idBtn').forEach(b=>b.addEventListener('click',()=>{
+    if(idAnswered) return;
+    idAnswered=true;
+    const correct=b.dataset.opt===scenario.label;
+    const fb=document.getElementById('idFeedback');
+    fb.className='q-feedback '+(correct?'correct':'incorrect');
+    fb.textContent=correct?'Correct — '+scenario.label+'.':'This one was '+scenario.label+'.';
+    document.querySelectorAll('.idBtn').forEach(x=>x.disabled=true);
+  }));
+}
+
+function renderCaptureQuestion(){
+  let html='<div class="q-block"><div class="q-prompt">Capture confirmed. Which pulse do you palpate to confirm mechanical capture?</div><div class="q-choices">'+
+    '<button class="mechBtn" data-opt="radial">Radial pulse</button>'+
+    '<button class="mechBtn" data-opt="carotid">Carotid pulse</button>'+
+    '<button class="mechBtn" data-opt="femoral">Femoral pulse</button>'+
+    '</div><div id="mechFeedback" class="q-feedback"></div>';
+  if(rate!==mdOrderedRate){
+    html+='<div class="q-note">Note: the rate is set to '+rate+' ppm. The MD ordered '+mdOrderedRate+'.</div>';
+  }
+  html+='</div>';
+  document.getElementById('captureQuestion').innerHTML=html;
+  document.querySelectorAll('.mechBtn').forEach(b=>b.addEventListener('click',()=>{
+    if(mechAnswered) return;
+    mechAnswered=true;
+    const fb=document.getElementById('mechFeedback');
+    document.querySelectorAll('.mechBtn').forEach(x=>x.disabled=true);
+    if(b.dataset.opt==='femoral'){
+      fb.className='q-feedback correct';
+      fb.textContent='Correct. Femoral is far enough from the pacing pads to avoid the muscle twitch being mistaken for a pulse.';
+    } else if(b.dataset.opt==='carotid'){
+      fb.className='q-feedback incorrect';
+      fb.textContent='Avoid carotid — chest wall muscle contraction from pacing can be mistaken for a pulse this close to the pads.';
+    } else {
+      fb.className='q-feedback incorrect';
+      fb.textContent='Radial can work, but pulses closer to the pacing site are more reliable to distinguish from the muscle twitch — femoral is preferred.';
+    }
+  }));
+}
+
+document.getElementById('newScenarioBtn').addEventListener('click', newScenario);
+
+const canvas=document.getElementById('strip');
+const ctx=canvas.getContext('2d');
+function fit(){ const r=canvas.getBoundingClientRect(); canvas.width=r.width*2; canvas.height=r.height*2; ctx.scale(2,2); }
+window.addEventListener('resize', fit);
+fit();
+
+document.getElementById('rateDial').addEventListener('input',e=>{rate=+e.target.value; document.getElementById('rateOut').textContent=rate+' ppm';});
+document.getElementById('maDial').addEventListener('input',e=>{ma=+e.target.value; document.getElementById('maOut').textContent=ma+' mA';});
+
+const BRADY_PERIOD=1.7;
+
+function peaBeat(p, prExtra, conducted){
+  let v=0;
+  if(p<0.09) v+=0.15*Math.sin(Math.PI*p/0.09);
+  if(!conducted) return v;
+  const d=p-prExtra;
+  if(d>=0.11&&d<0.14) v+=-0.10*Math.sin(Math.PI*(d-0.11)/0.03);
+  if(d>=0.14&&d<0.20) v+=0.90*Math.sin(Math.PI*(d-0.14)/0.06);
+  if(d>=0.20&&d<0.24) v+=-0.22*Math.sin(Math.PI*(d-0.20)/0.04);
+  if(d>=0.26&&d<0.46) v+=0.18*Math.sin(Math.PI*(d-0.26)/0.20);
+  return v;
+}
+
+function bradyWave(p){
+  return peaBeat(p, 0, true);
+}
+
+function wenckebachWave(t){
+  const pInterval=1.1;
+  const groupSize=4;
+  const prSteps=[0,0.08,0.18];
+  const superCycle=pInterval*groupSize;
+  const localT=((t%superCycle)+superCycle)%superCycle;
+  let v=0;
+  for(let i=0;i<groupSize;i++){
+    const b=i*pInterval;
+    const p=localT-b;
+    if(p<0||p>=pInterval) continue;
+    const conducted=i<3;
+    v+=peaBeat(p, conducted?prSteps[i]:0, conducted);
+  }
+  return v;
+}
+
+function chbWave(t){
+  const pRate=0.65, qRate=1.8;
+  let v=0;
+  const pp=((t%pRate)+pRate)%pRate;
+  if(pp<0.09) v+=0.14*Math.sin(Math.PI*pp/0.09);
+  const qq=((t%qRate)+qRate)%qRate;
+  if(qq>=0&&qq<0.07) v+=1.1*Math.sin(Math.PI*qq/0.07);
+  if(qq>=0.07&&qq<0.13) v-=0.28*Math.sin(Math.PI*(qq-0.07)/0.06);
+  if(qq>=0.15&&qq<0.38) v+=0.22*Math.sin(Math.PI*(qq-0.15)/0.23);
+  return v;
+}
+
+function nativeRateBpm(){
+  if(scenario.rhythm==='3rd') return 33;
+  if(scenario.rhythm==='2nd') return 41;
+  return 35;
+}
+
+function nativeWave(sampleT){
+  if(scenario.rhythm==='3rd') return chbWave(sampleT);
+  if(scenario.rhythm==='2nd') return wenckebachWave(sampleT);
+  const p=((sampleT%BRADY_PERIOD)+BRADY_PERIOD)%BRADY_PERIOD;
+  return bradyWave(p);
+}
+
+const pxPerSec=100;
+const AMP_SCALE=62;
+
+function draw(now){
+  const dt = lastFrameT ? Math.min((now-lastFrameT)/1000,0.05) : 0;
+  lastFrameT=now;
+  const w=canvas.getBoundingClientRect().width, h=canvas.getBoundingClientRect().height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='#123312'; ctx.lineWidth=0.5;
+  for(let x=0;x<w;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+
+  t+=dt;
+  const qt = Math.floor(t*pxPerSec)/pxPerSec;
+  const pacerActive = rate>0 && ma>0;
+  const captureNow = pacerActive && ma>=captureThreshold;
+
+  const cm=document.getElementById('captureMsg');
+  const hr=document.getElementById('hrReadout');
+  if(hr) hr.innerHTML=(confirmed?rate:nativeRateBpm())+' <span class="hr-unit">bpm</span>';
+  if(!confirmed){
+    if(!pacerActive){ cm.textContent=''; holdTime=0; }
+    else if(!captureNow){ cm.textContent='PACER SPIKES — NO CAPTURE'; cm.style.color='#cc8800'; holdTime=0; }
+    else {
+      holdTime+=dt;
+      cm.textContent='';
+      if(holdTime>=HOLD_REQUIRED){
+        confirmed=true;
+        cm.textContent='CAPTURE CONFIRMED';
+        renderCaptureQuestion();
+      }
+    }
+  }
+
+  if(pacerActive){
+    const interval=60/rate;
+    if(t-lastSpikeT>=interval){ lastSpikeT=t; spikes.push({time:t, captured:captureNow}); }
+  }
+
+  ctx.lineWidth=2; ctx.strokeStyle='#3fae3f'; ctx.beginPath();
+  for(let x=0;x<w;x++){
+    const sampleT=qt-(w-x)/pxPerSec;
+    let y = confirmed ? h/2 : h/2 - nativeWave(sampleT)*AMP_SCALE;
+    for(const s of spikes){
+      const d=sampleT-s.time;
+      if(d>=0&&d<0.03){ y=h/2-(d<0.015?d/0.015:(0.03-d)/0.015)*46; }
+      else if(s.captured && d>=0.03&&d<0.14){ y=h/2+70*Math.sin(Math.PI*(d-0.03)/0.11); }
+      else if(s.captured && d>=0.14&&d<0.22){ y=h/2-25*Math.sin(Math.PI*(d-0.14)/0.08); }
+      else if(s.captured && d>=0.27&&d<0.47){ y=h/2-30*Math.sin(Math.PI*(d-0.27)/0.20); }
+    }
+    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  const maxAge = w/pxPerSec + 0.5;
+  while(spikes.length&&t-spikes[0].time>maxAge) spikes.shift();
+  requestAnimationFrame(draw);
+}
+newScenario();
+requestAnimationFrame(draw);
+</script>
+
+</body>
+</html>
