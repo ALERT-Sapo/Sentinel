@@ -110,9 +110,10 @@
   </div>
 
   <div class="ref-card">
-    <div class="ref-title">A note on the rates in this drill</div>
+    <div class="ref-title">A note on the dials in this drill</div>
     <div class="ref-text">
       <p><strong>What rate actually does:</strong> in demand (synchronous) mode — the standard mode on the ZOLL — the device watches the patient's intrinsic rhythm continuously. If the native rate stays at or above the set rate, the pacer holds off and doesn't fire at all. Once the interval since the last sensed native beat exceeds what the set rate calls for, the pacer fires. So rate isn't just a floor for the paced heart rate — it's the actual trigger for when a pacing stimulus gets delivered.</p>
+      <p style="margin-top: 8px;"><strong>What output (mA) actually does:</strong> output controls the strength of each pacing stimulus. Below capture threshold you'll see spikes with nothing following them; increasing output is what allows a spike to actually capture and drive a paced beat. Threshold varies patient to patient — chest wall thickness, edema, and pericardial effusion can all push it higher.</p>
       <p style="margin-top: 8px;">The specific rates used here — the default, the MD's order, the capture threshold — are arbitrary and chosen for learning purposes. They are not clinical guidance.</p>
       <p style="margin-top: 8px;">The ZOLL's default pacing rate is 70 ppm. At the bedside, the ordering provider will tell you what rate to set. If they don't say, ask what they want the ppm set to — don't assume the default is the target.</p>
     </div>
@@ -173,6 +174,7 @@
       </div>
       <p><strong>Using the 3-lead built into the One-Step Complete pads.</strong> The One-Step Complete pads have their own 3-lead EKG built in, which is what makes them an all-in-one device for TCP — but that means there are two different cables that both carry "3-lead," and they're not interchangeable. Placement matters here too: the pads have to go exactly where the package insert illustration shows in order to pace transcutaneously. The cable matters just as much: the standard 3-lead EKG cable needs to be disconnected, and the ZOLL OneStep Complete 3-lead sensor cable plugged in instead.</p>
       <p style="margin-top: 8px;"><strong>If the rhythm sensed through the pads looks unreliable.</strong> You can still pace. Reconnect the 3-lead EKG cable to the ZOLL and place it on the patient as a backup method for rhythm sensing, while pacing continues through the pads.</p>
+      <p style="margin-top: 8px;"><strong>Plug the device in.</strong> Continuous pacing delivers current constantly, and that drains the battery a lot faster than the ZOLL sees in normal monitoring use. Get it on AC power as soon as you can. A pacer that dies unexpectedly mid-therapy isn't just an inconvenience — for a patient who's dependent on it, that's potentially life-threatening.</p>
     </div>
   </div>
 
@@ -186,12 +188,12 @@
 const SCENARIOS=[
   {rhythm:'3rd', label:'3rd-degree (complete) heart block',
    text:'68-year-old, post-op day 1 from hip repair. Sudden dizziness and diaphoresis at the bedside. BP 76/48, HR displayed on the monitor looks slow and dissociated. Patient is symptomatic and hypotensive.'},
-  {rhythm:'2nd', label:'2nd-degree AV block',
+  {rhythm:'2nd', label:'2nd-degree AV block (Wenckebach)',
    text:'74-year-old with a history of MI, reports lightheadedness and near-syncope. BP 82/54. Monitor shows a regular atrial rate with intermittent dropped beats.'},
   {rhythm:'brady', label:'Profound sinus bradycardia',
    text:'81-year-old on a beta-blocker, found unresponsive to voice but arousable to touch. HR in the 30s on the monitor, BP 68/40. Atropine has already been given without effect.'}
 ];
-const RHYTHM_OPTIONS=['2nd-degree AV block','3rd-degree (complete) heart block','Profound sinus bradycardia'];
+const RHYTHM_OPTIONS=['2nd-degree AV block (Wenckebach)','3rd-degree (complete) heart block','Profound sinus bradycardia'];
 const DEFAULT_RATE=70;
 const HOLD_REQUIRED=3;
 
@@ -231,7 +233,8 @@ function renderIdQuestion(){
 }
 
 function renderCaptureQuestion(){
-  let html='<div class="q-block"><div class="q-prompt">Capture confirmed. Which pulse do you palpate to confirm mechanical capture?</div><div class="q-choices">'+
+  let html='<div class="ap-note" style="margin-bottom: 12px;"><strong>Address the patient\'s pain.</strong> Capture means the chest wall is contracting with every paced beat. Check in on comfort and analgesia now, not after.</div>';
+  html+='<div class="q-block"><div class="q-prompt">Capture confirmed. Which pulse do you palpate to confirm mechanical capture?</div><div class="q-choices">'+
     '<button class="mechBtn" data-opt="radial">Radial pulse</button>'+
     '<button class="mechBtn" data-opt="carotid">Carotid pulse</button>'+
     '<button class="mechBtn" data-opt="femoral">Femoral pulse</button>'+
@@ -350,8 +353,7 @@ function draw(now){
   const hr=document.getElementById('hrReadout');
   if(hr) hr.innerHTML=(confirmed?rate:nativeRateBpm())+' <span class="hr-unit">bpm</span>';
   if(!confirmed){
-    if(!pacerActive){ cm.textContent=''; holdTime=0; }
-    else if(!captureNow){ cm.textContent='PACER SPIKES — NO CAPTURE'; cm.style.color='#cc8800'; holdTime=0; }
+    if(!pacerActive || !captureNow){ cm.textContent=''; holdTime=0; }
     else {
       holdTime+=dt;
       cm.textContent='';
