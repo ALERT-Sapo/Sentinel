@@ -156,6 +156,7 @@
     .tool-card.sbar:hover { border-color: var(--purple); }
     .tool-card.pacing:hover { border-color: var(--amber); }
     .tool-card.shock:hover { border-color: var(--blue); }
+    .tool-card.electrolyte:hover { border-color: var(--red); }
 
     .card-icon {
       width: 44px;
@@ -173,6 +174,7 @@
     .card-icon.sbar { background: var(--purple-bg); border: 1px solid var(--purple-border); }
     .card-icon.pacing { background: var(--amber-bg); border: 1px solid var(--amber-border); }
     .card-icon.shock { background: var(--blue-bg); border: 1px solid var(--blue-border); }
+    .card-icon.electrolyte { background: var(--red-bg); border: 1px solid var(--red-border); }
 
     .card-icon svg {
       width: 22px; height: 22px; fill: none;
@@ -185,6 +187,7 @@
     .card-icon.sbar svg { stroke: var(--purple); }
     .card-icon.pacing svg { stroke: var(--amber); fill: var(--amber); }
     .card-icon.shock svg { stroke: var(--blue); fill: var(--blue); }
+    .card-icon.electrolyte svg { stroke: var(--red); }
 
     .card-body { flex: 1; }
 
@@ -202,6 +205,7 @@
     .card-tag.sbar { color: var(--purple); }
     .card-tag.pacing { color: var(--amber); }
     .card-tag.shock { color: var(--blue); }
+    .card-tag.electrolyte { color: var(--red); }
 
     .construction-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--amber); background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); padding: 7px 10px; margin: -24px -20px 0 -20px; border-radius: 12px 12px 0 0; }
     .construction-badge svg { width: 12px; height: 12px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
@@ -247,6 +251,7 @@
     .card-arrow.sbar { background: var(--purple-bg); }
     .card-arrow.pacing { background: var(--amber-bg); }
     .card-arrow.shock { background: var(--blue-bg); }
+    .card-arrow.electrolyte { background: var(--red-bg); }
 
     .card-arrow svg {
       width: 14px; height: 14px; fill: none;
@@ -532,22 +537,35 @@
       </div>
     </a>
 
-    <a class="tool-card cases" href="case-study.html">
-      <span class="construction-badge">
-        <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
-        Under Construction
-      </span>
-      <div class="card-icon cases">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <a class="tool-card electrolyte" href="electrolyte-derangements.html">
+      <div class="card-icon electrolyte">
+        <svg viewBox="0 0 24 24"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>
       </div>
       <div class="card-body">
-        <div class="card-tag cases">Interactive Cases</div>
-        <div class="card-title">ACLS Case Studies</div>
-        <div class="card-desc">Work through real clinical scenarios, make decisions, and see the consequences unfold. Currently being revised — password required.</div>
+        <div class="card-tag electrolyte">Drill Mode</div>
+        <div class="card-title">Electrolyte Derangements</div>
+        <div class="card-desc">Drag severity dials for hyper/hypokalemia and hyper/hypocalcemia, compare against real strips, and see what actually gets ordered.</div>
       </div>
       <div class="card-footer">
-        <span class="card-meta">Practice · Decision-based</span>
-        <div class="card-arrow cases">
+        <span class="card-meta">Drill · 4 derangements</span>
+        <div class="card-arrow electrolyte">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="tool-card pacing" href="pacing-practice.html">
+      <div class="card-icon pacing">
+        <svg viewBox="0 0 24 24"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag pacing">Skills Drill</div>
+        <div class="card-title">Transcutaneous Pacing Practice</div>
+        <div class="card-desc">Titrate rate and output to capture on a randomized rhythm, then confirm mechanical capture.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-meta">Drill · Repeatable</span>
+        <div class="card-arrow pacing">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
@@ -570,18 +588,22 @@
       </div>
     </a>
 
-    <a class="tool-card pacing" href="pacing-practice.html">
-      <div class="card-icon pacing">
-        <svg viewBox="0 0 24 24"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg>
+    <a class="tool-card cases" href="case-study.html">
+      <span class="construction-badge">
+        <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        Under Construction
+      </span>
+      <div class="card-icon cases">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       </div>
       <div class="card-body">
-        <div class="card-tag pacing">Skills Drill</div>
-        <div class="card-title">Transcutaneous Pacing Practice</div>
-        <div class="card-desc">Titrate rate and output to capture on a randomized rhythm, then confirm mechanical capture.</div>
+        <div class="card-tag cases">Interactive Cases</div>
+        <div class="card-title">ACLS Case Studies</div>
+        <div class="card-desc">Work through real clinical scenarios, make decisions, and see the consequences unfold. Currently being revised — password required.</div>
       </div>
       <div class="card-footer">
-        <span class="card-meta">Drill · Repeatable</span>
-        <div class="card-arrow pacing">
+        <span class="card-meta">Practice · Decision-based</span>
+        <div class="card-arrow cases">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
