@@ -71,6 +71,18 @@ hyperK and torsades in hypoK: a real, teachable finding that's often
 *more prominent in precordial leads than in lead II* — worth keeping in the
 dial but not overselling how visible it'd be on a single-lead monitor.
 
+## Hypocalcemia
+
+| Asset | Ca²⁺ | Lead II morphology | Status |
+|---|---|---|---|
+| `hypoca-1.png` | not specified — QTc 500ms given instead | Hypoparathyroidism, post-thyroidectomy. Lead II shows narrow QRS with a clearly stretched gap before the T wave — prolonged QT via ST elongation, confirmed directly in this lead. | verified (v1 dial) |
+| `hypoca-2.png` | not specified | Same pattern as `hypoca-1` — narrow QRS, T wave pulled noticeably further from the QRS than normal. | verified (v1 dial) |
+
+**Confirmed:** QT prolongation via a stretched ST segment (not a T-wave
+shape change) shows up clearly in lead II in both strips — matches the dial
+model directly, no rework needed here the way hypoK's torsades mechanic
+needed one.
+
 ## Notes for future additions
 
 - Confirm lead used for each strip (defaulting to II/ground lead per current
