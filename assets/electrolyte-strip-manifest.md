@@ -32,7 +32,7 @@ right now the dial is interpolating that gap without a reference.
 |---|---|---|---|
 | `hypok-1.png` | 1.7 | Regular sinus, narrow QRS, widespread ST depression, T wave inversion, prominent U waves. No ectopy. | pending — dial needs rework, see below |
 | `hypok-2.png` | 1.9 | Same baseline pattern. HR 74, PVC 0 (annotated on strip). ST depression/T inversion best seen in inferior leads (II, III, aVF) — subtle on a single-lead monitor view, but U waves still prominent there. | pending — dial needs rework, see below |
-| `hypok-3.png` | not specified — illustrates trigger mechanism, not baseline severity | Baseline shows narrow QRS with visible U waves (PVC 9, so ectopy already present, unlike `hypok-1`/`hypok-2`). A PVC lands directly on the preceding T wave (R-on-T) and that beat is what triggers the abrupt transition into sustained torsades — wide, twisting, polymorphic complexes. | pending — confirms trigger mechanism below |
+| `hypok-3.png` | not specified — illustrates trigger mechanism, not baseline severity | Baseline shows narrow QRS with visible U waves (PVC 9, so ectopy already present, unlike `hypok-1`/`hypok-2`). A PVC lands directly on the preceding T wave (R-on-T) and that beat triggers a sustained torsades run — confirmed visible in lead II itself (not just V1–V6): the continuous bottom strip shows narrow complexes for the first half, then a direct transition into a fast run of wide, pointed-peak complexes with a waxing/waning amplitude envelope (the "twisting" signature) for the second half. | verified (v2 dial, torsades shape calibrated to this crop) |
 
 **Confirmed:** the U wave IS clearly visible in lead II at severe
 hypokalemia, alongside ST depression and T wave inversion (most pronounced
@@ -55,6 +55,21 @@ separate mechanics, not one slider:
 **Open question for next batch:** still nothing in the 2.5–3.4 range to see
 how gradual the T-flattening/U-emergence transition actually looks there —
 right now that stretch of the dial is still interpolated, not confirmed.
+
+## Hypercalcemia
+
+| Asset | Ca²⁺ | Lead II morphology | Status |
+|---|---|---|---|
+| `hyperca-1.png` | not specified | J waves easily noticeable, seen in V3 and V4 (per user read). Not confirmed as clearly visible in lead II itself — consistent with the same lead-dependence seen in the other derangements. | pending — not usable for lead II J-wave calibration |
+| `hyperca-2.png` | not specified | Bizarre-looking QRS complexes, very short QT interval, J waves best seen in V1 (per user read). **No lead II available in this strip** — reason unclear. | pending — QT/QRS morphology only, no lead II J-wave reference |
+
+**Working read so far:** short QT via a compressed/absent ST segment is
+confirmed as a real lead-II-visible finding (independently verified by
+inspecting `hyperca-2.png`'s lead II directly — QRS and T are fused with
+almost no gap). J waves, though, look to be the same story as peaked T in
+hyperK and torsades in hypoK: a real, teachable finding that's often
+*more prominent in precordial leads than in lead II* — worth keeping in the
+dial but not overselling how visible it'd be on a single-lead monitor.
 
 ## Notes for future additions
 
