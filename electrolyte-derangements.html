@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Electrolyte Derangements — ALERT Team</title>
+<style>
+  :root {
+    --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f5f7fa;
+    --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+    --text: #111827; --text2: #4b5563; --text3: #9ca3af;
+    --green: #059669; --green-bg: rgba(5,150,105,0.08); --green-border: rgba(5,150,105,0.25);
+    --red: #dc2626; --red-bg: rgba(220,38,38,0.08); --red-border: rgba(220,38,38,0.25);
+    --blue: #2563eb; --blue-bg: rgba(37,99,235,0.08); --blue-border: rgba(37,99,235,0.25);
+    --amber: #d97706; --amber-bg: rgba(217,119,6,0.08); --amber-border: rgba(217,119,6,0.25);
+    --coral: #ea580c; --coral-bg: rgba(234,88,12,0.08); --coral-border: rgba(234,88,12,0.25);
+    --purple: #7c3aed; --purple-bg: rgba(124,58,237,0.08); --purple-border: rgba(124,58,237,0.25);
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 5rem; }
+  header { background: #151c30; border-bottom: 3px solid; border-image: linear-gradient(90deg, #ea580c 0%, #2563eb 100%) 1; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; }
+  .header-icon { width: 36px; height: 36px; background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-icon svg { width: 18px; height: 18px; stroke: var(--purple); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  header h1 { font-size: 16px; font-weight: 600; color: #f3f4f6; letter-spacing: -0.01em; }
+  header p { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+  .tag { margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9ca3af; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; }
+
+  main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  a.back-link, button.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; margin-bottom: 1.5rem; transition: color 0.15s; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; }
+  a.back-link:hover, button.back-link:hover { color: var(--text); }
+  a.back-link svg, button.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .caveat-card { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.75rem; font-size: 13px; line-height: 1.6; color: var(--text); }
+  .caveat-card strong { color: var(--amber); }
+
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; text-align: left; }
+  .case-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .case-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
+  .case-meta { font-size: 12px; color: var(--text2); }
+  .case-card.disabled { opacity: 0.45; cursor: default; }
+  .case-card.disabled:hover { transform: none; border-color: var(--border); }
+  @media (max-width: 480px) { .case-grid { grid-template-columns: 1fr; } }
+
+  .detail-view { display: none; }
+  .detail-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .detail-sub { font-size: 12.5px; color: var(--text2); margin-bottom: 1.25rem; }
+
+  .ref-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 1.5rem; }
+  .ref-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .sx-row { display: flex; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .sx-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .sx-row:first-child { padding-top: 0; }
+  .sx-sys { flex: 0 0 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text3); padding-top: 1px; }
+  .sx-desc { flex: 1; font-size: 13px; line-height: 1.55; color: var(--text2); }
+  .sx-desc strong { color: var(--text); font-weight: 600; }
+  @media (max-width: 480px) { .sx-row { flex-direction: column; gap: 3px; } .sx-sys { flex: none; } }
+
+  .strip-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 6px; }
+  .strip-gallery figure { margin: 0; }
+  .strip-gallery img { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border2); display: block; cursor: zoom-in; }
+  .strip-gallery figcaption { font-size: 11px; color: var(--text2); margin-top: 6px; line-height: 1.4; text-align: center; }
+  .strip-gallery figcaption strong { color: var(--text); display: block; }
+  .strip-source { font-size: 10.5px; color: var(--text3); text-align: center; margin-bottom: 1.5rem; }
+  @media (max-width: 480px) { .strip-gallery { grid-template-columns: 1fr 1fr; } }
+
+  .normal-chip { display: inline-block; font-size: 11.5px; font-weight: 600; color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 20px; padding: 3px 11px; }
+
+  .tx-tier { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 9px; border-radius: 20px; display: inline-block; margin-bottom: 7px; }
+  .tx-tier.protect { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+  .tx-tier.shift { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tx-tier.remove { background: var(--coral-bg); color: var(--coral); border: 1px solid var(--coral-border); }
+  .tx-item { padding: 13px 0; border-bottom: 1px solid var(--border); }
+  .tx-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tx-item:first-child { padding-top: 0; }
+  .tx-name { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tx-desc { font-size: 13px; line-height: 1.55; color: var(--text2); }
+  .tx-desc strong { color: var(--text); font-weight: 600; }
+  .tx-intro { font-size: 12.5px; color: var(--text2); line-height: 1.55; margin-bottom: 14px; }
+
+  .term-toggle { margin-top: 4px; }
+  .term-toggle summary { cursor: pointer; font-size: 12.5px; color: var(--blue); font-weight: 600; list-style: none; }
+  .term-toggle summary::-webkit-details-marker { display: none; }
+  .term-toggle summary::before { content: '▸ '; }
+  .term-toggle[open] summary::before { content: '▾ '; }
+  .term-toggle-body { margin-top: 10px; }
+  .term-toggle-body img { width: 100%; max-width: 340px; border-radius: var(--radius-sm); border: 1px solid var(--border2); display: block; }
+  .term-toggle-body p { font-size: 11.5px; color: var(--text2); margin-top: 8px; line-height: 1.55; }
+
+  .calc-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; }
+  .calc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .calc-row label { font-size: 12px; color: var(--text2); }
+  .calc-row input { width: 90px; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border2); font-size: 13px; text-align: right; font-family: inherit; }
+  .calc-result { font-size: 13px; font-weight: 600; color: var(--text); padding-top: 8px; margin-top: 2px; border-top: 1px solid var(--border); }
+  .calc-result strong { color: var(--green); }
+
+  .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .section-sub { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+
+  .device { background: #0a0a0a; border-radius: var(--radius); padding: 16px; }
+  .device-hdr-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .device-hdr { font-family: 'SF Mono', Consolas, monospace; font-size: 10px; color: #4a8a4a; letter-spacing: 1px; }
+  .device-stage { font-family: 'SF Mono', Consolas, monospace; font-size: 10px; color: #3fae3f; text-align: right; max-width: 60%; }
+  canvas.strip { width: 100%; height: 200px; display: block; background: #050505; border-radius: 6px; }
+
+  .dial-row { margin-top: 14px; }
+  .dial-label-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+  .dial-label-row span.anchor { color: var(--blue); font-weight: 600; }
+  input[type=range] { width: 100%; }
+
+  .pvc-btn { margin-top: 14px; width: 100%; padding: 11px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red); transition: background 0.15s; }
+  .pvc-btn:hover { background: rgba(220,38,38,0.14); }
+  .event-label { margin-top: 8px; font-family: 'SF Mono', Consolas, monospace; font-size: 11px; color: var(--amber); min-height: 14px; text-align: center; }
+
+  footer { text-align: center; padding: 1.5rem; font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 2rem; }
+
+  .lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .lightbox-overlay.open { display: flex; }
+  .lightbox-overlay img { max-width: 100%; max-height: 100%; border-radius: var(--radius-sm); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l2-8 4 16 2-8h6"/></svg>
+  </div>
+  <div>
+    <h1>Electrolyte Derangements</h1>
+    <p>ALERT Team</p>
+  </div>
+  <span class="tag">Drill Mode</span>
+</header>
+
+<main>
+
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to home
+  </a>
+
+  <div id="selectorView">
+    <div class="case-grid">
+      <div class="case-card" onclick="showDerangement('hyperk')">
+        <div class="case-title">Hyperkalemia</div>
+        <div class="case-meta">Elevated K⁺ — peaked T, QRS widening, sine wave</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal K⁺: 3.5–5.0 mEq/L</div>
+      </div>
+      <div class="case-card" onclick="showDerangement('hypok')">
+        <div class="case-title">Hypokalemia</div>
+        <div class="case-meta">Low K⁺ — U waves, ectopy, torsades risk</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal K⁺: 3.5–5.0 mEq/L</div>
+      </div>
+      <div class="case-card" onclick="showDerangement('hyperca')">
+        <div class="case-title">Hypercalcemia</div>
+        <div class="case-meta">Elevated Ca²⁺ — short QT, bradyarrhythmia, J waves</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal Ca²⁺: 8.5–10.5 mg/dL</div>
+      </div>
+      <div class="case-card" onclick="showDerangement('hypoca')">
+        <div class="case-title">Hypocalcemia</div>
+        <div class="case-meta">Low Ca²⁺ — QT prolongation, torsades risk</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal Ca²⁺: 8.5–10.5 mg/dL</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-view" id="hyperkView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hyperkalemia</div>
+    <div class="detail-sub">Elevated serum potassium</div>
+    <div class="normal-chip" style="margin-bottom: 1.25rem;">Normal K⁺: 3.5–5.0 mEq/L</div>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms</div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">Peaked, tented T waves progressing to QRS widening, P wave flattening/loss, and eventually a sine wave pattern. Bradycardia, heart block, and risk of VF or asystole as severity increases.</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuromuscular</span><span class="sx-desc"><strong>Often the earliest clue</strong>, sometimes preceding ECG changes. Ascending weakness (legs before arms), paresthesias, hyporeflexia, and in severe cases flaccid paralysis.</span></div>
+      <div class="sx-row"><span class="sx-sys">GI</span><span class="sx-desc">Nausea, vomiting, abdominal cramping, diarrhea.</span></div>
+      <div class="sx-row"><span class="sx-sys">General</span><span class="sx-desc">Fatigue and malaise — nonspecific, and frequently how a patient is initially described before the cause is identified. Many patients are asymptomatic until cardiac changes appear.</span></div>
+    </div>
+
+    <div class="ref-title" style="margin-top: -0.5rem;">Real examples, for comparison</div>
+    <div class="strip-gallery">
+      <figure><img src="assets/hyperk-1.png" alt="Hyperkalemia reference strip, K 9.3" /><figcaption><strong>K⁺ 9.3 mEq/L</strong>Sine wave pattern</figcaption></figure>
+      <figure><img src="assets/hyperk-2.png" alt="Hyperkalemia reference strip, K 7.0" /><figcaption><strong>K⁺ 7.0 mEq/L</strong>Subtle in lead II</figcaption></figure>
+      <figure><img src="assets/hyperk-3.png" alt="Hyperkalemia reference strip, K 9.0" /><figcaption><strong>K⁺ 9.0 mEq/L</strong>Sine wave pattern</figcaption></figure>
+    </div>
+    <div class="strip-source">Source: LITFL. Look at the bottom strip in each image (lead II). The panels above it are other leads and can look quite different for the same patient at the same moment — be intentional about which lead you're comparing to which, since pairing the wrong ones can make the exaggeration look bigger or smaller than it really is.</div>
+
+    <div class="ref-card">
+      <div class="ref-title">What to expect — treatment</div>
+      <div class="tx-intro">Knowing what's coming and why helps you anticipate orders, monitor for the right things, and understand what you're watching for. Treatment generally follows three tiers, and not every patient needs all three.</div>
+
+      <div class="tx-tier protect">Protect</div>
+      <div class="tx-item">
+        <div class="tx-name">Calcium chloride</div>
+        <div class="tx-desc"><strong>Stabilizes the cardiac cell membrane threshold potential — it does not lower serum K⁺ at all.</strong> It buys time by protecting the heart from the arrhythmia risk while other treatments work. Delivers roughly 3x the elemental calcium per gram compared to gluconate, but it's a vesicant — generally reserved for central access or emergent/code situations. Onset within minutes; effect lasts roughly 30–60 minutes, so it often needs repeating or a bridge to the next tier.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Calcium gluconate</div>
+        <div class="tx-desc"><strong>Same mechanism as calcium chloride</strong> — membrane stabilization, not a K⁺ fix. Gentler on peripheral veins, so it's often the first choice when there's no central access yet. Less elemental calcium per gram, so it's sometimes dosed in larger volumes or repeated more readily than chloride.</div>
+      </div>
+
+      <div class="tx-tier shift">Shift</div>
+      <div class="tx-item">
+        <div class="tx-name">Dextrose + insulin</div>
+        <div class="tx-desc">Regular insulin — <strong>given IV push, not subQ</strong> — drives K⁺ into cells via the Na⁺/K⁺-ATPase pump; dextrose prevents the hypoglycemia that follows. <strong>Order matters: dextrose first, then insulin.</strong> If the line blows after the insulin push, there's no way to reverse the hypoglycemia that's about to hit. Onset ~15–30 min, effect lasts several hours; expect fingerstick monitoring afterward regardless.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Albuterol (nebulized, high-dose)</div>
+        <div class="tx-desc">Beta-2 agonism also stimulates the Na⁺/K⁺-ATPase pump, shifting K⁺ intracellularly. Used as an <strong>adjunct</strong> to insulin/dextrose, not a replacement. Can cause tachycardia — worth knowing if you're already worried about the rhythm.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Sodium bicarbonate</div>
+        <div class="tx-desc">Shifts K⁺ intracellularly, most useful if the patient is also acidotic. Less central to routine management than it used to be — you may or may not see it ordered.</div>
+      </div>
+
+      <div class="tx-tier remove">Remove</div>
+      <div class="tx-item">
+        <div class="tx-name">Loop diuretics (e.g. furosemide)</div>
+        <div class="tx-desc">Increases renal excretion of K⁺ — actually removes it from the body rather than just relocating it. Only works if the kidneys are functioning; often not enough on its own in renal failure.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">GI potassium binders</div>
+        <div class="tx-desc">Patiromer, sodium zirconium cyclosilicate, or older sodium polystyrene sulfonate — bind K⁺ in the gut for elimination in stool. Slower onset (hours), used for more definitive control once the acute threat is stabilized.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Dialysis</div>
+        <div class="tx-desc">Removes K⁺ directly and rapidly. Definitive treatment for severe or refractory hyperkalemia, especially with renal failure where the kidneys can't do it themselves.</div>
+      </div>
+    </div>
+
+    <div class="caveat-card">
+      <strong>Read this first:</strong> this dial is illustrative, not a tracing validated against a specific patient. Real strips vary a lot — by baseline conduction, rate of change, and what else is going on — and the morphology here is deliberately pushed toward the textbook pattern so the changes are easy to see and learn. Don't expect every real hyperkalemic patient to match this exactly.
+    </div>
+
+    <div class="section-title">Lead II trace</div>
+    <div class="section-sub">Drag the dial. Watch the T wave grow and the QRS widen before everything merges.</div>
+    <div class="device">
+      <div class="device-hdr-row">
+        <span class="device-hdr">LEAD II</span>
+        <span class="device-stage" id="highStage">Normal sinus rhythm</span>
+      </div>
+      <canvas class="strip" id="highStrip"></canvas>
+    </div>
+    <div class="dial-row">
+      <div class="dial-label-row"><span class="anchor">Normal baseline</span><span>Severe hyperkalemia</span></div>
+      <input type="range" id="highSlider" min="0" max="100" step="0.5" value="0" />
+    </div>
+  </div>
+
+  <div class="detail-view" id="hypokView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hypokalemia</div>
+    <div class="detail-sub">Low serum potassium</div>
+    <div class="normal-chip" style="margin-bottom: 1.25rem;">Normal K⁺: 3.5–5.0 mEq/L</div>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms</div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">T wave flattening, ST depression, and a prominent U wave — sometimes taller than the T wave itself. Increased ectopy (PACs, PVCs) and palpitations. Severe cases carry <strong>torsades de pointes</strong> risk, especially if an ectopic beat lands on the T wave (R-on-T).</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuromuscular</span><span class="sx-desc">Muscle weakness, cramping, fatigue, hyporeflexia. Severe, rapid drops can cause ascending paralysis or rhabdomyolysis.</span></div>
+      <div class="sx-row"><span class="sx-sys">GI</span><span class="sx-desc">Constipation, and in severe cases ileus — smooth muscle is potassium-dependent too, not just cardiac and skeletal muscle.</span></div>
+      <div class="sx-row"><span class="sx-sys">Renal</span><span class="sx-desc">Polyuria and polydipsia from impaired urine-concentrating ability (hypokalemic nephropathy) with prolonged or severe depletion.</span></div>
+    </div>
+
+    <div class="ref-title" style="margin-top: -0.5rem;">Real examples, for comparison</div>
+    <div class="strip-gallery">
+      <figure><img src="assets/hypok-1.png" alt="Hypokalemia reference strip, K 1.7" /><figcaption><strong>K⁺ 1.7 mEq/L</strong>Prominent U waves</figcaption></figure>
+      <figure><img src="assets/hypok-2.png" alt="Hypokalemia reference strip, K 1.9" /><figcaption><strong>K⁺ 1.9 mEq/L</strong>Prominent U waves</figcaption></figure>
+      <figure><img src="assets/hypok-3.png" alt="Hypokalemia reference strip showing R-on-T triggering torsades" /><figcaption><strong>K not specified</strong>R-on-T &rarr; torsades</figcaption></figure>
+    </div>
+    <div class="strip-source">Source: LITFL. Look at the bottom strip in each image (lead II). The panels above it are other leads and can look quite different for the same patient at the same moment — be intentional about which lead you're comparing to which, since pairing the wrong ones can make the exaggeration look bigger or smaller than it really is.</div>
+
+    <div class="ref-card">
+      <div class="ref-title">What to expect — treatment</div>
+      <div class="tx-intro">Knowing what's coming and why helps you anticipate orders, monitor for the right things, and understand what you're watching for.</div>
+
+      <div class="tx-tier protect">Monitor</div>
+      <div class="tx-item">
+        <div class="tx-name">Continuous cardiac monitoring</div>
+        <div class="tx-desc">Given the ectopy and torsades risk covered on this page, expect continuous telemetry through the whole replacement process — not just before it starts. Replacement doesn't eliminate the arrhythmia risk until levels actually come back up, so the danger window is during correction, not just before it.</div>
+      </div>
+
+      <div class="tx-tier shift">Replace</div>
+      <div class="tx-item">
+        <div class="tx-name">IV potassium chloride</div>
+        <div class="tx-desc">Directly replaces the deficit. Concentrated KCl is a <strong>vesicant and genuinely painful peripherally</strong> — infusions are diluted and rate-limited, with faster rates needing central access and closer monitoring per your unit's policy. Expect the IV site to ache during infusion; that's expected, though infiltration should still be ruled out rather than assumed.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Oral potassium chloride</div>
+        <div class="tx-desc">Used for milder, non-urgent deficits, or to continue correction after IV therapy. Gentler on the vasculature, but too slow alone for a symptomatic or severely low patient. Requires a working GI tract — vomiting, ileus, or NPO status take it off the table regardless of how mild the deficit is.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Combining routes</div>
+        <div class="tx-desc">For severe or symptomatic depletion, expect both at once rather than one or the other. IV rate is capped for safety, not because it's inherently faster than the gut absorbs — so oral on top doesn't compete with or slow the IV route, it adds more total repletion in parallel without pushing the IV rate into riskier territory.</div>
+      </div>
+
+      <div class="tx-tier remove">Correct magnesium</div>
+      <div class="tx-item">
+        <div class="tx-name">Magnesium repletion</div>
+        <div class="tx-desc">Magnesium is a cofactor for the same Na⁺/K⁺-ATPase pump and for renal potassium retention. Hypokalemia is often <strong>refractory to K⁺ replacement alone</strong> if magnesium is also low — expect a magnesium level to be checked and corrected alongside, especially if the K⁺ isn't responding the way it should.</div>
+      </div>
+    </div>
+
+    <div class="caveat-card">
+      <strong>Read this first:</strong> this dial is illustrative, not a tracing validated against a specific patient. Real strips vary a lot — by baseline conduction, rate of change, and what else is going on — and the morphology here is deliberately pushed toward the textbook pattern so the changes are easy to see and learn. Don't expect every real hypokalemic patient to match this exactly.
+    </div>
+
+    <div class="section-title">Lead II trace</div>
+    <div class="section-sub">Drag the dial to see the U wave emerge, then trigger a PVC to see whether it lands somewhere dangerous.</div>
+    <div class="device">
+      <div class="device-hdr-row">
+        <span class="device-hdr">LEAD II</span>
+        <span class="device-stage" id="lowStage">Normal sinus rhythm</span>
+      </div>
+      <canvas class="strip" id="lowStrip"></canvas>
+    </div>
+    <div class="dial-row">
+      <div class="dial-label-row"><span class="anchor">Normal baseline</span><span>Severe hypokalemia</span></div>
+      <input type="range" id="lowSlider" min="0" max="100" step="0.5" value="0" />
+    </div>
+    <button class="pvc-btn" id="pvcBtn">Trigger PVC</button>
+    <div class="event-label" id="eventLabel">&nbsp;</div>
+  </div>
+
+  <div class="detail-view" id="hypercaView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hypercalcemia</div>
+    <div class="detail-sub">Elevated serum calcium</div>
+    <div class="normal-chip" style="margin-bottom: 10px;">Normal Ca²⁺: 8.5–10.5 mg/dL</div>
+    <details class="term-toggle" style="margin-bottom: 1.25rem;">
+      <summary>Total vs. corrected vs. ionized calcium</summary>
+      <div class="term-toggle-body">
+        <p>Total calcium can be misleading if albumin is abnormal — corrected or ionized calcium is more reliable in that situation, and ionized especially so in critically ill patients.</p>
+        <p><strong>Corrected calcium (mg/dL) = measured total Ca + 0.8 × (4.0 − albumin, g/dL)</strong></p>
+        <div class="calc-box">
+          <div class="calc-row"><label>Measured Ca (mg/dL)</label><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" id="hypercaMeasured" placeholder="e.g. 11.5" oninput="calcCorrectedCa('hypercaMeasured','hypercaAlbumin','hypercaResult')" /></div>
+          <div class="calc-row"><label>Albumin (g/dL)</label><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" id="hypercaAlbumin" placeholder="e.g. 2.5" oninput="calcCorrectedCa('hypercaMeasured','hypercaAlbumin','hypercaResult')" /></div>
+          <div class="calc-result" id="hypercaResult">Corrected Ca: —</div>
+        </div>
+      </div>
+    </details>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms</div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">Shortened QT interval (compressed or absent ST segment), bradyarrhythmia, and in severe cases Osborn-like J waves with risk of malignant arrhythmia. Elevated Ca²⁺ also <strong>potentiates digoxin toxicity</strong> — a key reason digoxin is used cautiously or avoided here.</span></div>
+      <details class="term-toggle">
+        <summary>What's a J wave?</summary>
+        <div class="term-toggle-body">
+          <img src="assets/j-wave-diagram.png" alt="Diagram of J point and Osborn wave morphology: normal, J point elevation, J point elevation with Osborn wave, and J point depression" />
+          <p>The J point is where the QRS ends and the ST segment begins. A J wave (Osborn wave) is a notch or dome right at that junction — elevated J point plus that extra hump is what you're looking for, not just any bump near the QRS.</p>
+        </div>
+      </details>
+      <div class="sx-row"><span class="sx-sys">Neuro</span><span class="sx-desc">Confusion, lethargy, weakness, and decreased level of consciousness — can progress to coma in a severe crisis. Often the presenting complaint that gets someone worked up in the first place, well before anyone's looking at a rhythm strip.</span></div>
+      <div class="sx-row"><span class="sx-sys">GI</span><span class="sx-desc">Constipation, nausea, vomiting, abdominal pain. Associated with increased risk of pancreatitis and peptic ulcer disease.</span></div>
+      <div class="sx-row"><span class="sx-sys">Renal</span><span class="sx-desc">Polyuria and polydipsia from impaired urine-concentrating ability, nephrolithiasis with chronic elevation, and risk of AKI — dehydration from the polyuria itself can worsen the hypercalcemia, a vicious cycle.</span></div>
+      <div class="sx-row"><span class="sx-sys">Musculoskeletal</span><span class="sx-desc">Bone pain and pathologic fractures, especially when the underlying cause involves bone resorption (hyperparathyroidism, malignancy).</span></div>
+    </div>
+
+    <div class="ref-title" style="margin-top: -0.5rem;">Real examples, for comparison</div>
+    <div class="strip-gallery">
+      <figure><img src="assets/hyperca-1.png" alt="Hypercalcemia reference strip showing J waves" /><figcaption><strong>Ca²⁺ not specified</strong>J waves in V3/V4</figcaption></figure>
+      <figure><img src="assets/hyperca-2.png" alt="Hypercalcemia reference strip showing short QT" /><figcaption><strong>Ca²⁺ not specified</strong>Short QT, no lead II</figcaption></figure>
+    </div>
+    <div class="strip-source">Source: LITFL. The second example has no usable lead II strip. In the first, the J waves called out are in V3/V4 — same as the other derangements on this page, some findings show up more clearly in other leads than in lead II.</div>
+
+    <div class="caveat-card">
+      <strong>Read this first:</strong> this dial is illustrative, not a tracing validated against a specific patient. Real strips vary a lot — by baseline conduction, rate of change, and what else is going on — and the morphology here is deliberately pushed toward the textbook pattern so the changes are easy to see and learn. Don't expect every real hypercalcemic patient to match this exactly. The J wave shown here at high severity is a real finding, but it's often more visible in precordial leads than in lead II — don't expect it to always be this obvious on a single-lead monitor.
+    </div>
+
+    <div class="section-title">Lead II trace</div>
+    <div class="section-sub">Drag the dial. Watch the ST segment shorten and the T wave pull in close to the QRS.</div>
+    <div class="device">
+      <div class="device-hdr-row">
+        <span class="device-hdr">LEAD II</span>
+        <span class="device-stage" id="caStage">Normal sinus rhythm</span>
+      </div>
+      <canvas class="strip" id="caStrip"></canvas>
+    </div>
+    <div class="dial-row">
+      <div class="dial-label-row"><span class="anchor">Normal baseline</span><span>Severe hypercalcemia</span></div>
+      <input type="range" id="caSlider" min="0" max="100" step="0.5" value="0" />
+    </div>
+  </div>
+
+  <div class="detail-view" id="hypocaView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hypocalcemia</div>
+    <div class="detail-sub">Low serum calcium</div>
+    <div class="normal-chip" style="margin-bottom: 10px;">Normal Ca²⁺: 8.5–10.5 mg/dL</div>
+    <details class="term-toggle" style="margin-bottom: 1.25rem;">
+      <summary>Total vs. corrected vs. ionized calcium</summary>
+      <div class="term-toggle-body">
+        <p>Total calcium can be misleading if albumin is abnormal — corrected or ionized calcium is more reliable in that situation, and ionized especially so in critically ill patients.</p>
+        <p><strong>Corrected calcium (mg/dL) = measured total Ca + 0.8 × (4.0 − albumin, g/dL)</strong></p>
+        <div class="calc-box">
+          <div class="calc-row"><label>Measured Ca (mg/dL)</label><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" id="hypocaMeasured" placeholder="e.g. 7.2" oninput="calcCorrectedCa('hypocaMeasured','hypocaAlbumin','hypocaResult')" /></div>
+          <div class="calc-row"><label>Albumin (g/dL)</label><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" id="hypocaAlbumin" placeholder="e.g. 2.5" oninput="calcCorrectedCa('hypocaMeasured','hypocaAlbumin','hypocaResult')" /></div>
+          <div class="calc-result" id="hypocaResult">Corrected Ca: —</div>
+        </div>
+      </div>
+    </details>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms</div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">Prolonged QT interval via a stretched ST segment, with <strong>torsades de pointes risk</strong> — the same downstream danger as severe hypokalemia, just via a different mechanism. Reduced cardiac contractility and hypotension, since calcium is required for excitation-contraction coupling.</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuromuscular</span><span class="sx-desc"><strong>Chvostek's sign</strong> (tapping the facial nerve triggers twitching) and <strong>Trousseau's sign</strong> (carpal spasm when a BP cuff is inflated) are the classic bedside findings. Perioral numbness and tingling, muscle cramps, and in severe cases tetany, laryngospasm, or seizures.</span></div>
+      <div class="sx-row"><span class="sx-sys">Psychiatric</span><span class="sx-desc">Anxiety and irritability, and in severe or chronic cases confusion or depression.</span></div>
+    </div>
+
+    <div class="ref-title" style="margin-top: -0.5rem;">Real examples, for comparison</div>
+    <div class="strip-gallery">
+      <figure><img src="assets/hypoca-1.png" alt="Hypocalcemia reference strip, QTc 500ms" /><figcaption><strong>QTc 500ms</strong>Hypoparathyroidism, post-thyroidectomy</figcaption></figure>
+      <figure><img src="assets/hypoca-2.png" alt="Hypocalcemia reference strip showing QT prolongation" /><figcaption><strong>Ca²⁺ not specified</strong>QT prolongation</figcaption></figure>
+    </div>
+    <div class="strip-source">Source: LITFL. Look at the bottom strip in each image (lead II). The panels above it are other leads and can look quite different for the same patient at the same moment — be intentional about which lead you're comparing to which, since pairing the wrong ones can make the exaggeration look bigger or smaller than it really is.</div>
+
+    <div class="caveat-card">
+      <strong>Read this first:</strong> this dial is illustrative, not a tracing validated against a specific patient. Real strips vary a lot — by baseline conduction, rate of change, and what else is going on — and the morphology here is deliberately pushed toward the textbook pattern so the changes are easy to see and learn. Don't expect every real hypocalcemic patient to match this exactly.
+    </div>
+
+    <div class="section-title">Lead II trace</div>
+    <div class="section-sub">Drag the dial. Watch the ST segment stretch out and the T wave pull further from the QRS.</div>
+    <div class="device">
+      <div class="device-hdr-row">
+        <span class="device-hdr">LEAD II</span>
+        <span class="device-stage" id="hypocaStage">Normal sinus rhythm</span>
+      </div>
+      <canvas class="strip" id="hypocaStrip"></canvas>
+    </div>
+    <div class="dial-row">
+      <div class="dial-label-row"><span class="anchor">Normal baseline</span><span>Severe hypocalcemia</span></div>
+      <input type="range" id="hypocaSlider" min="0" max="100" step="0.5" value="0" />
+    </div>
+  </div>
+
+</main>
+
+<footer>Sentinel &middot; ALERT Team</footer>
+
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="" />
+</div>
+
+<script>
+function showDerangement(id){
+  document.getElementById('selectorView').style.display = 'none';
+  document.querySelectorAll('.detail-view').forEach(v => v.style.display = 'none');
+  document.getElementById(id + 'View').style.display = 'block';
+  window.scrollTo(0,0);
+  if (id === 'hyperk') drawHigh();
+  if (id === 'hypok') drawLowStatic();
+  if (id === 'hyperca') drawCa();
+  if (id === 'hypoca') drawHypoCa();
+}
+function backToSelector(){
+  document.querySelectorAll('.detail-view').forEach(v => v.style.display = 'none');
+  document.getElementById('selectorView').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function fitCanvas(canvas){
+  const r = canvas.getBoundingClientRect();
+  canvas.width = r.width * 2;
+  canvas.height = r.height * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(2,2);
+  return { ctx, w: r.width, h: r.height };
+}
+
+function drawGrid(ctx, w, h){
+  ctx.strokeStyle = '#123312';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < w; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+}
+
+/* ---------- Hyperkalemia ---------- */
+const highCanvas = document.getElementById('highStrip');
+let highSeverity = 0;
+
+function pWave(x, cx, amp) { const d = x - cx; if (Math.abs(d) > 12) return 0; return amp * Math.exp(-(d*d)/30); }
+function qrsComplex(x, cx, ws) { const d = (x - cx) / ws; if (d < -3 || d > 2.5) return 0; if (d < -1) return (d + 3) * -4; if (d < 0) return -8 + (d + 1) * 88; if (d < 1) return 80 - d * 104; return -24 + (d - 1) * 16; }
+function tWaveHigh(x, cx, tCenterOffset, tSigma, tAmp) { const d = (x - cx - tCenterOffset) / tSigma; if (Math.abs(d) > 2.2) return 0; return tAmp * Math.exp(-(d*d)); }
+function sineHump(x, cx, freq) { return Math.sin((x - cx) * freq) * 34; }
+function blendHigh(s) { const raw = Math.max(0, (s - 75) / 20); const c = Math.min(raw, 1); return c * c * (3 - 2 * c); }
+
+function drawHigh(){
+  const { ctx, w, h } = fitCanvas(highCanvas);
+  ctx.clearRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  ctx.strokeStyle = '#3fae3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const midY = h/2, beatSpacing = 170;
+  const b = blendHigh(highSeverity);
+  const capped = Math.min(highSeverity, 75);
+  const ws = 1 + capped * 0.03;
+  const tAmp = 9 + capped * 1.0;
+  const tCenterOffset = 19 + capped * 0.45;
+  const tSigma = 9 + capped * 0.1;
+  const pFactor = Math.max(1 - highSeverity/70, 0);
+  const freq = 2*Math.PI/beatSpacing;
+  for (let x = 0; x < w; x++) {
+    const cx = x % beatSpacing;
+    let normalY = pWave(cx,30,4)*pFactor + qrsComplex(cx,60,ws) + tWaveHigh(cx,60,tCenterOffset,tSigma,tAmp);
+    const sineY = sineHump(x,60,freq);
+    const y = midY - (normalY*(1-b) + sineY*b);
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function highStageLabel(s){
+  if (s < 20) return 'Normal sinus rhythm';
+  if (s < 50) return 'T waves tall and tented, QRS widening';
+  if (s < 75) return 'T taller than QRS, P wave lost';
+  return 'Sine wave pattern';
+}
+
+document.getElementById('highSlider').addEventListener('input', e => {
+  highSeverity = parseFloat(e.target.value);
+  document.getElementById('highStage').textContent = highStageLabel(highSeverity);
+  drawHigh();
+});
+window.addEventListener('resize', () => { if (document.getElementById('hyperkView').style.display === 'block') drawHigh(); });
+
+/* ---------- Hypokalemia ---------- */
+const lowCanvas = document.getElementById('lowStrip');
+const beatSpacingLow = 170, beatIntervalMs = 800, speedLow = beatSpacingLow / beatIntervalMs;
+let lowSeverity = 0;
+let lowMode = 'static';
+let animStart = 0, animDurationMs = 0, animEventWorldStart = 0, animCascade = false, animTorsadesEndWorld = 0;
+let rafId = null, labelTimeoutId = null;
+
+function qrsComplexLow(x, cx) { const d = x - cx; if (d < -3 || d > 2.5) return 0; if (d < -1) return (d + 3) * -4; if (d < 0) return -8 + (d + 1) * 88; if (d < 1) return 80 - d * 104; return -24 + (d - 1) * 16; }
+function stDepression(x, cx, s) { const dep = Math.min(s, 100) * 0.045; const d = x - (cx + 10); if (Math.abs(d) > 8) return 0; return -dep * Math.exp(-(d*d)/25); }
+function tWaveLow(x, cx, s) { const tAmp = 9 - s * 0.13; const d = x - (cx + 19); if (Math.abs(d) > 9) return 0; return tAmp * Math.exp(-(d*d)/16); }
+function uWave(x, cx, s) { const uAmp = Math.min(s * 0.11, 11); if (uAmp < 0.3) return 0; const d = x - (cx + 33); if (Math.abs(d) > 8) return 0; return uAmp * Math.exp(-(d*d)/18); }
+function normalBeat(cx, s) { return pWave(cx,30,4) + qrsComplexLow(cx,60) + stDepression(cx,60,s) + tWaveLow(cx,60,s) + uWave(cx,60,s); }
+function pvcComplex(x, cx) { const d = x - cx; if (Math.abs(d) > 14) return 0; if (d < -6) return 0; if (d < -2) return (d + 6) * 9; if (d < 3) return 36 - (d + 2) * 10; return -14 + (d - 3) * 3; }
+function torsadesY(worldX) {
+  const freq = 0.16;
+  const phase = worldX * freq;
+  const s = Math.sin(phase);
+  const shape = Math.sign(s) * Math.pow(Math.abs(s), 0.6);
+  const envFreq = 0.0126;
+  const envelope = 0.4 + 0.6 * Math.abs(Math.sin(worldX * envFreq));
+  const baseAmp = 90;
+  return shape * baseAmp * envelope;
+}
+
+function lowStageLabel(s){
+  if (s < 20) return 'Normal sinus rhythm';
+  if (s < 45) return 'T wave flattening, mild ST depression';
+  if (s < 70) return 'ST depression, T inversion, U wave emerging';
+  return 'Prominent U wave — torsades risk if ectopy occurs';
+}
+
+function drawLowStatic(){
+  const { ctx, w, h } = fitCanvas(lowCanvas);
+  ctx.clearRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  ctx.strokeStyle = '#3fae3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const midY = h/2;
+  for (let x = 0; x < w; x++) {
+    const cx = x % beatSpacingLow;
+    const y = midY - normalBeat(cx, lowSeverity);
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function drawLowAnimFrame(){
+  const elapsed = performance.now() - animStart;
+  if (elapsed >= animDurationMs) {
+    lowMode = 'static';
+    drawLowStatic();
+    return;
+  }
+  const { ctx, w, h } = fitCanvas(lowCanvas);
+  const offset = elapsed * speedLow;
+  ctx.clearRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  ctx.strokeStyle = '#3fae3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const midY = h/2;
+  for (let x = 0; x < w; x++) {
+    const worldX = x + offset;
+    let val;
+    if (animCascade && worldX >= animEventWorldStart && worldX < animTorsadesEndWorld) {
+      val = worldX < animEventWorldStart + beatSpacingLow*0.4 ? pvcComplex(worldX, animEventWorldStart+20) : torsadesY(worldX - animEventWorldStart);
+    } else if (!animCascade && worldX >= animEventWorldStart && worldX < animEventWorldStart + beatSpacingLow) {
+      val = pvcComplex(worldX, animEventWorldStart+20);
+    } else {
+      val = normalBeat(worldX % beatSpacingLow, lowSeverity);
+    }
+    const y = midY - val;
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  rafId = requestAnimationFrame(drawLowAnimFrame);
+}
+
+document.getElementById('lowSlider').addEventListener('input', e => {
+  lowSeverity = parseFloat(e.target.value);
+  document.getElementById('lowStage').textContent = lowStageLabel(lowSeverity);
+  if (lowMode === 'static') drawLowStatic();
+});
+
+document.getElementById('pvcBtn').addEventListener('click', () => {
+  animCascade = lowSeverity >= 55;
+  animEventWorldStart = beatSpacingLow * 4 - 20;
+  animTorsadesEndWorld = animEventWorldStart + beatSpacingLow * 6;
+  animDurationMs = (animCascade ? 12 : 7) * beatIntervalMs;
+  lowMode = 'anim';
+  animStart = performance.now();
+  document.getElementById('eventLabel').textContent = '\u00a0';
+  if (labelTimeoutId) clearTimeout(labelTimeoutId);
+  const msUntilEvent = animEventWorldStart / speedLow;
+  labelTimeoutId = setTimeout(() => {
+    document.getElementById('eventLabel').textContent = animCascade
+      ? 'PVC lands on the T wave — R-on-T triggers torsades'
+      : 'Isolated PVC — did not land on the vulnerable window, rhythm resumes';
+  }, msUntilEvent);
+  if (rafId) cancelAnimationFrame(rafId);
+  drawLowAnimFrame();
+});
+
+window.addEventListener('resize', () => { if (lowMode === 'static' && document.getElementById('hypokView').style.display === 'block') drawLowStatic(); });
+
+/* ---------- Hypercalcemia ---------- */
+const caCanvas = document.getElementById('caStrip');
+let caSeverity = 0;
+
+function jWave(x, cx, amp) { if (amp < 0.5) return 0; const d = x - (cx + 4); if (Math.abs(d) > 4) return 0; return amp * Math.exp(-(d*d)/4); }
+
+function drawCa(){
+  const { ctx, w, h } = fitCanvas(caCanvas);
+  ctx.clearRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  ctx.strokeStyle = '#3fae3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const midY = h/2, beatSpacing = 170;
+  const tCenterOffset = 19 - caSeverity * 0.13;
+  const tSigma = 9 - caSeverity * 0.02;
+  const jAmp = caSeverity > 70 ? (caSeverity - 70) * 0.5 : 0;
+  for (let x = 0; x < w; x++) {
+    const cx = x % beatSpacing;
+    const val = pWave(cx,30,4) + qrsComplexLow(cx,60) + jWave(cx,60,jAmp) + tWaveHigh(cx,60,tCenterOffset,tSigma,9);
+    const y = midY - val;
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function caStageLabel(s){
+  if (s < 20) return 'Normal sinus rhythm';
+  if (s < 50) return 'ST segment shortening, QT narrowing';
+  if (s < 80) return 'QT markedly shortened — bradycardia, AV block risk rising';
+  return 'Osborn-like J waves — malignant arrhythmia risk';
+}
+
+document.getElementById('caSlider').addEventListener('input', e => {
+  caSeverity = parseFloat(e.target.value);
+  document.getElementById('caStage').textContent = caStageLabel(caSeverity);
+  drawCa();
+});
+window.addEventListener('resize', () => { if (document.getElementById('hypercaView').style.display === 'block') drawCa(); });
+
+/* ---------- Hypocalcemia ---------- */
+const hypocaCanvas = document.getElementById('hypocaStrip');
+let hypocaSeverity = 0;
+
+function drawHypoCa(){
+  const { ctx, w, h } = fitCanvas(hypocaCanvas);
+  ctx.clearRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  ctx.strokeStyle = '#3fae3f';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const midY = h/2, beatSpacing = 170;
+  const tCenterOffset = 19 + hypocaSeverity * 0.35;
+  for (let x = 0; x < w; x++) {
+    const cx = x % beatSpacing;
+    const val = pWave(cx,30,4) + qrsComplexLow(cx,60) + tWaveHigh(cx,60,tCenterOffset,9,9);
+    const y = midY - val;
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function hypocaStageLabel(s){
+  if (s < 20) return 'Normal sinus rhythm';
+  if (s < 50) return 'ST segment prolonging, QT lengthening';
+  if (s < 80) return 'QT markedly prolonged — torsades risk rising';
+  return 'Severely prolonged QT — high torsades risk';
+}
+
+document.getElementById('hypocaSlider').addEventListener('input', e => {
+  hypocaSeverity = parseFloat(e.target.value);
+  document.getElementById('hypocaStage').textContent = hypocaStageLabel(hypocaSeverity);
+  drawHypoCa();
+});
+window.addEventListener('resize', () => { if (document.getElementById('hypocaView').style.display === 'block') drawHypoCa(); });
+
+/* ---------- Lightbox ---------- */
+function openLightbox(src, alt){
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxImg').alt = alt || '';
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.querySelectorAll('.strip-gallery img, .term-toggle-body img').forEach(img => {
+  img.addEventListener('click', () => openLightbox(img.src, img.alt));
+});
+
+/* ---------- Corrected calcium calculator ---------- */
+function calcCorrectedCa(measuredId, albuminId, resultId){
+  const measured = parseFloat(document.getElementById(measuredId).value);
+  const albumin = parseFloat(document.getElementById(albuminId).value);
+  const resultEl = document.getElementById(resultId);
+  if (isNaN(measured) || isNaN(albumin)) { resultEl.textContent = 'Corrected Ca: \u2014'; return; }
+  const corrected = measured + 0.8 * (4.0 - albumin);
+  resultEl.innerHTML = 'Corrected Ca: <strong>' + corrected.toFixed(2) + ' mg/dL</strong>';
+}
+</script>
+
+</body>
+</html>
