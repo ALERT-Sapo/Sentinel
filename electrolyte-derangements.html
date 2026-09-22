@@ -96,6 +96,13 @@
   .calc-result { font-size: 13px; font-weight: 600; color: var(--text); padding-top: 8px; margin-top: 2px; border-top: 1px solid var(--border); }
   .calc-result strong { color: var(--green); }
 
+  .ref-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+  .ref-table th, .ref-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  .ref-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text3); }
+  .ref-table td { color: var(--text2); }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .citation-note { font-size: 11px; color: var(--text3); margin-top: 10px; line-height: 1.6; }
+
   .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   .section-sub { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
 
@@ -162,6 +169,16 @@
         <div class="case-title">Hypocalcemia</div>
         <div class="case-meta">Low Ca²⁺ — QT prolongation, torsades risk</div>
         <div class="normal-chip" style="margin-top: 8px;">Normal Ca²⁺: 8.5–10.5 mg/dL</div>
+      </div>
+      <div class="case-card" onclick="showDerangement('hypermag')">
+        <div class="case-title">Hypermagnesemia</div>
+        <div class="case-meta">Elevated Mg²⁺ — DTR loss, resp. depression, bradycardia</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal Mg²⁺: 1.7–2.2 mg/dL</div>
+      </div>
+      <div class="case-card" onclick="showDerangement('hypomag')">
+        <div class="case-title">Hypomagnesemia</div>
+        <div class="case-meta">Low Mg²⁺ — neuromuscular signs, often not isolated</div>
+        <div class="normal-chip" style="margin-top: 8px;">Normal Mg²⁺: 1.7–2.2 mg/dL</div>
       </div>
     </div>
   </div>
@@ -444,6 +461,104 @@
     <div class="dial-row">
       <div class="dial-label-row"><span class="anchor">Normal baseline</span><span>Severe hypocalcemia</span></div>
       <input type="range" id="hypocaSlider" min="0" max="100" step="0.5" value="0" />
+    </div>
+  </div>
+
+  <div class="detail-view" id="hypermagView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hypermagnesemia</div>
+    <div class="detail-sub">Elevated serum magnesium</div>
+    <div class="normal-chip" style="margin-bottom: 1.25rem;">Normal Mg²⁺: 1.7–2.2 mg/dL</div>
+
+    <div class="caveat-card">
+      <strong>No dial for this one:</strong> unlike the derangements above, this page has no interactive EKG trace. Magnesium's cardiac effects are real, but there isn't the same clean, isolated evidence base to calibrate a dial against — so this page leans on signs and a clinical monitoring parameter instead of a rhythm to recognize.
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms — a predictable progression</div>
+      <div class="sx-row"><span class="sx-sys">Neuromuscular</span><span class="sx-desc"><strong>Deep tendon reflex (DTR) loss is the classic early warning sign</strong> — reflexes diminish and then disappear in a fairly predictable, stepwise way as levels climb, well before respiratory or cardiac compromise. This is the actual bedside monitoring parameter, not the EKG.</span></div>
+      <div class="sx-row"><span class="sx-sys">Respiratory</span><span class="sx-desc">Mg²⁺ blocks neuromuscular transmission — at high levels this extends to the diaphragm, causing respiratory depression and, in severe toxicity, respiratory failure.</span></div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">Magnesium acts like a physiologic calcium channel blocker — bradycardia and hypotension are expected, with progression toward heart block or asystole at extreme levels. Real risk, just without a validated single-lead signature to show here.</span></div>
+      <div class="sx-row"><span class="sx-sys">General</span><span class="sx-desc">Lethargy and sedation, tracking the same progression as the reflex loss above.</span></div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">Serum Mg²⁺ reference thresholds</div>
+      <table class="ref-table">
+        <thead><tr><th>Serum Mg²⁺ (mg/dL)</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>4.9–8.5</td><td>Therapeutic range for seizure prophylaxis</td></tr>
+          <tr><td>8.5–12.2</td><td>Loss of deep tendon reflexes</td></tr>
+          <tr><td>12.2–15.8</td><td>Respiratory paralysis</td></tr>
+          <tr><td>&gt;18.2</td><td>Altered cardiac conduction</td></tr>
+          <tr><td>&gt;30</td><td>Cardiac arrest</td></tr>
+        </tbody>
+      </table>
+      <div class="citation-note">
+        American College of Obstetricians and Gynecologists. Gestational Hypertension and Preeclampsia: ACOG Practice Bulletin, Number 222. <em>Obstet Gynecol.</em> 2020;135(6):e237–e260. doi:10.1097/AOG.0000000000003891. PMID: 32443079. Reaffirmed/revised July 2025.
+        <br><br>
+        Worth knowing: the specific numeric cutoffs above trace back to older pharmacokinetic literature (Lu &amp; Nightingale, <em>Clin Pharmacokinet</em>, 2000) that current guidelines continue to cite rather than replace — not from sloppiness, but because generating fresh dose-toxicity data by pushing magnesium levels higher in real patients isn't something you can ethically do. Different sources report slightly different cutoffs for this reason; treat these as the general shape of the progression, not exact bright lines.
+      </div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">What to actually monitor</div>
+      <div class="sx-row"><span class="sx-sys">Cause</span><span class="sx-desc">Usually iatrogenic — renal failure plus magnesium-containing antacids or laxatives, or accumulation during magnesium sulfate treatment (e.g. eclampsia), especially with impaired renal clearance.</span></div>
+      <div class="sx-row"><span class="sx-sys">DTRs</span><span class="sx-desc">Serial patellar reflex checks are the standard bedside surveillance tool, particularly during a magnesium infusion — reflex loss is your cue to stop and reassess before it progresses further.</span></div>
+      <div class="sx-row"><span class="sx-sys">Resp &amp; LOC</span><span class="sx-desc">Respiratory rate/effort and mental status track the same progression as the reflexes — worsening in the same order.</span></div>
+      <div class="sx-row"><span class="sx-sys">Renal</span><span class="sx-desc">Urine output matters directly — the kidneys are the primary route of elimination, so reduced output means reduced clearance and a rising risk of accumulation.</span></div>
+    </div>
+  </div>
+
+  <div class="detail-view" id="hypomagView">
+    <button class="back-link" onclick="backToSelector()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to derangements
+    </button>
+    <div class="detail-title">Hypomagnesemia</div>
+    <div class="detail-sub">Low serum magnesium</div>
+    <div class="normal-chip" style="margin-bottom: 1.25rem;">Normal Mg²⁺: 1.7–2.2 mg/dL</div>
+
+    <div class="caveat-card">
+      <strong>No dial for this one, and here's why:</strong> most of what's taught about hypomagnesemia's EKG changes comes from literature that didn't exclude patients with coexisting K⁺ or Ca²⁺ disturbances — so it's genuinely unclear what belongs to magnesium alone. Building a confident-looking dial here would be teaching something the evidence doesn't actually support.
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">Signs &amp; symptoms</div>
+      <div class="sx-row"><span class="sx-sys">Cardiac</span><span class="sx-desc">Real arrhythmia risk. QT prolongation and increased dispersion of ventricular repolarization are confirmed findings in isolated hypomagnesemia — genuine torsades risk, just via QT/repolarization changes rather than the classic U-wave/ST-depression story borrowed from hypoK.</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuromuscular</span><span class="sx-desc">Tremor, hyperreflexia, muscle weakness, fasciculations, and in severe cases tetany or seizures. Can also produce positive <strong>Chvostek's and Trousseau's signs</strong> — magnesium deficiency impairs PTH secretion, causing a secondary hypocalcemia.</span></div>
+      <div class="sx-row"><span class="sx-sys">General</span><span class="sx-desc">Rarely occurs in isolation — frequently found alongside hypokalemia and/or hypocalcemia, and is a common reason those don't correct on replacement alone (see the hypokalemia treatment page).</span></div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">Treating torsades — this isn't just replacement</div>
+      <div class="tx-intro">IV magnesium is first-line for torsades de pointes <strong>regardless of the patient's own magnesium level</strong> — even someone with a normal serum Mg²⁺ gets it, because the membrane-stabilizing effect is what's doing the work here, not correcting a deficiency.</div>
+      <div class="tx-item">
+        <div class="tx-name">Unstable / pulseless</div>
+        <div class="tx-desc">1–2 g IV/IO push, diluted, given fast — this is the cardiac arrest dosing when torsades or suspected hypomagnesemia is the cause.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Stable, has a pulse</div>
+        <div class="tx-desc">1–2 g IV loading dose over 5–60 minutes (faster toward the unstable end of that range), then an infusion of roughly 0.5–2 g/hr, titrated to control the rhythm. Repeat the loading dose once if there's no effect.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Watch for</div>
+        <div class="tx-desc">You're pushing a real dose fast — once the rhythm is controlled, monitor for the same things covered on the hypermagnesemia page (reflex loss, respiratory depression). Correcting one derangement can create the other if you're not watching.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Avoid</div>
+        <div class="tx-desc">Amiodarone and procainamide can prolong the QT further and make torsades worse — not the antiarrhythmics to reach for here.</div>
+      </div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-title">What to actually monitor</div>
+      <div class="sx-row"><span class="sx-sys">Correlate</span><span class="sx-desc">Because isolated hypomagnesemia's own EKG picture is unclear, the more useful move is checking K⁺ and Ca²⁺ alongside it — if either is also low and not correcting as expected, magnesium is the first thing to suspect.</span></div>
+      <div class="sx-row"><span class="sx-sys">Telemetry</span><span class="sx-desc">Still warranted given the real (if not precisely characterized) arrhythmia risk — just don't expect a specific, recognizable morphology the way you would with the other derangements on this page.</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuro checks</span><span class="sx-desc">Reflexes and mental status — hyperreflexia and tremor are more reliably tied to magnesium itself than anything on the strip.</span></div>
     </div>
   </div>
 
