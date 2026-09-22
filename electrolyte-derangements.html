@@ -102,6 +102,7 @@
   .ref-table td { color: var(--text2); }
   .ref-table tr:last-child td { border-bottom: none; }
   .citation-note { font-size: 11px; color: var(--text3); margin-top: 10px; line-height: 1.6; }
+  .citation-note a { color: var(--blue); }
 
   .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
   .section-sub { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
@@ -534,11 +535,28 @@
     </div>
 
     <div class="ref-card">
+      <div class="ref-title">What to actually monitor</div>
+      <div class="sx-row"><span class="sx-sys">Correlate</span><span class="sx-desc">Because isolated hypomagnesemia's own EKG picture is unclear, the more useful move is checking K⁺ and Ca²⁺ alongside it — if either is also low and not correcting as expected, magnesium is the first thing to suspect.</span></div>
+      <div class="sx-row"><span class="sx-sys">Telemetry</span><span class="sx-desc">Still warranted given the real (if not precisely characterized) arrhythmia risk — just don't expect a specific, recognizable morphology the way you would with the other derangements on this page.</span></div>
+      <div class="sx-row"><span class="sx-sys">Neuro checks</span><span class="sx-desc">Reflexes and mental status — hyperreflexia and tremor are more reliably tied to magnesium itself than anything on the strip.</span></div>
+    </div>
+
+    <div class="ref-card">
       <div class="ref-title">Treating torsades — this isn't just replacement</div>
       <div class="tx-intro">IV magnesium is first-line for torsades de pointes <strong>regardless of the patient's own magnesium level</strong> — even someone with a normal serum Mg²⁺ gets it, because the membrane-stabilizing effect is what's doing the work here, not correcting a deficiency.</div>
       <div class="tx-item">
-        <div class="tx-name">Unstable / pulseless</div>
-        <div class="tx-desc">1–2 g IV/IO push, diluted, given fast — this is the cardiac arrest dosing when torsades or suspected hypomagnesemia is the cause.</div>
+        <div class="tx-name">Often paroxysmal</div>
+        <div class="tx-desc">Torsades frequently starts, runs for a few seconds to a minute, and self-terminates on its own — the classic presentation in long QT syndrome, congenital or acquired. Recurrent, self-limiting runs cause palpitations, presyncope, or brief syncope, with the patient waking back up in sinus rhythm before anyone's even shocked them. "Torsades with a pulse" is a real, distinct category, not an edge case.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Pulseless</div>
+        <div class="tx-desc">Straightforward — this is the cardiac arrest algorithm. Immediate unsynchronized defibrillation, no attempt at sync, same as VF. Magnesium (1–2 g IV/IO push, diluted, given fast) is an adjunct given alongside CPR and defibrillation, not a substitute for shocking.</div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-name">Unstable, but still has a pulse</div>
+        <div class="tx-desc">This is the part that surprises people: the usual rule is "pulse present → synchronized cardioversion," but polymorphic VT (torsades included) is its own branch on the AHA's electrical cardioversion algorithm — <strong>unsynchronized</strong> from the start, regardless of pulse status. That's because torsades' constantly shifting "twisting" QRS morphology and irregular R-R intervals usually defeat the defibrillator's sync algorithm — there's no consistent R wave for it to reliably lock onto. If electrical therapy is needed, you're defibrillating, not cardioverting.
+          <div class="citation-note">American Heart Association. Electrical Cardioversion Algorithm. 2025. <a href="https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-Electrical-Cardioversion-250514.pdf" target="_blank" rel="noopener">cpr.heart.org</a></div>
+        </div>
       </div>
       <div class="tx-item">
         <div class="tx-name">Stable, has a pulse</div>
@@ -552,13 +570,6 @@
         <div class="tx-name">Avoid</div>
         <div class="tx-desc">Amiodarone and procainamide can prolong the QT further and make torsades worse — not the antiarrhythmics to reach for here.</div>
       </div>
-    </div>
-
-    <div class="ref-card">
-      <div class="ref-title">What to actually monitor</div>
-      <div class="sx-row"><span class="sx-sys">Correlate</span><span class="sx-desc">Because isolated hypomagnesemia's own EKG picture is unclear, the more useful move is checking K⁺ and Ca²⁺ alongside it — if either is also low and not correcting as expected, magnesium is the first thing to suspect.</span></div>
-      <div class="sx-row"><span class="sx-sys">Telemetry</span><span class="sx-desc">Still warranted given the real (if not precisely characterized) arrhythmia risk — just don't expect a specific, recognizable morphology the way you would with the other derangements on this page.</span></div>
-      <div class="sx-row"><span class="sx-sys">Neuro checks</span><span class="sx-desc">Reflexes and mental status — hyperreflexia and tremor are more reliably tied to magnesium itself than anything on the strip.</span></div>
     </div>
   </div>
 
