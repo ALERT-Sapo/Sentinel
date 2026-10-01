@@ -448,8 +448,13 @@ function startAnim(rhythm){
   canvas.width=Math.round(cssW*dpr); canvas.height=Math.round(cssH*dpr);
   canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
   const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
-  const W=cssW,H=cssH,MID=H/2,SCALE=H*0.34,PPS=200,ERASER=18;
-  const buf=new Float32Array(W); let xPos=0;
+  const W=cssW,H=cssH,MID=H/2,SCALE=H*0.34,ERASER=18;
+  // Sweep speed is time-based, NOT frame-based. Previously the trace advanced 1px per
+  // animation frame, so 120/144Hz desktop monitors swept 2-2.4x faster than 60Hz phones
+  // and every complex looked stretched. 60 px/s reproduces the phone look on every screen.
+  const PX_PER_SEC=60, SUB=4;
+  const GRID=H/5; // square grid boxes, fixed size regardless of canvas width
+  let xPos=0, prevVal=0;
 
   ctx.fillStyle='#020802'; ctx.fillRect(0,0,W,H);
 
@@ -457,7 +462,7 @@ function startAnim(rhythm){
     ctx.save(); ctx.beginPath(); ctx.rect(x,0,w,H); ctx.clip();
     ctx.fillStyle='#020802'; ctx.fillRect(x,0,w,H);
     ctx.strokeStyle='#0d2a0d'; ctx.lineWidth=0.5;
-    for(let gx=0;gx<=W;gx+=W/20) if(gx>=x-1&&gx<=x+w+1){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(let gx=0;gx<=W;gx+=GRID) if(gx>=x-1&&gx<=x+w+1){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
     for(let gy=0;gy<=H;gy+=H/5){ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x+w,gy);ctx.stroke();}
     ctx.restore();
   }
@@ -486,16 +491,18 @@ function startAnim(rhythm){
       if(mode==='zoll') onZollRhythmRevealed();
     }
 
-    const steps=Math.max(1,Math.ceil(PPS*dt));
-    for(let s=0;s<steps;s++){
-      const st=simT-dt+(s/steps)*dt;
-      const val=getSample(st);
-      const x=Math.floor(xPos)%W; buf[x]=val;
-      drawStrip((x+ERASER)%W,ERASER+2);
-      const px=(x-1+W)%W;
-      ctx.strokeStyle='#00e676'; ctx.lineWidth=1.8; ctx.lineCap='round';
-      ctx.beginPath(); ctx.moveTo(px,MID-buf[px]*SCALE); ctx.lineTo(x,MID-val*SCALE); ctx.stroke();
-      xPos=(xPos+1/steps)%W;
+    const dist=PX_PER_SEC*dt;
+    const n=Math.max(1,Math.ceil(dist*SUB));
+    ctx.strokeStyle='#00e676'; ctx.lineWidth=1.8; ctx.lineCap='round';
+    for(let s=1;s<=n;s++){
+      const f=s/n, st=simT-dt+f*dt, val=getSample(st);
+      const x0=xPos, x1=xPos+dist/n;
+      const px0=x0%W, px1=x1%W;
+      if(Math.floor(x1)!==Math.floor(x0)) drawStrip((Math.floor(px1)+ERASER)%W,ERASER+2);
+      if(px1>=px0){ // skip the segment that wraps from right edge back to left
+        ctx.beginPath(); ctx.moveTo(px0,MID-prevVal*SCALE); ctx.lineTo(px1,MID-val*SCALE); ctx.stroke();
+      }
+      prevVal=val; xPos=x1>=W*1000?x1%W:x1;
     }
     animId=requestAnimationFrame(frame);
   }
