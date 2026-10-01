@@ -309,11 +309,30 @@ html, body {
 </div>
 
 <script>
+/* ── WAVEFORM HELPERS ── */
+// smooth bounded noise from incommensurate sines (~[-1,1])
+function sn(t,s){return (Math.sin(t+s)+0.6*Math.sin(2.37*t+2.1*s)+0.35*Math.sin(3.91*t+3.3*s))/1.95;}
+// VF engine: phase-modulated carrier (wandering frequency) with waxing/waning envelope
+function vfWave(t,f0,amp,depth,seed){
+  const ph=2*Math.PI*f0*t+2.2*Math.sin(2*Math.PI*0.31*t+seed)+1.4*Math.sin(2*Math.PI*0.73*t+2*seed)+0.9*Math.sin(2*Math.PI*1.37*t+3*seed);
+  const env=1+depth*sn(2*Math.PI*0.32*t,seed);
+  const w=Math.sin(ph)+0.35*Math.sin(2*ph+1.3*Math.sin(2*Math.PI*0.53*t))+0.06*Math.sin(2*Math.PI*23.7*t);
+  return amp*env*w;
+}
+// seeded PRNG so irregular rhythms are deterministic
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
 const RHYTHMS = [
   { id:'vtach', shockable:true, name:'Pulseless Ventricular Tachycardia', abbr:'Pulseless V-Tach', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK as soon as the defibrillator is ready.',
     pearl:'Pulseless V-Tach is electrically identical to V-Fib in terms of management — no pulse means treat it as cardiac arrest. The organized waveform can fool you into thinking there\'s output. Always check for a pulse before deciding.',
-    gen(t){ const r=1/3.5,cw=0.42,p=t%r; return p<cw?Math.sin(Math.PI*p/cw)*1.1:-Math.sin(Math.PI*(p-cw)/(r-cw))*0.55; }
+    gen(t){
+      const cyc=2*Math.PI*3.1*t+0.25*Math.sin(2*Math.PI*0.17*t)+0.15*Math.sin(2*Math.PI*0.43*t+0.8);
+      const p=((cyc/(2*Math.PI))%1+1)%1;
+      const g=(c,w)=>{const d=((p-c+1.5)%1)-0.5;return Math.exp(-(d/w)*(d/w));};
+      const v=1.1*g(0.22,0.15)-0.35*g(0.45,0.08)-0.55*g(0.72,0.16);
+      return v-0.087+0.015*Math.sin(2*Math.PI*0.3*t);
+    }
   },
   { id:'asystole', shockable:false, name:'Asystole', abbr:'Asystole', pulse:false,
     action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes (H's & T's). Do NOT shock asystole.",
@@ -323,8 +342,7 @@ const RHYTHMS = [
   { id:'cvfib', shockable:true, name:'Coarse Ventricular Fibrillation', abbr:'Coarse V-Fib', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK as soon as the defibrillator is ready.',
     pearl:'Coarse V-Fib has higher amplitude chaos and generally responds better to defibrillation than fine V-Fib. Speed matters — every minute without defibrillation drops survival by roughly 10%. Pre-charge during CPR to minimize the hands-off interval.',
-    _s:null,
-    gen(t){ if(!this._s){this._s=[];for(let i=0;i<8;i++)this._s.push({f:1+i*1.4+Math.sin(i)*0.4,a:0.5-i*0.04,p:i*0.97});} let v=0;this._s.forEach(s=>v+=s.a*Math.sin(2*Math.PI*s.f*t+s.p));return v*0.88; }
+    gen(t){ return vfWave(t,4.8,0.52,0.5,0.7)+vfWave(t,8.3,0.16,0.7,2.6); }
   },
   { id:'nsr', shockable:false, name:'Normal Sinus Rhythm', abbr:'NSR', pulse:true,
     action:'Pulse is present. Check vital signs and proceed per clinical judgment. Do NOT shock.',
@@ -334,7 +352,13 @@ const RHYTHMS = [
   { id:'torsades', shockable:true, name:'Torsades de Pointes', abbr:'Polymorphic V-Tach', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK. Primary team will administer Magnesium 2g IVP.',
     pearl:'Torsades is a polymorphic V-Tach that twists around the baseline — the classic "twisting of the points." It\'s associated with prolonged QT. Magnesium 2g IVP is the specific antidote, but if the patient is pulseless, defibrillate first and sort out the cause after ROSC.',
-    gen(t){ const r=1/3.3,cw=0.28,p=t%r; return Math.sin(2*Math.PI*0.28*t)*(p<cw?Math.sin(Math.PI*p/cw)*1.45:0); }
+    gen(t){
+      const ph=2*Math.PI*3.8*t+0.9*Math.sin(2*Math.PI*0.23*t)+0.5*Math.sin(2*Math.PI*0.61*t+1.2);
+      const th=2*Math.PI*t/3.8+0.6*Math.sin(2*Math.PI*0.11*t+0.4);
+      const w1=(Math.exp(1.6*Math.cos(ph))-1.75)/3.2, w2=Math.sin(ph);
+      const env=1.15+0.12*Math.sin(2*Math.PI*0.07*t);
+      return env*(Math.cos(th)*w1+0.14*Math.sin(th)*w2)+0.02*Math.sin(2*Math.PI*0.3*t);
+    }
   },
   { id:'junctional', shockable:false, name:'Junctional Escape Rhythm', abbr:'Junctional Escape', pulse:true,
     action:'Pulse is present. Check vital signs and hemodynamic stability. Do NOT shock.',
@@ -344,8 +368,7 @@ const RHYTHMS = [
   { id:'fvfib', shockable:true, name:'Fine Ventricular Fibrillation', abbr:'Fine V-Fib', pulse:false,
     action:"Activate CODE BLUE. Begin HIGH QUALITY CPR. Deliver a SHOCK. Fine V-Fib can look like asystole — look closely.",
     pearl:'Fine V-Fib has low amplitude and is easy to miss or misread as asystole. Check two leads. If there\'s any doubt and the amplitude is greater than 1mm, treat it as V-Fib and shock. CPR can actually convert fine V-Fib to coarse, improving the chance of successful defibrillation.',
-    _s:null,
-    gen(t){ if(!this._s){this._s=[];for(let i=0;i<7;i++)this._s.push({f:2+i*2.2+Math.sin(i*1.3)*0.5,a:0.13-i*0.01,p:i*1.1});} let v=0;this._s.forEach(s=>v+=s.a*Math.sin(2*Math.PI*s.f*t+s.p));return v; }
+    gen(t){ return vfWave(t,6.2,0.12,0.5,1.9)+vfWave(t,10.1,0.07,0.7,3.4)+0.02*Math.sin(2*Math.PI*0.4*t); }
   },
   { id:'sbrad', shockable:false, name:'Sinus Bradycardia', abbr:'Sinus Brady', pulse:true,
     action:'Pulse is present. Check vital signs and hemodynamic stability. Do NOT shock.',
@@ -360,7 +383,19 @@ const RHYTHMS = [
   { id:'agonal', shockable:false, name:'Agonal Rhythm', abbr:'Agonal', pulse:false,
     action:'Activate CODE BLUE. Begin HIGH QUALITY CPR. Administer EPINEPHRINE. Treat reversible causes. Do NOT shock.',
     pearl:'Agonal rhythm is a dying heart — slow, wide, irregular beats as the myocardium loses all organized activity. It\'s a terminal rhythm and carries a very poor prognosis. Do not shock. High-quality CPR and aggressive treatment of reversible causes are the only interventions with any chance of ROSC.',
-    gen(t){ const r=4.8,p=t%r,cw=0.72; return p<cw?(0.55*Math.sin(Math.PI*p/cw)+0.30*Math.sin(2*Math.PI*p/cw)):0; }
+    _b:null,_r:null,
+    gen(t){
+      if(!this._b){this._r=mulberry(4242);this._b=[{s:0.6}];this._fill(this._b[0]);}
+      while(this._b[this._b.length-1].s<t+8){const L=this._b[this._b.length-1];const b={s:L.s+2.4+this._r()*3.1};this._fill(b);this._b.push(b);}
+      let lo=0,hi=this._b.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(this._b[m].s<=t)lo=m;else hi=m-1;}
+      const b=this._b[lo],x=t-b.s;let v=0.015*Math.sin(2*Math.PI*0.35*t);
+      if(x<0||x>1.4)return v;
+      v+=b.a*Math.exp(-Math.pow((x-b.w*0.45)/(b.w*0.28),2));
+      v+=b.n*b.a*Math.exp(-Math.pow((x-b.w*0.8)/(b.w*0.18),2));
+      v+=b.ta*Math.exp(-Math.pow((x-b.w-0.25)/0.16,2));
+      return v;
+    },
+    _fill(b){const r=this._r;b.w=0.32+r()*0.16;const pol=r()<0.3?-1:1;b.a=pol*(0.45+r()*0.4);b.n=-0.25+r()*0.6;b.ta=-pol*(0.15+r()*0.15);}
   }
 ];
 
