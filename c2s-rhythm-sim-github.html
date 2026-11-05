@@ -1,0 +1,459 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}*{box-sizing:border-box}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>C2S Rhythm Sim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an instrument with two faces. A private queue console, then a full-bleed monitor learners can watch. */
+:root {
+  color-scheme: dark;
+  --bg: #050a07;
+  --panel: #0c1511;
+  --panel-2: #131f19;
+  --line: #24352c;
+  --fg: #dfeee5;
+  --muted: #8aa497;
+  --trace: #00e676;
+  --trace-ink: #02190d;
+  --grid: #0d2a18;
+  --grid-major: #154227;
+  --shock: #ff5a4d;
+  --shock-bg: #2a0d0a;
+  --noshock: #4db4ff;
+  --noshock-bg: #08202f;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--display); font-size: 17px; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--trace); outline-offset: 2px; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+.face { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+
+/* Queue console */
+.console-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px; }
+.console { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.intro { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 2px; }
+h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .01em; text-wrap: balance; }
+.intro p { margin: 0; color: var(--muted); font-size: 18px; font-weight: 500; }
+.picks { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group-label { font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.group-label.shock { color: var(--shock); }
+.group-label.noshock { color: var(--noshock); }
+.rhythm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 8px; }
+.pick { display: flex; flex-direction: column; gap: 4px; padding: 9px 10px 7px; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; font-size: 18px; font-weight: 600; line-height: 1.1; min-width: 0; }
+.pick:hover { background: var(--panel-2); border-color: var(--muted); }
+.pick canvas { display: block; width: 100%; height: 30px; }
+.queue { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.queue-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.queue-head h2 { margin: 0; font-size: 21px; font-weight: 700; }
+.text-btn { background: none; border: 0; padding: 4px 2px; color: var(--muted); font-size: 16px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.queue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.queue-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 6px 6px 8px; background: var(--panel-2); border-radius: 5px; }
+.queue-num { font-family: var(--mono); font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.queue-name { font-size: 18px; font-weight: 600; line-height: 1.1; min-width: 0; }
+.queue-tag { display: block; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.queue-tag.shock { color: var(--shock); }
+.queue-tag.noshock { color: var(--noshock); }
+.queue-tag.random { color: var(--muted); }
+.row-btns { display: flex; gap: 3px; }
+.row-btn { width: 34px; height: 34px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; font-family: var(--mono); font-size: 15px; line-height: 1; }
+.empty { margin: 0; padding: 14px 8px; color: var(--muted); font-size: 17px; }
+.random-btn { padding: 10px; background: none; border: 1px dashed var(--muted); border-radius: 6px; font-size: 18px; font-weight: 600; }
+.random-btn:hover { background: var(--panel-2); }
+.hint { margin: 0; color: var(--muted); font-size: 15.5px; line-height: 1.3; font-weight: 500; }
+.start-bar { flex: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px; background: var(--panel); border-top: 1px solid var(--line); }
+.start-inner { max-width: 1120px; margin: 0 auto; }
+
+/* Shared action button */
+.primary { width: 100%; min-height: 60px; padding: 10px 16px; background: var(--trace); color: var(--trace-ink); border: 0; border-radius: 7px; font-size: 25px; font-weight: 700; letter-spacing: .02em; touch-action: manipulation; }
+.primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+/* Monitor */
+#monitor { background: var(--bg); user-select: none; -webkit-user-select: none; }
+.mon-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); padding-block: 8px; font-family: var(--mono); font-size: 14px; color: var(--trace); border-bottom: 1px solid var(--grid-major); }
+.mon-head > * { min-width: 0; }
+.lead { white-space: nowrap; }
+.sim-tag { margin-left: 8px; padding: 1px 5px; border: 1px solid var(--muted); border-radius: 3px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; }
+.mon-right { display: flex; align-items: center; gap: 12px; }
+.hands-off { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
+.hands-off.over { color: var(--shock); font-weight: 600; }
+.rep-chip { padding: 6px 9px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font-family: var(--mono); font-size: 13px; white-space: nowrap; touch-action: none; }
+.rep-chip.peek { color: var(--fg); border-color: var(--muted); }
+.screen { position: relative; flex: 1; min-height: 0; background: var(--bg); overflow: hidden; }
+.screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.status { position: absolute; top: 9px; left: max(14px, env(safe-area-inset-left, 0px)); font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--trace); letter-spacing: .06em; pointer-events: none; }
+.answer { position: absolute; top: 34px; left: max(12px, env(safe-area-inset-left, 0px)); max-width: min(440px, calc(100% - 24px)); padding: 10px 14px 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; display: flex; flex-direction: column; gap: 2px; }
+.answer-call { font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: .02em; }
+.answer-call.shock { color: var(--shock); }
+.answer-call.noshock { color: var(--noshock); }
+.answer-name { font-size: 21px; font-weight: 600; }
+.answer-do { font-size: 17px; font-weight: 500; color: var(--muted); line-height: 1.2; }
+.mon-foot { flex: none; display: flex; gap: 8px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); padding-block: 8px; border-top: 1px solid var(--grid-major); }
+.side-btn { min-height: 60px; padding: 8px 14px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; font-size: 19px; font-weight: 600; touch-action: manipulation; }
+.side-btn:hover { border-color: var(--muted); }
+.mon-foot .primary { flex: 1; width: auto; min-width: 0; }
+.primary.resume { background: var(--panel-2); color: var(--trace); box-shadow: inset 0 0 0 2px var(--trace); }
+
+@media (max-width: 760px) {
+  .console { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .queue { position: static; order: -1; grid-row: 2; }
+  .intro { grid-row: 1; }
+  .picks { grid-row: 3; }
+  h1 { font-size: 28px; }
+  .rhythm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-height: 460px) {
+  .mon-head { padding-block: 4px; }
+  .mon-foot { padding-block: 5px; }
+  .primary, .side-btn { min-height: 46px; }
+  .primary { font-size: 21px; }
+  .answer { padding: 7px 11px; }
+  .answer-call { font-size: 25px; }
+  .answer-name { font-size: 18px; }
+  .answer-do { font-size: 15px; }
+}
+@media (max-width: 460px) {
+  .lead-extra { display: none; }
+  .side-btn { padding: 8px 10px; font-size: 17px; }
+  .primary { font-size: 21px; }
+}
+</style>
+</head><body>
+
+
+<section id="setup" class="face">
+  <div class="console-scroll">
+    <div class="console">
+      <div class="intro">
+        <h1>C2S Rhythm Sim</h1>
+        <p>Queue the rhythms, start compressions, then show each one when the team holds.</p>
+      </div>
+      <div class="picks">
+        <div class="group">
+          <div class="group-label shock">Shock</div>
+          <div class="rhythm-grid" id="grid-shock"></div>
+        </div>
+        <div class="group">
+          <div class="group-label noshock">No shock</div>
+          <div class="rhythm-grid" id="grid-noshock"></div>
+        </div>
+      </div>
+      <aside class="queue" aria-label="Rhythm queue">
+        <div class="queue-head">
+          <h2 id="queue-title">Queue</h2>
+          <button class="text-btn" id="clear-btn" type="button">Clear</button>
+        </div>
+        <ol class="queue-list" id="queue-list"></ol>
+        <p class="empty" id="queue-empty" hidden>Tap a rhythm to add it.</p>
+        <button class="random-btn" id="random-btn" type="button">+ Random, 50/50 shock</button>
+        <p class="hint">On the monitor, press and hold the rep counter to check the queued rhythm. Space, Enter or a presentation clicker also works the main button.</p>
+      </aside>
+    </div>
+  </div>
+  <div class="start-bar">
+    <div class="start-inner">
+      <button class="primary" id="start-btn" type="button">Start compressions</button>
+    </div>
+  </div>
+</section>
+
+<section id="monitor" class="face" hidden>
+  <div class="mon-head">
+    <div class="lead">II <span class="lead-extra">&nbsp;x1&nbsp; 25 mm/s</span><span class="sim-tag">SIM</span></div>
+    <div class="mon-right">
+      <span class="hands-off" id="hands-off" aria-live="off"></span>
+      <button class="rep-chip" id="rep-chip" type="button" aria-label="Press and hold to check the queued rhythm"></button>
+    </div>
+  </div>
+  <div class="screen" id="screen">
+    <canvas id="trace"></canvas>
+    <div class="status" id="status"></div>
+    <div class="answer" id="answer" hidden>
+      <div class="answer-call" id="answer-call"></div>
+      <div class="answer-name" id="answer-name"></div>
+      <div class="answer-do" id="answer-do"></div>
+    </div>
+  </div>
+  <div class="mon-foot">
+    <button class="side-btn" id="exit-btn" type="button">Queue</button>
+    <button class="side-btn" id="answer-btn" type="button" hidden>Answer</button>
+    <button class="primary" id="main-btn" type="button">Show rhythm</button>
+  </div>
+</section>
+
+<script>
+/* ── WAVEFORMS: same generators as the Sentinel Shock or No Shock quiz ── */
+function sn(t,s){return (Math.sin(t+s)+0.6*Math.sin(2.37*t+2.1*s)+0.35*Math.sin(3.91*t+3.3*s))/1.95;}
+function vfWave(t,f0,amp,depth,seed){
+  const ph=2*Math.PI*f0*t+2.2*Math.sin(2*Math.PI*0.31*t+seed)+1.4*Math.sin(2*Math.PI*0.73*t+2*seed)+0.9*Math.sin(2*Math.PI*1.37*t+3*seed);
+  const env=1+depth*sn(2*Math.PI*0.32*t,seed);
+  const w=Math.sin(ph)+0.35*Math.sin(2*ph+1.3*Math.sin(2*Math.PI*0.53*t))+0.06*Math.sin(2*Math.PI*23.7*t);
+  return amp*env*w;
+}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+const RHYTHMS = [
+  { id:'cvfib', shockable:true, pulse:false, name:'Coarse V-Fib',
+    gen(t){ return vfWave(t,4.8,0.52,0.5,0.7)+vfWave(t,8.3,0.16,0.7,2.6); } },
+  { id:'fvfib', shockable:true, pulse:false, name:'Fine V-Fib',
+    gen(t){ return vfWave(t,6.2,0.12,0.5,1.9)+vfWave(t,10.1,0.07,0.7,3.4)+0.02*Math.sin(2*Math.PI*0.4*t); } },
+  { id:'vtach', shockable:true, pulse:false, name:'Pulseless V-Tach',
+    gen(t){
+      const cyc=2*Math.PI*3.1*t+0.25*Math.sin(2*Math.PI*0.17*t)+0.15*Math.sin(2*Math.PI*0.43*t+0.8);
+      const p=((cyc/(2*Math.PI))%1+1)%1;
+      const g=(c,w)=>{const d=((p-c+1.5)%1)-0.5;return Math.exp(-(d/w)*(d/w));};
+      const v=1.1*g(0.22,0.15)-0.35*g(0.45,0.08)-0.55*g(0.72,0.16);
+      return v-0.087+0.015*Math.sin(2*Math.PI*0.3*t);
+    } },
+  { id:'torsades', shockable:true, pulse:false, name:'Torsades',
+    gen(t){
+      const ph=2*Math.PI*3.8*t+0.9*Math.sin(2*Math.PI*0.23*t)+0.5*Math.sin(2*Math.PI*0.61*t+1.2);
+      const th=2*Math.PI*t/3.8+0.6*Math.sin(2*Math.PI*0.11*t+0.4);
+      const w1=(Math.exp(1.6*Math.cos(ph))-1.75)/3.2, w2=Math.sin(ph);
+      const env=1.15+0.12*Math.sin(2*Math.PI*0.07*t);
+      return env*(Math.cos(th)*w1+0.14*Math.sin(th)*w2)+0.02*Math.sin(2*Math.PI*0.3*t);
+    } },
+  { id:'asystole', shockable:false, pulse:false, name:'Asystole',
+    gen(t){ return Math.sin(t*7.3)*0.03+Math.sin(t*13.1)*0.02; } },
+  { id:'pea', shockable:false, pulse:false, name:'PEA',
+    gen(t){ const r=1.09,p=t%r; if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 0.90*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.22*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.18*Math.sin(Math.PI*(p-0.26)/0.20); return 0; } },
+  { id:'agonal', shockable:false, pulse:false, name:'Agonal',
+    _b:null,_r:null,
+    gen(t){
+      if(!this._b){this._r=mulberry(4242);this._b=[{s:0.6}];this._fill(this._b[0]);}
+      while(this._b[this._b.length-1].s<t+8){const L=this._b[this._b.length-1];const b={s:L.s+2.4+this._r()*3.1};this._fill(b);this._b.push(b);}
+      let lo=0,hi=this._b.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(this._b[m].s<=t)lo=m;else hi=m-1;}
+      const b=this._b[lo],x=t-b.s;let v=0.015*Math.sin(2*Math.PI*0.35*t);
+      if(x<0||x>1.4)return v;
+      v+=b.a*Math.exp(-Math.pow((x-b.w*0.45)/(b.w*0.28),2));
+      v+=b.n*b.a*Math.exp(-Math.pow((x-b.w*0.8)/(b.w*0.18),2));
+      v+=b.ta*Math.exp(-Math.pow((x-b.w-0.25)/0.16,2));
+      return v;
+    },
+    _fill(b){const r=this._r;b.w=0.32+r()*0.16;const pol=r()<0.3?-1:1;b.a=pol*(0.45+r()*0.4);b.n=-0.25+r()*0.6;b.ta=-pol*(0.15+r()*0.15);} },
+  { id:'nsr', shockable:false, pulse:true, name:'Normal Sinus',
+    gen(t){ const r=0.83,p=t%r; if(p<0.09)return 0.18*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.12*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 1.15*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.28*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.22*Math.sin(Math.PI*(p-0.26)/0.20); return 0; } },
+  { id:'sbrad', shockable:false, pulse:true, name:'Sinus Brady',
+    gen(t){ const r=1.67,p=t%r; if(p<0.09)return 0.18*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.12*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 1.15*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.28*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.22*Math.sin(Math.PI*(p-0.26)/0.20); return 0; } },
+  { id:'junctional', shockable:false, pulse:true, name:'Junctional Escape',
+    gen(t){ const r=1.43,p=t%r; if(p<0.07)return 1.05*Math.sin(Math.PI*p/0.07); if(p>=0.07&&p<0.11)return -0.22*Math.sin(Math.PI*(p-0.07)/0.04); if(p>=0.13&&p<0.33)return 0.18*Math.sin(Math.PI*(p-0.13)/0.20); return 0; } }
+];
+const BY_ID = Object.fromEntries(RHYTHMS.map(r => [r.id, r]));
+const SHOCK = RHYTHMS.filter(r => r.shockable);
+const NOSHOCK = RHYTHMS.filter(r => !r.shockable);
+
+/* Compressions: about 110/min, uneven beat to beat. Knows nothing about the queued rhythm. */
+function beatHash(n){ const x=Math.sin(n*12.9898+4.1)*43758.5453; return x-Math.floor(x); }
+function cprArtifact(t){
+  const ph=1.84*t+0.09*Math.sin(2*Math.PI*0.11*t)+0.05*Math.sin(2*Math.PI*0.29*t+1);
+  const n=Math.floor(ph), p=ph-n;
+  const amp=1.0+0.34*(beatHash(n)-0.5), push=0.36+0.07*beatHash(n+50);
+  let v=0;
+  if(p<push) v=amp*1.25*Math.pow(Math.sin(Math.PI*p/push),2);
+  else if(p<push+0.3) v=-amp*0.28*Math.pow(Math.sin(Math.PI*(p-push)/0.3),2);
+  return v+0.12*Math.sin(2*Math.PI*0.23*t)+0.07*Math.sin(2*Math.PI*0.41*t+0.6)+0.06*Math.sin(t*23.1)+0.04*Math.sin(t*47.3)+0.025*Math.sin(t*91.7);
+}
+
+/* ── QUEUE ── */
+const STORE_KEY='c2s-rhythm-queue';
+const STARTER=['cvfib','pea','vtach'];
+function loadQueue(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(raw){ const q=JSON.parse(raw); if(Array.isArray(q)) return q.filter(id=>id==='random'||BY_ID[id]); }
+  }catch(e){}
+  return STARTER.slice();
+}
+function saveQueue(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(queue)); }catch(e){} }
+let queue=loadQueue();
+const $=id=>document.getElementById(id);
+
+function renderQueue(){
+  const list=$('queue-list'); list.textContent='';
+  queue.forEach((id,i)=>{
+    const r=BY_ID[id], li=document.createElement('li'); li.className='queue-row';
+    const num=document.createElement('span'); num.className='queue-num'; num.textContent=i+1;
+    const name=document.createElement('span'); name.className='queue-name'; name.textContent=r?r.name:'Random';
+    const tag=document.createElement('span'); tag.className='queue-tag '+(r?(r.shockable?'shock':'noshock'):'random');
+    tag.textContent=r?(r.shockable?'Shock':'No shock'):'Hidden until you peek';
+    name.appendChild(tag);
+    const btns=document.createElement('span'); btns.className='row-btns';
+    const mk=(txt,label,fn,off)=>{const b=document.createElement('button');b.type='button';b.className='row-btn';b.textContent=txt;b.setAttribute('aria-label',label);b.disabled=!!off;b.onclick=fn;btns.appendChild(b);};
+    mk('↑','Move rep '+(i+1)+' up',()=>moveItem(i,-1),i===0);
+    mk('↓','Move rep '+(i+1)+' down',()=>moveItem(i,1),i===queue.length-1);
+    mk('×','Remove rep '+(i+1),()=>{queue.splice(i,1);commit();});
+    li.append(num,name,btns); list.appendChild(li);
+  });
+  $('queue-empty').hidden=queue.length>0;
+  $('clear-btn').hidden=queue.length===0;
+  $('queue-title').textContent=queue.length?'Queue: '+queue.length+(queue.length===1?' rep':' reps'):'Queue';
+  const start=$('start-btn');
+  start.disabled=queue.length===0;
+  start.textContent=queue.length?'Start compressions':'Add a rhythm to start';
+}
+function moveItem(i,d){ const[x]=queue.splice(i,1); queue.splice(i+d,0,x); commit(); }
+function commit(){ saveQueue(); renderQueue(); }
+
+function buildPicks(){
+  [[SHOCK,'grid-shock'],[NOSHOCK,'grid-noshock']].forEach(([set,gridId])=>{
+    set.forEach(r=>{
+      const b=document.createElement('button'); b.type='button'; b.className='pick'; b.setAttribute('aria-label','Add '+r.name+' to the queue');
+      const c=document.createElement('canvas'); c.width=320; c.height=60;
+      const s=document.createElement('span'); s.textContent=r.name;
+      b.append(s,c); b.onclick=()=>{queue.push(r.id);commit();};
+      $(gridId).appendChild(b);
+      const x=c.getContext('2d'); x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--trace').trim(); x.lineWidth=2; x.lineJoin='round'; x.beginPath();
+      for(let i=0;i<=320;i++){ const y=30-r.gen(11+i/320*3.2)*20; i?x.lineTo(i,Math.max(1,Math.min(59,y))):x.moveTo(i,y); }
+      x.stroke();
+    });
+  });
+}
+
+/* ── MONITOR STATE ── */
+const SETTLE_TO_RHYTHM=0.7, SETTLE_TO_CPR=0.3, MAX_HANDS_OFF=10;
+let run=[], rep=0, phase='idle'; // compressions | rhythm | finished
+let shown=null, blend=0, holdStart=0, simT=0, lastTS=null, rafId=null, lastTap=0, peeking=false;
+
+function resolveRun(){
+  return queue.map(id=>{
+    if(id!=='random') return BY_ID[id];
+    const pool=Math.random()<0.5?SHOCK:NOSHOCK;
+    return pool[Math.floor(Math.random()*pool.length)];
+  });
+}
+function startRun(){
+  run=resolveRun(); rep=0; phase='compressions'; shown=null; blend=0;
+  $('setup').hidden=true; $('monitor').hidden=false;
+  const root=document.documentElement;
+  try{ const p=root.requestFullscreen&&root.requestFullscreen(); if(p&&p.catch)p.catch(()=>{}); }catch(e){}
+  keepAwake(); sizeCanvas(); syncMonitor();
+  lastTS=null; if(!rafId) rafId=requestAnimationFrame(frame);
+}
+function exitRun(){
+  phase='idle'; if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  $('monitor').hidden=true; $('setup').hidden=false;
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){}
+  releaseAwake(); renderQueue();
+}
+function advance(){
+  const now=performance.now(); if(now-lastTap<500) return; lastTap=now; // a double tap must not skip a rhythm
+  if(phase==='compressions'){
+    shown=run[rep]; phase='rhythm'; holdStart=now;
+  }else if(phase==='rhythm'){
+    rep++; phase=rep<run.length?'compressions':'finished'; $('answer').hidden=true;
+  }else if(phase==='finished'){ exitRun(); return; }
+  syncMonitor();
+}
+function syncMonitor(){
+  const main=$('main-btn');
+  main.classList.toggle('resume',phase==='rhythm');
+  main.textContent=phase==='compressions'?'Show rhythm':phase==='rhythm'?'Resume compressions':'Back to queue';
+  $('status').textContent=phase==='rhythm'?'COMPRESSIONS HELD':'CPR IN PROGRESS';
+  $('answer-btn').hidden=phase!=='rhythm';
+  if(phase==='rhythm'){
+    const r=shown, call=$('answer-call');
+    call.textContent=r.shockable?'SHOCK':'NO SHOCK'; call.className='answer-call '+(r.shockable?'shock':'noshock');
+    $('answer-name').textContent=r.name;
+    $('answer-do').textContent=r.shockable?'No pulse. Clear, then shock.':r.pulse?'Pulse present. Check vitals. Do not shock.':'No pulse. Resume compressions. Give epi.';
+  }
+  drawRepChip(); $('hands-off').textContent=''; $('hands-off').classList.remove('over');
+}
+function drawRepChip(){
+  const chip=$('rep-chip'); chip.classList.toggle('peek',peeking);
+  const next=run[rep];
+  if(peeking) chip.textContent=next?next.name:'Queue done';
+  else chip.textContent=phase==='finished'?'DONE':'REP '+(rep+1)+'/'+run.length;
+}
+
+/* ── DRAWING: fixed 6-second sweep, on a true ECG grid (big box = 0.2 s) ── */
+const canvas=$('trace'), ctx=canvas.getContext('2d'), gridCanvas=document.createElement('canvas');
+let W=0,H=0,dpr=1,pps=60,xHead=0,prevY=null;
+function sizeCanvas(){
+  const box=$('screen').getBoundingClientRect(); if(!box.width||!box.height) return;
+  dpr=window.devicePixelRatio||1;
+  W=Math.round(box.width*dpr); H=Math.round(box.height*dpr);
+  canvas.width=W; canvas.height=H; gridCanvas.width=W; gridCanvas.height=H;
+  pps=W/6; xHead=0; prevY=null;
+  const css=getComputedStyle(document.documentElement), g=gridCanvas.getContext('2d');
+  g.fillStyle=css.getPropertyValue('--bg').trim(); g.fillRect(0,0,W,H);
+  const big=pps*0.2, small=big/5, mid=H*0.55;
+  const lines=(step,color,width)=>{
+    g.strokeStyle=color; g.lineWidth=width; g.beginPath();
+    for(let x=0;x<=W;x+=step){g.moveTo(x,0);g.lineTo(x,H);}
+    for(let y=mid%step;y<=H;y+=step){g.moveTo(0,y);g.lineTo(W,y);}
+    g.stroke();
+  };
+  if(small>=5*dpr) lines(small,css.getPropertyValue('--grid').trim(),1);
+  lines(big,css.getPropertyValue('--grid-major').trim(),1);
+  ctx.drawImage(gridCanvas,0,0);
+}
+function eraseAhead(x,width){
+  const start=Math.ceil(x)+Math.ceil(2*dpr), w=Math.ceil(width);
+  for(const [sx,sw] of start+w<=W?[[start,w]]:[[start,Math.max(0,W-start)],[0,start+w-W]]){
+    if(sw>0&&sx<W) ctx.drawImage(gridCanvas,sx,0,sw,H,sx,0,sw,H);
+  }
+}
+function sample(t){
+  const cpr=blend<1?cprArtifact(t):0, rhy=(blend>0&&shown)?shown.gen(t):0;
+  return cpr*(1-blend)+rhy*blend;
+}
+function frame(ts){
+  rafId=requestAnimationFrame(frame);
+  if(!W){ sizeCanvas(); if(!W) return; }
+  if(lastTS===null) lastTS=ts;
+  const dt=Math.min((ts-lastTS)/1000,0.1); lastTS=ts;
+  const target=phase==='rhythm'?1:0, rate=phase==='rhythm'?SETTLE_TO_RHYTHM:SETTLE_TO_CPR;
+  const steps=Math.max(1,Math.ceil(pps*dt/dpr*2)), mid=H*0.55, scale=Math.min(H*0.34,pps*1.5);
+  ctx.strokeStyle=getTrace(); ctx.lineWidth=2*dpr; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath();
+  for(let i=0;i<steps;i++){
+    const d=dt/steps; simT+=d;
+    blend=target>blend?Math.min(target,blend+d/rate):Math.max(target,blend-d/rate);
+    if(blend===0&&phase!=='rhythm') shown=null;
+    const nx=xHead+pps*d, y=Math.max(dpr,Math.min(H-dpr,mid-sample(simT)*scale));
+    if(prevY!==null){ ctx.moveTo(xHead,prevY); ctx.lineTo(nx,y); }
+    xHead=nx; prevY=y;
+    if(xHead>=W){ xHead-=W; }
+  }
+  ctx.stroke();
+  eraseAhead(xHead,pps*0.14);
+  if(phase==='rhythm'){
+    const s=Math.floor((performance.now()-holdStart)/1000), el=$('hands-off');
+    el.textContent='HANDS OFF 0:'+String(Math.min(s,59)).padStart(2,'0')+(s>59?'+':'');
+    el.classList.toggle('over',s>=MAX_HANDS_OFF);
+  }
+}
+let traceColor=null;
+function getTrace(){ return traceColor||(traceColor=getComputedStyle(document.documentElement).getPropertyValue('--trace').trim()); }
+
+/* Keep the screen on while teaching. Refused on some devices, which is fine. */
+let wakeLock=null;
+async function keepAwake(){ try{ if(navigator.wakeLock) wakeLock=await navigator.wakeLock.request('screen'); }catch(e){} }
+function releaseAwake(){ try{ if(wakeLock){wakeLock.release();wakeLock=null;} }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&phase!=='idle') keepAwake(); });
+
+/* ── WIRING ── */
+$('start-btn').onclick=startRun;
+$('clear-btn').onclick=()=>{queue=[];commit();};
+$('random-btn').onclick=()=>{queue.push('random');commit();};
+$('main-btn').onclick=e=>{e.currentTarget.blur();advance();};
+$('exit-btn').onclick=exitRun;
+$('answer-btn').onclick=()=>{ $('answer').hidden=!$('answer').hidden; };
+const chip=$('rep-chip');
+const peekOn=e=>{e.preventDefault();peeking=true;drawRepChip();};
+const peekOff=()=>{ if(peeking){peeking=false;drawRepChip();} };
+chip.addEventListener('pointerdown',peekOn);
+['pointerup','pointercancel','pointerleave'].forEach(n=>chip.addEventListener(n,peekOff));
+chip.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if($('monitor').hidden||e.repeat) return;
+  if([' ','Enter','ArrowRight','PageDown'].includes(e.key)){ e.preventDefault(); advance(); }
+});
+if(window.ResizeObserver) new ResizeObserver(()=>{ if(!$('monitor').hidden) sizeCanvas(); }).observe($('screen'));
+
+buildPicks(); renderQueue();
+</script>
+
+</body></html>
