@@ -89,7 +89,7 @@ h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .01em; text-w
 .screen { position: relative; flex: 1; min-height: 0; background: var(--bg); overflow: hidden; }
 .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .status { position: absolute; top: 9px; left: max(14px, env(safe-area-inset-left, 0px)); font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--trace); letter-spacing: .06em; pointer-events: none; }
-.answer { position: absolute; top: 34px; left: max(12px, env(safe-area-inset-left, 0px)); max-width: min(440px, calc(100% - 24px)); padding: 10px 14px 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; display: flex; flex-direction: column; gap: 2px; }
+.answer { position: absolute; top: 48px; left: max(12px, env(safe-area-inset-left, 0px)); max-width: min(440px, calc(100% - 24px)); padding: 10px 14px 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; display: flex; flex-direction: column; gap: 2px; }
 .answer-call { font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: .02em; }
 .answer-call.shock { color: var(--shock); }
 .answer-call.noshock { color: var(--noshock); }
@@ -100,6 +100,15 @@ h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .01em; text-w
 .side-btn:hover { border-color: var(--muted); }
 .mon-foot .primary { flex: 1; width: auto; min-width: 0; }
 .primary.resume { background: var(--panel-2); color: var(--trace); box-shadow: inset 0 0 0 2px var(--trace); }
+
+.metro-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 10px; background: var(--panel-2); border-radius: 5px; }
+.metro-label { font-size: 18px; font-weight: 600; }
+.metro-controls { display: flex; align-items: center; gap: 4px; }
+.metro-rate { min-width: 36px; text-align: center; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+.metro-toggle { min-width: 52px; height: 34px; margin-left: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font-size: 16px; font-weight: 700; }
+.metro-toggle.on { color: var(--trace); border-color: var(--trace); }
+.metro-mon { position: absolute; top: 6px; right: max(10px, env(safe-area-inset-right, 0px)); min-height: 36px; padding: 4px 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font-family: var(--mono); font-size: 13px; font-weight: 500; touch-action: manipulation; }
+.metro-mon.on { color: var(--trace); border-color: var(--trace); }
 
 @media (max-width: 760px) {
   .console { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -153,6 +162,15 @@ h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .01em; text-w
         <ol class="queue-list" id="queue-list"></ol>
         <p class="empty" id="queue-empty" hidden>Tap a rhythm to add it.</p>
         <button class="random-btn" id="random-btn" type="button">+ Random, 50/50 shock</button>
+        <div class="metro-row">
+          <span class="metro-label">Metronome</span>
+          <span class="metro-controls">
+            <button class="row-btn" id="metro-down" type="button" aria-label="Slower">&minus;</button>
+            <span class="metro-rate" id="metro-rate" aria-label="Compressions per minute">110</span>
+            <button class="row-btn" id="metro-up" type="button" aria-label="Faster">+</button>
+            <button class="metro-toggle" id="metro-toggle" type="button" aria-label="Metronome on or off">On</button>
+          </span>
+        </div>
         <p class="hint">On the monitor, press and hold the rep counter to check the queued rhythm. Space, Enter or a presentation clicker also works the main button.</p>
       </aside>
     </div>
@@ -175,6 +193,7 @@ h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .01em; text-w
   <div class="screen" id="screen">
     <canvas id="trace"></canvas>
     <div class="status" id="status"></div>
+    <button class="metro-mon" id="metro-mon" type="button" aria-label="Turn the metronome on or off"></button>
     <div class="answer" id="answer" hidden>
       <div class="answer-call" id="answer-call"></div>
       <div class="answer-name" id="answer-name"></div>
@@ -222,7 +241,7 @@ const RHYTHMS = [
     } },
   { id:'asystole', shockable:false, pulse:false, name:'Asystole',
     gen(t){ return Math.sin(t*7.3)*0.03+Math.sin(t*13.1)*0.02; } },
-  { id:'pea', shockable:false, pulse:false, name:'PEA',
+  { id:'pea', shockable:false, pulse:false, name:'PEA', pickName:'PEA (rhythm varies)',
     gen(t){ const r=1.09,p=t%r; if(p<0.09)return 0.15*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -0.10*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return 0.90*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -0.22*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return 0.18*Math.sin(Math.PI*(p-0.26)/0.20); return 0; } },
   { id:'agonal', shockable:false, pulse:false, name:'Agonal',
     _b:null,_r:null,
@@ -282,7 +301,7 @@ function renderQueue(){
     const num=document.createElement('span'); num.className='queue-num'; num.textContent=i+1;
     const name=document.createElement('span'); name.className='queue-name'; name.textContent=r?r.name:'Random';
     const tag=document.createElement('span'); tag.className='queue-tag '+(r?(r.shockable?'shock':'noshock'):'random');
-    tag.textContent=r?(r.shockable?'Shock':'No shock'):'Hidden until you peek';
+    tag.textContent=r?(r.shockable?'Shock':id==='pea'?'No shock, rhythm varies':'No shock'):'Hidden until you peek';
     name.appendChild(tag);
     const btns=document.createElement('span'); btns.className='row-btns';
     const mk=(txt,label,fn,off)=>{const b=document.createElement('button');b.type='button';b.className='row-btn';b.textContent=txt;b.setAttribute('aria-label',label);b.disabled=!!off;b.onclick=fn;btns.appendChild(b);};
@@ -306,7 +325,7 @@ function buildPicks(){
     set.forEach(r=>{
       const b=document.createElement('button'); b.type='button'; b.className='pick'; b.setAttribute('aria-label','Add '+r.name+' to the queue');
       const c=document.createElement('canvas'); c.width=320; c.height=60;
-      const s=document.createElement('span'); s.textContent=r.name;
+      const s=document.createElement('span'); s.textContent=r.pickName||r.name;
       b.append(s,c); b.onclick=()=>{queue.push(r.id);commit();};
       $(gridId).appendChild(b);
       const x=c.getContext('2d'); x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--trace').trim(); x.lineWidth=2; x.lineJoin='round'; x.beginPath();
@@ -321,14 +340,46 @@ const SETTLE_TO_RHYTHM=0.7, SETTLE_TO_CPR=0.3, MAX_HANDS_OFF=10;
 let run=[], rep=0, phase='idle'; // compressions | rhythm | finished
 let shown=null, blend=0, holdStart=0, simT=0, lastTS=null, rafId=null, lastTap=0, peeking=false;
 
+/* ── PEA: any organized rhythm can be pulseless, so each PEA rep gets a random look and rate ── */
+const between=(a,b)=>a+Math.random()*(b-a);
+function sinusLook(r,a){ return t=>{ const p=t%r;
+  if(p<0.09)return a*0.18*Math.sin(Math.PI*p/0.09); if(p>=0.11&&p<0.14)return -a*0.12*Math.sin(Math.PI*(p-0.11)/0.03); if(p>=0.14&&p<0.20)return a*1.15*Math.sin(Math.PI*(p-0.14)/0.06); if(p>=0.20&&p<0.24)return -a*0.28*Math.sin(Math.PI*(p-0.20)/0.04); if(p>=0.26&&p<0.46)return a*0.22*Math.sin(Math.PI*(p-0.26)/0.20); return 0; }; }
+function junctionalLook(r,a){ return t=>{ const p=t%r;
+  if(p<0.07)return a*1.05*Math.sin(Math.PI*p/0.07); if(p>=0.07&&p<0.11)return -a*0.22*Math.sin(Math.PI*(p-0.07)/0.04); if(p>=0.13&&p<0.33)return a*0.18*Math.sin(Math.PI*(p-0.13)/0.20); return 0; }; }
+function afibLook(a,seed){
+  const rnd=mulberry(seed); let beats=null;
+  return t=>{
+    if(!beats) beats=[t-1];
+    while(beats[beats.length-1]<t+2) beats.push(beats[beats.length-1]+0.45+rnd()*0.55);
+    let lo=0,hi=beats.length-1; while(lo<hi){const m=(lo+hi+1)>>1; if(beats[m]<=t)lo=m; else hi=m-1;}
+    const x=t-beats[lo]; let v=vfWave(t,6.5,0.035,0.5,seed%7)+0.02*Math.sin(2*Math.PI*0.3*t);
+    if(x>=0&&x<0.07) v+=a*1.05*Math.sin(Math.PI*x/0.07); else if(x>=0.07&&x<0.11) v-=a*0.22*Math.sin(Math.PI*(x-0.07)/0.04); else if(x>=0.14&&x<0.32) v+=a*0.16*Math.sin(Math.PI*(x-0.14)/0.18);
+    return v;
+  };
+}
+const bpm=(lo,hi)=>60/between(lo,hi);
+const PEA_LOOKS=[
+  {look:'Normal Sinus', make:()=>sinusLook(bpm(65,90),between(0.75,1.05))},
+  {look:'Sinus Tach', make:()=>sinusLook(bpm(105,130),between(0.7,1))},
+  {look:'Sinus Brady', make:()=>sinusLook(bpm(40,55),between(0.75,1.05))},
+  {look:'Junctional', make:()=>junctionalLook(bpm(40,60),between(0.75,1.05))},
+  {look:'A-Fib', make:()=>afibLook(between(0.75,1),Math.floor(Math.random()*1e6))}
+];
+let lastPeaLook=null;
+function peaInstance(){
+  const pool=PEA_LOOKS.filter(l=>l.look!==lastPeaLook), pick=pool[Math.floor(Math.random()*pool.length)];
+  lastPeaLook=pick.look;
+  return Object.assign({},BY_ID.pea,{look:pick.look,gen:pick.make()});
+}
 function resolveRun(){
   return queue.map(id=>{
-    if(id!=='random') return BY_ID[id];
-    const pool=Math.random()<0.5?SHOCK:NOSHOCK;
-    return pool[Math.floor(Math.random()*pool.length)];
+    let r=BY_ID[id];
+    if(id==='random'){ const pool=Math.random()<0.5?SHOCK:NOSHOCK; r=pool[Math.floor(Math.random()*pool.length)]; }
+    return r.id==='pea'?peaInstance():r;
   });
 }
 function startRun(){
+  ensureAudio();
   run=resolveRun(); rep=0; phase='compressions'; shown=null; blend=0;
   $('setup').hidden=true; $('monitor').hidden=false;
   const root=document.documentElement;
@@ -337,7 +388,7 @@ function startRun(){
   lastTS=null; if(!rafId) rafId=requestAnimationFrame(frame);
 }
 function exitRun(){
-  phase='idle'; if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  phase='idle'; updateMetro(); if(rafId){cancelAnimationFrame(rafId);rafId=null;}
   $('monitor').hidden=true; $('setup').hidden=false;
   try{ if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(e){}
   releaseAwake(); renderQueue();
@@ -361,14 +412,14 @@ function syncMonitor(){
     const r=shown, call=$('answer-call');
     call.textContent=r.shockable?'SHOCK':'NO SHOCK'; call.className='answer-call '+(r.shockable?'shock':'noshock');
     $('answer-name').textContent=r.name;
-    $('answer-do').textContent=r.shockable?'No pulse. Clear, then shock.':r.pulse?'Pulse present. Check vitals. Do not shock.':'No pulse. Resume compressions. Give epi.';
+    $('answer-do').textContent=r.shockable?'No pulse. Clear, then shock.':r.pulse?'Pulse present. Check vitals. Do not shock.':(r.look?'Showing '+r.look+'. ':'')+'No pulse. Resume compressions. Give epi.';
   }
-  drawRepChip(); $('hands-off').textContent=''; $('hands-off').classList.remove('over');
+  updateMetro(); drawRepChip(); $('hands-off').textContent=''; $('hands-off').classList.remove('over');
 }
 function drawRepChip(){
   const chip=$('rep-chip'); chip.classList.toggle('peek',peeking);
   const next=run[rep];
-  if(peeking) chip.textContent=next?next.name:'Queue done';
+  if(peeking) chip.textContent=next?(next.look?'PEA: '+next.look:next.name):'Queue done';
   else chip.textContent=phase==='finished'?'DONE':'REP '+(rep+1)+'/'+run.length;
 }
 
@@ -437,9 +488,56 @@ function getTrace(){ return traceColor||(traceColor=getComputedStyle(document.do
 let wakeLock=null;
 async function keepAwake(){ try{ if(navigator.wakeLock) wakeLock=await navigator.wakeLock.request('screen'); }catch(e){} }
 function releaseAwake(){ try{ if(wakeLock){wakeLock.release();wakeLock=null;} }catch(e){} }
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&phase!=='idle') keepAwake(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&phase!=='idle'){ keepAwake(); ensureAudio(); } });
+
+/* ── METRONOME: clicks during compressions, silent while they are held ── */
+const METRO_KEY='c2s-metronome', METRO_MIN=100, METRO_MAX=120, METRO_STEP=5;
+let metroOn=true, metroBpm=110, audioCtx=null, metroGain=null, metroNext=0, metroLive=false;
+try{ const m=JSON.parse(localStorage.getItem(METRO_KEY)||'null'); if(m){ metroOn=!!m.on; if(m.bpm>=METRO_MIN&&m.bpm<=METRO_MAX) metroBpm=m.bpm; } }catch(e){}
+function saveMetro(){ try{ localStorage.setItem(METRO_KEY,JSON.stringify({on:metroOn,bpm:metroBpm})); }catch(e){} }
+function ensureAudio(){ // call from a tap: browsers only allow sound after one
+  try{
+    if(navigator.audioSession) navigator.audioSession.type='playback'; // lets iPhone play it with the ringer on silent
+    if(!audioCtx){
+      const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      audioCtx=new AC(); metroGain=audioCtx.createGain(); metroGain.gain.value=0; metroGain.connect(audioCtx.destination);
+    }
+    if(audioCtx.state!=='running') audioCtx.resume();
+  }catch(e){}
+}
+function metroClick(at){
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type='square'; o.frequency.value=1500;
+  g.gain.setValueAtTime(0.0001,at); g.gain.exponentialRampToValueAtTime(0.7,at+0.002); g.gain.exponentialRampToValueAtTime(0.0001,at+0.045);
+  o.connect(g); g.connect(metroGain); o.start(at); o.stop(at+0.05);
+}
+function updateMetro(){
+  const live=metroOn&&(phase==='compressions'||phase==='finished');
+  if(audioCtx&&metroGain){
+    metroGain.gain.setValueAtTime(live?1:0,audioCtx.currentTime);
+    if(live&&!metroLive) metroNext=audioCtx.currentTime+0.05;
+  }
+  metroLive=live;
+  const label=metroOn?'METRO '+metroBpm:'METRO OFF', b=$('metro-mon');
+  b.textContent=label; b.classList.toggle('on',metroOn); b.setAttribute('aria-pressed',metroOn);
+  $('metro-toggle').textContent=metroOn?'On':'Off'; $('metro-toggle').classList.toggle('on',metroOn); $('metro-toggle').setAttribute('aria-pressed',metroOn);
+  $('metro-rate').textContent=metroBpm;
+  $('metro-down').disabled=metroBpm<=METRO_MIN; $('metro-up').disabled=metroBpm>=METRO_MAX;
+}
+setInterval(()=>{
+  if(!metroLive||!audioCtx||audioCtx.state!=='running') return;
+  const now=audioCtx.currentTime;
+  if(metroNext<now) metroNext=now+0.02; // catch up after the phone was locked or the tab was hidden
+  while(metroNext<now+0.12){ metroClick(metroNext); metroNext+=60/metroBpm; }
+},25);
+function toggleMetro(){ ensureAudio(); metroOn=!metroOn; saveMetro(); updateMetro(); }
+function stepMetro(d){ ensureAudio(); metroBpm=Math.max(METRO_MIN,Math.min(METRO_MAX,metroBpm+d)); saveMetro(); updateMetro(); }
 
 /* ── WIRING ── */
+$('metro-mon').onclick=e=>{e.currentTarget.blur();toggleMetro();};
+$('metro-toggle').onclick=toggleMetro;
+$('metro-down').onclick=()=>stepMetro(-METRO_STEP);
+$('metro-up').onclick=()=>stepMetro(METRO_STEP);
 $('start-btn').onclick=startRun;
 $('clear-btn').onclick=()=>{queue=[];commit();};
 $('random-btn').onclick=()=>{queue.push('random');commit();};
@@ -458,7 +556,7 @@ document.addEventListener('keydown',e=>{
 });
 if(window.ResizeObserver) new ResizeObserver(()=>{ if(!$('monitor').hidden) sizeCanvas(); }).observe($('screen'));
 
-buildPicks(); renderQueue();
+buildPicks(); renderQueue(); updateMetro();
 </script>
 
 </body></html>
